@@ -95,9 +95,13 @@ func getSubChannels(ctx *zmq.Context) (sub *zmq.Socket, chans *zmq.Channels, err
 	return sub, chans, err
 }
 
+type command struct {
+	Event string
+	Message map[string]interface{}
+}
+
 
 func getSockMessage(conn *websocket.Conn, ctx *zmq.Context, done chan<- bool) error {
-	
 	pub, err := ctx.Socket(zmq.Pub)
 	if err = pub.Connect("tcp://192.168.1.16:6112"); err != nil {
 		return err
@@ -109,14 +113,22 @@ func getSockMessage(conn *websocket.Conn, ctx *zmq.Context, done chan<- bool) er
 	
 	for {
 		messageType, p, err := conn.ReadMessage()
-		fmt.Println(messageType, string(p), err)
 		if err != nil {
 			done <- true
 			return err
 		}
 		if messageType == websocket.TextMessage {
-			msg := [][]byte{p}
-			pub.Send(msg)
+			cmd := &command{}
+			err := json.Unmarshal(p, cmd)
+			if err == nil {
+				b, _ := json.Marshal(cmd.Message)
+				msg := [][]byte{
+					[]byte(cmd.Event),
+					b,
+				}
+				pub.Send(msg)
+			}
+			
 		} else if messageType == websocket.CloseMessage || messageType == -1 {
 			done <- true
 			return nil
