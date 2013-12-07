@@ -1,13 +1,12 @@
 package controllers
 
 import (
-	"fmt"
+	"log"
 	"net/http"
 	"github.com/gorilla/websocket"
 	"github.com/vaughan0/go-zmq"
 	"encoding/json"
 )
-
 
 func HandleSocket(w http.ResponseWriter, r *http.Request) error {
 	ctx, err := zmq.NewContext()
@@ -26,7 +25,63 @@ func HandleSocket(w http.ResponseWriter, r *http.Request) error {
 	go getSubMessage(conn, ctx, quitSub)
 	<-sockIsDone
 	quitSub <- true
-	fmt.Println("finished")
+	return nil
+}
+
+func getSubMessage(conn * websocket.Conn, ctx *zmq.Context, shouldQuit <-chan bool) error {
+	requestStatus(conn, ctx)
+	sub, chans, err := getSubChannels(ctx)
+	if err != nil {
+		return err
+	}
+	defer sub.Close()
+	defer chans.Close()
+	for {
+		select {
+		case msg := <-chans.In():
+			sendMessage(conn, msg)
+		case <-shouldQuit:
+			return nil
+		case err := <-chans.Errors():
+			return err
+		}
+	}
+	return nil
+}
+
+func getSockMessage(conn *websocket.Conn, ctx *zmq.Context, done chan<- bool) error {
+	pub, err := ctx.Socket(zmq.Pub)
+	if err = pub.Connect("tcp://192.168.1.16:6112"); err != nil {
+		return err
+	}
+	defer pub.Close()
+	if err != nil {
+		return err
+	}
+	for {
+		messageType, p, err := conn.ReadMessage()
+		if err != nil {
+			done <- true
+			return err
+		}
+		if messageType == websocket.TextMessage {
+			cmd := &command{}
+			err := json.Unmarshal(p, cmd)
+			if err == nil {
+				b, _ := json.Marshal(cmd.Message)
+				msg := [][]byte{
+					[]byte(cmd.Event),
+					b,
+				}
+				pub.Send(msg)
+			} else {
+				log.Println(err)
+			}
+		} else if messageType == websocket.CloseMessage || messageType == -1 {
+			done <- true
+			return nil
+		}
+	}
 	return nil
 }
 
@@ -59,27 +114,6 @@ func requestStatus(conn * websocket.Conn, ctx *zmq.Context) error {
 	return nil
 }
 
-func getSubMessage(conn * websocket.Conn, ctx *zmq.Context, shouldQuit <-chan bool) error {
-	requestStatus(conn, ctx)
-	sub, chans, err := getSubChannels(ctx)
-	if err != nil {
-		return err
-	}
-	defer sub.Close()
-	defer chans.Close()
-	for {
-		select {
-		case msg := <-chans.In():
-			sendMessage(conn, msg)
-		case <-shouldQuit:
-			return nil
-		case err := <-chans.Errors():
-			return err
-		}
-	}
-	return nil
-}
-
 func getSubChannels(ctx *zmq.Context) (sub *zmq.Socket, chans *zmq.Channels, err error) {
 	uid := "gadgets ctrl";
 	sub, err = ctx.Socket(zmq.Sub)
@@ -100,42 +134,6 @@ type command struct {
 	Message map[string]interface{}
 }
 
-
-func getSockMessage(conn *websocket.Conn, ctx *zmq.Context, done chan<- bool) error {
-	pub, err := ctx.Socket(zmq.Pub)
-	if err = pub.Connect("tcp://192.168.1.16:6112"); err != nil {
-		return err
-	}
-	defer pub.Close()
-	if err != nil {
-		return err
-	}
-	
-	for {
-		messageType, p, err := conn.ReadMessage()
-		if err != nil {
-			done <- true
-			return err
-		}
-		if messageType == websocket.TextMessage {
-			cmd := &command{}
-			err := json.Unmarshal(p, cmd)
-			if err == nil {
-				b, _ := json.Marshal(cmd.Message)
-				msg := [][]byte{
-					[]byte(cmd.Event),
-					b,
-				}
-				pub.Send(msg)
-			}
-			
-		} else if messageType == websocket.CloseMessage || messageType == -1 {
-			done <- true
-			return nil
-		}
-	}
-	return nil
-}
 
 
 

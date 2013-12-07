@@ -37,10 +37,10 @@ func GetHome(w http.ResponseWriter, r *http.Request) {
 
 func DoLogin(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("logging in")
-	w.Header().Set("Access-Control-Allow-Origin", "http://gadgets.dyndns-ip.com")
-	w.Header().Set("Access-Control-Allow-Headers","X-Requested-With");
-	w.Header().Set("Access-Control-Allow-Methods","GET, POST");
-	w.Header().Set("Access-Control-Allow-Credentials", "true");
+	//w.Header().Set("Access-Control-Allow-Origin", "http://gadgets.dyndns-ip.com")
+	//w.Header().Set("Access-Control-Allow-Headers","X-Requested-With");
+	//w.Header().Set("Access-Control-Allow-Methods","GET, POST");
+	//w.Header().Set("Access-Control-Allow-Credentials", "true");
 	user := &models.User{}
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -60,12 +60,12 @@ func DoLogin(w http.ResponseWriter, r *http.Request) {
 	value := map[string]string{
 		"user": user.Username,
 	}
-	fmt.Println(value)
 	encoded, _ := SecureCookie.Encode("gadgets", value)
 	cookie := &http.Cookie{
 		Name:  "gadgets",
 		Value: encoded,
 		Path:  "/",
+		HttpOnly: false,
 	}
 	http.SetCookie(w, cookie)
 }
@@ -92,8 +92,8 @@ func getUserFromCookie(r *http.Request) (*models.User, error) {
 	user := &models.User{}
 	cookie, err := r.Cookie("gadgets")
 	fmt.Println("getuserfromcookie", cookie, err)
-	m := map[string]string{}
 	if err == nil {
+		m := map[string]string{}
 		err = SecureCookie.Decode("gadgets", cookie.Value, &m)
 		fmt.Println("getuserfromcookie", m, err)
 		if err == nil {
