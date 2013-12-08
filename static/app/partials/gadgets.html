@@ -9,6 +9,9 @@
       </div>
     </div>
   </div>
+  <div>
+    <select ng-model="gadget" ng-click="connect()" ng-options="g.name for g in gadgets"></select><br>
+  </div>
   <div class="row-fluid gadgets-holder">
     <h3>{{name}}</h3>
     <div>

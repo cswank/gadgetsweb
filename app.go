@@ -21,6 +21,7 @@ func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/login", Login).Methods("POST")
 	r.HandleFunc("/logout", Logout).Methods("POST")
+	r.HandleFunc("/gadgets", GetGadgets).Methods("GET")
 	r.HandleFunc("/history/locations/summary", GetSummary).Methods("GET")
 	r.HandleFunc("/history/locations/{location}/directions/{direction}/devices/{device}", GetTimeseries).Methods("GET")
 	r.HandleFunc("/socket", GetSocket)
@@ -44,17 +45,17 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	user := &models.User{}
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		http.Error(w, "bad request", http.StatusBadRequest)
+		http.Error(w, "bad request 1", http.StatusBadRequest)
 		return
 	}
 	err = json.Unmarshal(body, user)
 	if err != nil {
-		http.Error(w, "bad request", http.StatusBadRequest)
+		http.Error(w, "bad request 2", http.StatusBadRequest)
 		return
 	}
 	goodPassword, err := user.CheckPassword()
 	if !goodPassword {
-		http.Error(w, "bad request", http.StatusBadRequest)
+		http.Error(w, "bad request 3", http.StatusBadRequest)
 		return 
 	}
 	value := map[string]string{
@@ -70,6 +71,10 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, cookie)
 }
 
+func GetGadgets(w http.ResponseWriter, r *http.Request) {
+	controllers.GetGadgets(w, r)
+}
+
 func GetTimeseries(w http.ResponseWriter, r *http.Request) {
 	controllers.GetTimeseries(w, r)
 }
@@ -80,7 +85,6 @@ func GetSummary(w http.ResponseWriter, r *http.Request) {
 
 func GetSocket(w http.ResponseWriter, r *http.Request) {
 	user, err := getUserFromCookie(r)
-	fmt.Println("get socket", user, err)
 	if err == nil && user.IsAuthorized() {
 		controllers.HandleSocket(w, r)
 	} else {
@@ -91,11 +95,9 @@ func GetSocket(w http.ResponseWriter, r *http.Request) {
 func getUserFromCookie(r *http.Request) (*models.User, error) {
 	user := &models.User{}
 	cookie, err := r.Cookie("gadgets")
-	fmt.Println("getuserfromcookie", cookie, err)
 	if err == nil {
 		m := map[string]string{}
 		err = SecureCookie.Decode("gadgets", cookie.Value, &m)
-		fmt.Println("getuserfromcookie", m, err)
 		if err == nil {
 			user.Username = m["user"]
 		}

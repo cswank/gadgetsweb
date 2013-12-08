@@ -30,7 +30,7 @@ func TestSaveUser(t *testing.T) {
 	db.Query("DELETE FROM users")
 }
 
-func TestIsAuthorizedt(t *testing.T) {
+func TestIsAuthorized(t *testing.T) {
 	db, _ := getDB()
 	defer db.Close()
 	db.Query("CREATE TABLE users(username text PRIMARY KEY, password text)")

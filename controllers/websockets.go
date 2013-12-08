@@ -10,6 +10,8 @@ import (
 )
 
 func HandleSocket(w http.ResponseWriter, r *http.Request) error {
+	params := r.URL.Query()
+	host := params["host"][0]
 	ctx, err := zmq.NewContext()
 	defer ctx.Close()
 	if err != nil {
@@ -22,17 +24,16 @@ func HandleSocket(w http.ResponseWriter, r *http.Request) error {
 	}
 	quitSub := make(chan bool)
 	sockIsDone := make(chan bool)
-	go getSockMessage(conn, ctx, sockIsDone)
-	go getSubMessage(conn, ctx, quitSub)
+	go getSockMessage(conn, ctx, host, sockIsDone)
+	go getSubMessage(conn, ctx, host, quitSub)
 	<-sockIsDone
 	quitSub <- true
-	fmt.Println("exit websocket")
 	return nil
 }
 
-func getSubMessage(conn * websocket.Conn, ctx *zmq.Context, shouldQuit <-chan bool) error {
-	requestStatus(conn, ctx)
-	sub, chans, err := getSubChannels(ctx)
+func getSubMessage(conn * websocket.Conn, ctx *zmq.Context, host string, shouldQuit <-chan bool) error {
+	requestStatus(conn, ctx, host)
+	sub, chans, err := getSubChannels(ctx, host)
 	if err != nil {
 		return err
 	}
@@ -51,9 +52,9 @@ func getSubMessage(conn * websocket.Conn, ctx *zmq.Context, shouldQuit <-chan bo
 	return nil
 }
 
-func getSockMessage(conn *websocket.Conn, ctx *zmq.Context, done chan<- bool) error {
+func getSockMessage(conn *websocket.Conn, ctx *zmq.Context, host string, done chan<- bool) error {
 	pub, err := ctx.Socket(zmq.Pub)
-	if err = pub.Connect("tcp://192.168.1.16:6112"); err != nil {
+	if err = pub.Connect(fmt.Sprintf("tcp://%s:6112", host)); err != nil {
 		return err
 	}
 	defer pub.Close()
@@ -96,10 +97,10 @@ func sendMessage(conn * websocket.Conn, message [][]byte) {
 	conn.WriteMessage(websocket.TextMessage, b)
 }
 
-func requestStatus(conn * websocket.Conn, ctx *zmq.Context) error {
+func requestStatus(conn * websocket.Conn, ctx *zmq.Context, host string) error {
 	req, err := ctx.Socket(zmq.Req)
 	defer req.Close()
-	if err = req.Connect("tcp://192.168.1.16:6113"); err != nil {
+	if err = req.Connect(fmt.Sprintf("tcp://%s:6113", host)); err != nil {
 		return err
 	}
 	msg := [][]byte{[]byte("status"), []byte("{}")}
@@ -116,13 +117,13 @@ func requestStatus(conn * websocket.Conn, ctx *zmq.Context) error {
 	return nil
 }
 
-func getSubChannels(ctx *zmq.Context) (sub *zmq.Socket, chans *zmq.Channels, err error) {
+func getSubChannels(ctx *zmq.Context, host string) (sub *zmq.Socket, chans *zmq.Channels, err error) {
 	uid := "gadgets ctrl";
 	sub, err = ctx.Socket(zmq.Sub)
 	if err != nil {
 		return sub, chans, err
 	}
-	if err = sub.Connect("tcp://192.168.1.16:6111"); err != nil {
+	if err = sub.Connect(fmt.Sprintf("tcp://%s:6111", host)); err != nil {
 		return sub, chans, err
 	}
 	sub.Subscribe([]byte("UPDATE"))

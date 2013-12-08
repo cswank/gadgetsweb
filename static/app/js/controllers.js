@@ -46,6 +46,13 @@ angular.module('myApp.controllers', []).
     controller('GadgetsCtrl', ['$scope', '$http', '$timeout', '$modal', '$location', 'socket', function($scope, $http, $timeout, $modal, $location, socket) {
         var events = {};
         var promptEvent;
+
+        $http.get('/gadgets').success(function (data, status, headers, config) {
+            $scope.gadget = {'name': 'select a host', 'host': 'remove me'}
+            data.gadgets.unshift($scope.gadget);
+            $scope.gadgets = data.gadgets;
+        });
+        
         $scope.logout = function() {
             $http({
                 url: '/logout',
@@ -55,11 +62,17 @@ angular.module('myApp.controllers', []).
                 socket.close();
                 $scope.locations = {};
                 getCredentials();
-                
             }).error(function (data, status, headers, config) {
                 
             });
         }
+
+        $scope.connect = function() {
+            if ($scope.gadgets[0].host == 'remove me') {
+                $scope.gadgets.shift();
+            }
+            socket.connect($scope.gadget, getCredentials);
+        };
         var doLogin = function() {
             $http({
                 url: '/login',
@@ -67,9 +80,8 @@ angular.module('myApp.controllers', []).
                 data: JSON.stringify({username:$scope.username, password: $scope.password}),
                 headers: {'Content-Type': 'application/json'}
             }).success(function (data, status, headers, config) {
-                socket.connect(getCredentials);
+                socket.connect($scope.gadget, getCredentials);
             }).error(function (data, status, headers, config) {
-                alert("error");
             });
         };
         
@@ -122,8 +134,7 @@ angular.module('myApp.controllers', []).
             });
         });
 
-        socket.connect(getCredentials);
-
+        
 
         $scope.sendCommand = function() {
             $scope.promptShouldBeOpen = false;
@@ -148,7 +159,6 @@ angular.module('myApp.controllers', []).
             if (!$scope.promptShouldBeOpen) {
                 var commandValue = getCommandValue(value);
                 var command = $scope.commands[location][device][commandValue];
-                console.log(location, device, value, command, commandValue);
                 var msg = {event:command, message:{}};
                 socket.send(JSON.stringify(msg));
             }

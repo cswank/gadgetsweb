@@ -49,14 +49,15 @@ angular.module('myApp.services', [])
         var ws;
         var subscribeCallback;
         return {
-            connect: function(errorCallback) {
-                if(ws) { return; }
-                ws = new WebSocket("wss://gadgets.dyndns-ip.com/socket");
+            connect: function(gadget, errorCallback) {
+                if(ws) {
+                    ws.close();
+                    ws = null;
+                }
+                ws = new WebSocket("wss://gadgets.dyndns-ip.com/socket?host=" + gadget.host);
                 ws.onopen = function() {
-                    
                 };
                 ws.onerror = function() {
-                    ws = null;
                     errorCallback();
                 }
                 ws.onmessage = function(message) {
@@ -74,7 +75,6 @@ angular.module('myApp.services', [])
             },
             close: function() {
                 ws.close();
-                ws = null;
             }
         }
     }])
