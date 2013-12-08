@@ -18,20 +18,18 @@ var (
 )
 
 func main() {
-	
 	r := mux.NewRouter()
-	r.HandleFunc("/", GetHome).Methods("GET")
 	r.HandleFunc("/login", DoLogin).Methods("POST")
 	r.HandleFunc("/history/locations/summary", GetSummary).Methods("GET")
 	r.HandleFunc("/history/locations/{location}/directions/{direction}/devices/{device}", GetTimeseries).Methods("GET")
 	r.HandleFunc("/socket", GetSocket)
-
+	r.PathPrefix("/").Handler(http.FileServer(http.Dir("./static/app")))
 	http.Handle("/", r)
 	fmt.Println("listening on 0.0.0.0:8080")
 	http.ListenAndServe(":8080", nil)
 }
 
-func GetHome(w http.ResponseWriter, r *http.Request) {
+func GetClient(w http.ResponseWriter, r *http.Request) {
 	
 }
 

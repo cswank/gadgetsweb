@@ -1,0 +1,86 @@
+<div class="row-fluid">
+  <div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar-inner">
+      <div class="container">
+        <a class="brand" href="#/">Gadgets</a>
+        <a class="brand" href="#/history">History</a>
+        <a class="brand" href="#/methods">Methods</a>
+      </div>
+    </div>
+  </div>
+  <div class="row-fluid gadgets-holder">
+    <h3>{{name}}</h3>
+    <div>
+      <div class="span2">
+        <ul>
+          <li class="gadgets" ng-repeat="(location, devices) in locations">
+            <a>{{location}}</a>
+            <ul>
+              <li class="devices" ng-repeat="(device, data) in devices.input">
+                <a>{{device}}</a>
+                <!--<a class="device-value">{{data.value | number:1}}</a>-->
+                <a class="device-value">{{data.value}}</a>
+              </li>
+              <li class="devices" ng-repeat="(device, data) in devices.output">
+                <a>{{device}}</a>
+                <!--<a class="device-value">{{data.value | number:1}}</a>-->
+                <button class="device-value"
+                        ng-mousedown="getArguments(location, device, data.value)"
+                        ng-mouseup="toggle(location, device, data.value)">{{data.value}}</button>
+                <!--<a class="device-value">{{data.value}}</a>-->
+              </li>
+              <!-- <li class="devices" ng-repeat="device in outputArray(location) | orderBy:'key':true"> -->
+              <!--   <a class="device-label">{{device.key}}</a> -->
+              <!--   <button class="device-value" -->
+              <!--           ng-mousedown="getArguments(location, device.key, device.value)" -->
+              <!--           ng-mouseup="toggle(location, device.key, device.value)">{{device.value}}</button> -->
+              <!-- </li> -->
+            </ul>
+          </li>
+        </ul>
+      </div>
+      <div class="span10">
+        <ol>
+          <li ng-repeat="step in method.method">
+            <a ng-class="step.complete">{{step.step}}</a>
+          </li>
+        </ol>
+        <a>{{method.countdown}}</a>
+      </div>
+    </div>
+
+    <!-- <div modal="promptShouldBeOpen" close="closePrompt()" options="opts"> -->
+    <!--   <div class="modal-header"> -->
+    <!--     <h4>Send Command</h4> -->
+    <!--   </div> -->
+    <!--   <div class="modal-footer"> -->
+    <!--     <form> -->
+    <!--       <div class="left"> -->
+    <!--         <a>{{currentCommand}} {{commandArgument}}</a> -->
+    <!--       </div> -->
+    <!--       <input ng-model="commandArgument"/>  -->
+    <!--       <button class="btn btn-warning cancel" ng-click="sendCommand()">Send</button> -->
+    <!--       <button class="btn btn-warning cancel" ng-click="closePrompt()">Cancel</button> -->
+    <!--     </form> -->
+    <!--   </div> -->
+    <!-- </div> -->
+
+    
+    
+    <!-- <div modal="arbitraryPromptShouldBeOpen" close="closeArbitraryPrompt()" options="opts"> -->
+    <!--   <div class="modal-header"> -->
+    <!--     <h4>Send Arbitrary Command</h4> -->
+    <!--   </div> -->
+    <!--   <div class="modal-footer"> -->
+    <!--     <form> -->
+    <!--       <div class="left"> -->
+    <!--         <input ng-model="arbitraryCommand"/> -->
+    <!--         <button class="btn btn-warning cancel" ng-click="sendArbitraryCommand()">Send</button> -->
+    <!--         <button class="btn btn-warning cancel" ng-click="closeArbitraryPrompt()">Cancel</button> -->
+    <!--     </form> -->
+    <!--     </div> -->
+    <!--   </div> -->
+    <!-- </div> -->
+  </div>
+</div>
+
