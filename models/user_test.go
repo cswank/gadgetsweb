@@ -27,7 +27,7 @@ func TestSaveUser(t *testing.T) {
 	if pw != string(u.HashedPassword) {
 		t.Error(pw)
 	}
-	//db.Query("DELETE FROM users")
+	db.Query("DELETE FROM users")
 }
 
 func TestIsAuthorizedt(t *testing.T) {
