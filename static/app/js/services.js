@@ -72,6 +72,10 @@ angular.module('myApp.services', [])
             subscribe: function(callback) {
                 subscribeCallback = callback;
             },
+            close: function() {
+                ws.close();
+                ws = null;
+            }
         }
     }])
     .value('version', '0.1')

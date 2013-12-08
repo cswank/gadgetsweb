@@ -9,6 +9,28 @@ angular.module('myApp.directives', []).
             elm.text(version);
         };
     }])
+    .directive('ngEnter', function () {
+        return function (scope, element, attrs) {
+            element.bind("keydown keypress", function (event) {
+                if(event.which === 13) {
+                    scope.$apply(function (){
+                        scope.$eval(attrs.ngEnter);
+                    });
+                    
+                    event.preventDefault();
+                }
+            });
+        };
+    })
+    .directive('focusMe', function ($timeout) {    
+        return {    
+            link: function (scope, element, attrs, model) {                
+                $timeout(function () {
+                    element[0].focus();
+                });
+            }
+        };
+    })
     .directive('chart', function () {
 	return {
 	    restrict: 'E',

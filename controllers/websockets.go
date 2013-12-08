@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"github.com/gorilla/websocket"
@@ -25,6 +26,7 @@ func HandleSocket(w http.ResponseWriter, r *http.Request) error {
 	go getSubMessage(conn, ctx, quitSub)
 	<-sockIsDone
 	quitSub <- true
+	fmt.Println("exit websocket")
 	return nil
 }
 

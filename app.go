@@ -19,7 +19,8 @@ var (
 
 func main() {
 	r := mux.NewRouter()
-	r.HandleFunc("/login", DoLogin).Methods("POST")
+	r.HandleFunc("/login", Login).Methods("POST")
+	r.HandleFunc("/logout", Logout).Methods("POST")
 	r.HandleFunc("/history/locations/summary", GetSummary).Methods("GET")
 	r.HandleFunc("/history/locations/{location}/directions/{direction}/devices/{device}", GetTimeseries).Methods("GET")
 	r.HandleFunc("/socket", GetSocket)
@@ -29,16 +30,17 @@ func main() {
 	http.ListenAndServe(":8080", nil)
 }
 
-func GetClient(w http.ResponseWriter, r *http.Request) {
-	
+func Logout(w http.ResponseWriter, r *http.Request) {
+	cookie := &http.Cookie{
+		Name:  "gadgets",
+		Value: "",
+		Path:  "/",
+		MaxAge: -1,
+	}
+	http.SetCookie(w, cookie)
 }
 
-func DoLogin(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("logging in")
-	//w.Header().Set("Access-Control-Allow-Origin", "http://gadgets.dyndns-ip.com")
-	//w.Header().Set("Access-Control-Allow-Headers","X-Requested-With");
-	//w.Header().Set("Access-Control-Allow-Methods","GET, POST");
-	//w.Header().Set("Access-Control-Allow-Credentials", "true");
+func Login(w http.ResponseWriter, r *http.Request) {
 	user := &models.User{}
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {

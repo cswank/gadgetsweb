@@ -46,6 +46,20 @@ angular.module('myApp.controllers', []).
     controller('GadgetsCtrl', ['$scope', '$http', '$timeout', '$modal', '$location', 'socket', function($scope, $http, $timeout, $modal, $location, socket) {
         var events = {};
         var promptEvent;
+        $scope.logout = function() {
+            $http({
+                url: '/logout',
+                method: "POST",
+                headers: {'Content-Type': 'application/json'}
+            }).success(function (data, status, headers, config) {
+                socket.close();
+                $scope.locations = {};
+                getCredentials();
+                
+            }).error(function (data, status, headers, config) {
+                
+            });
+        }
         var doLogin = function() {
             $http({
                 url: '/login',
@@ -61,7 +75,7 @@ angular.module('myApp.controllers', []).
         
         var getCredentials = function() {
             var dlg = $modal.open({
-                templateUrl: '/dialogs/login.html',
+                templateUrl: '/dialogs/login.html?c=' + new Date().getTime(),
                 controller: LoginCtrl,
                 backdrop: false
             });
