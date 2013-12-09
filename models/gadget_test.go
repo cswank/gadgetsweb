@@ -8,7 +8,6 @@ import (
 func TestSaveGadget(t *testing.T) {
 	db, _ := getDB()
 	defer db.Close()
-	db.Query("CREATE TABLE gadgets(name text PRIMARY KEY, host text)")
 	db.Query("DELETE FROM gadgets")
 	g := Gadget{
 		Name: "brewery",
@@ -36,7 +35,6 @@ func TestSaveGadget(t *testing.T) {
 func TestGetGadgets(t *testing.T) {
 	db, _ := getDB()
 	defer db.Close()
-	db.Query("CREATE TABLE gadgets(name text PRIMARY KEY, host text)")
 	db.Query("DELETE FROM gadgets")
 	g := Gadget{
 		Name: "brewery",

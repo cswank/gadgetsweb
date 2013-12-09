@@ -40,7 +40,7 @@ var MethodCtrl = function($scope, $modalInstance, method) {
     $scope.method = method;
     var rawMethod = "";
     for (var i in method.method) {
-        rawMethod += method[i].step;
+        rawMethod += method.method[i].step + "\n";
     }
     $scope.rawMethod = rawMethod;
     
@@ -69,13 +69,15 @@ angular.module('myApp.controllers', []).
                 var rawMethod = data.methods[i];
                 var method = [];
                 for (var j in rawMethod.steps) {
-                    method.push({step: rawMethod.steps[j], complete:false})
+                    method.push({id: rawMethod.id, step: rawMethod.steps[j], complete:false})
                 }
-                methods.push({name: rawMethod.name, method:method});
+                methods.push({id: rawMethod.id, name: rawMethod.name, method:method});
             }
             $scope.method = {'name': 'select a method', 'steps': []}
             methods.unshift($scope.method);
             $scope.methods = {methods: methods};
+            console.log($scope.methods);
+            
         });
 
         $http.get('/gadgets').success(function (data, status, headers, config) {
@@ -94,18 +96,28 @@ angular.module('myApp.controllers', []).
         };
 
         var saveMethod = function() {
-            var method = []
             var method = [];
             for (var i in $scope.method.method) {
                 method.push($scope.method.method[i].step);
             }
+            var url, httpMethod, data
+            if ($scope.method.id != undefined && $scope.method.id > 0) {
+                url = '/methods/' + $scope.method.id.toString();
+                httpMethod = 'PUT'
+                data = {id: $scope.method.id, name: $scope.method.name, steps:method};
+            } else {
+                url = '/methods';
+                httpMethod = 'POST'
+                data = {name: $scope.method.name, steps:method};
+            }
+            console.log(url, method, data);
             $http({
-                url: '/methods',
-                method: "POST",
-                data: JSON.stringify({name: $scope.method.name, steps:method}),
+                url: url,
+                method: httpMethod,
+                data: JSON.stringify(data),
                 headers: {'Content-Type': 'application/json'}
             }).success(function (data, status, headers, config) {
-                
+                console.log(data, status);
             }).error(function (data, status, headers, config) {
                 
             });
