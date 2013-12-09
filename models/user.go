@@ -1,11 +1,8 @@
 package models
 
 import (
-	"os"
 	"errors"
 	"code.google.com/p/go.crypto/bcrypt"
-	"database/sql"
-	_ "code.google.com/p/go-sqlite/go1/sqlite3"
 )
 
 var (
@@ -78,7 +75,4 @@ func (u *User)getHashedPassword() error {
 	return err
 }
 
-func getDB() (*sql.DB, error) {
-	return sql.Open("sqlite3", os.Getenv("GADGETSDB"))
-}
 

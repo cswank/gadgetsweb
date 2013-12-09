@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"fmt"
 	"net/http"
 	"encoding/json"
@@ -22,6 +23,9 @@ func main() {
 	r.HandleFunc("/login", Login).Methods("POST")
 	r.HandleFunc("/logout", Logout).Methods("POST")
 	r.HandleFunc("/gadgets", GetGadgets).Methods("GET")
+	r.HandleFunc("/methods", GetMethods).Methods("GET")
+	r.HandleFunc("/methods", AddMethod).Methods("POST")
+	r.HandleFunc("/methods/{methodId}", UpdateMethod).Methods("PUT")
 	r.HandleFunc("/history/locations/summary", GetSummary).Methods("GET")
 	r.HandleFunc("/history/locations/{location}/directions/{direction}/devices/{device}", GetTimeseries).Methods("GET")
 	r.HandleFunc("/socket", GetSocket)
@@ -73,6 +77,36 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 func GetGadgets(w http.ResponseWriter, r *http.Request) {
 	controllers.GetGadgets(w, r)
+}
+
+func GetMethods(w http.ResponseWriter, r *http.Request) {
+	err := controllers.GetMethods(w, r)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+func AddMethod(w http.ResponseWriter, r *http.Request) {
+	user, err := getUserFromCookie(r)
+	if err == nil && user.IsAuthorized() {
+		err = controllers.AddMethod(w, r)
+		if err != nil {
+			log.Println(err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	} else {
+		http.Error(w, "Not Authorized", http.StatusUnauthorized)
+	}
+}
+
+func UpdateMethod(w http.ResponseWriter, r *http.Request) {
+	user, err := getUserFromCookie(r)
+	if err == nil && user.IsAuthorized() {
+		controllers.UpdateMethod(w, r)
+	} else {
+		http.Error(w, "Not Authorized", http.StatusUnauthorized)
+	}
 }
 
 func GetTimeseries(w http.ResponseWriter, r *http.Request) {

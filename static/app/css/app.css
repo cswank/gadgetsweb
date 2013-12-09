@@ -1,6 +1,8 @@
 /* app css stylesheet */
 
-/* app css stylesheet */
+body {
+    padding-left: 40px;
+}
 
 .menu {
   list-style: none;
@@ -36,13 +38,11 @@
 }
 
 .gadgets-holder {
-    margin-top:50px;
+
 }
 
 #method-holder {
-    margin-top:50px;
-    width: 300px;
-    float:right;
+
 }
 
 li.gadgets {
