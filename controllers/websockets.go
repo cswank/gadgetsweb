@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"bitbucket.com/cswank/gogadgets"
 	"github.com/gorilla/websocket"
 	"github.com/vaughan0/go-zmq"
 	"encoding/json"
@@ -32,13 +33,13 @@ func HandleSocket(w http.ResponseWriter, r *http.Request) error {
 }
 
 func getSubMessage(conn * websocket.Conn, ctx *zmq.Context, host string, shouldQuit <-chan bool) error {
-	requestStatus(conn, ctx, host)
 	sub, chans, err := getSubChannels(ctx, host)
 	if err != nil {
 		return err
 	}
 	defer sub.Close()
 	defer chans.Close()
+	
 	for {
 		select {
 		case msg := <-chans.In():
@@ -52,15 +53,24 @@ func getSubMessage(conn * websocket.Conn, ctx *zmq.Context, host string, shouldQ
 	return nil
 }
 
+func requestStatus(pub *zmq.Socket) {
+	msg := gogagets.Message{
+		Type: gogadgets.COMMAND,
+		Body: "status",
+	}
+	pub.Send(msg)
+}
+
 func getSockMessage(conn *websocket.Conn, ctx *zmq.Context, host string, done chan<- bool) error {
 	pub, err := ctx.Socket(zmq.Pub)
-	if err = pub.Connect(fmt.Sprintf("tcp://%s:6112", host)); err != nil {
+	if err = pub.Connect(fmt.Sprintf("tcp://%s:6111", host)); err != nil {
 		return err
 	}
 	defer pub.Close()
 	if err != nil {
 		return err
 	}
+	requestStatus(pub)
 	for {
 		messageType, p, err := conn.ReadMessage()
 		if err != nil {
@@ -97,37 +107,17 @@ func sendMessage(conn * websocket.Conn, message [][]byte) {
 	conn.WriteMessage(websocket.TextMessage, b)
 }
 
-func requestStatus(conn * websocket.Conn, ctx *zmq.Context, host string) error {
-	req, err := ctx.Socket(zmq.Req)
-	defer req.Close()
-	if err = req.Connect(fmt.Sprintf("tcp://%s:6113", host)); err != nil {
-		return err
-	}
-	msg := [][]byte{[]byte("status"), []byte("{}")}
-	req.Send(msg)
-	response, err := req.Recv()
-	if err != nil {
-		return err
-	}
-	sendMessage(conn, response)
-	msg = [][]byte{[]byte("commands"), []byte("{}")}
-	req.Send(msg)
-	response, err = req.Recv()
-	sendMessage(conn, response)
-	return nil
-}
-
 func getSubChannels(ctx *zmq.Context, host string) (sub *zmq.Socket, chans *zmq.Channels, err error) {
 	uid := "gadgets ctrl";
 	sub, err = ctx.Socket(zmq.Sub)
 	if err != nil {
 		return sub, chans, err
 	}
-	if err = sub.Connect(fmt.Sprintf("tcp://%s:6111", host)); err != nil {
+	if err = sub.Connect(fmt.Sprintf("tcp://%s:6112", host)); err != nil {
 		return sub, chans, err
 	}
-	sub.Subscribe([]byte("UPDATE"))
-	sub.Subscribe([]byte(uid))
+	sub.Subscribe([]byte("update"))
+	sub.Subscribe([]byte("status"))
 	chans = sub.Channels()
 	return sub, chans, err
 }

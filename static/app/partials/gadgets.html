@@ -20,7 +20,7 @@
           <li class="gadgets" ng-repeat="(location, devices) in locations">
             <a>{{location}}</a>
             <ul>
-              <li class="devices" ng-repeat="(device, data) in devices.input">
+              <li class="devices" ng-repeat="(device, data) in devices">
                 <a>{{device}}</a>
                 <!--<a class="device-value">{{data.value | number:1}}</a>-->
                 <a class="device-value">{{data.value}}</a>

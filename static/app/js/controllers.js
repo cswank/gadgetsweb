@@ -63,20 +63,20 @@ angular.module('myApp.controllers', []).
     controller('GadgetsCtrl', ['$scope', '$http', '$timeout', '$modal', '$location', 'socket', function($scope, $http, $timeout, $modal, $location, socket) {
         var events = {};
         var promptEvent;
-        $http.get('/methods').success(function (data, status, headers, config) {
-            var methods = [];
-            for (var i in data.methods) {
-                var rawMethod = data.methods[i];
-                var method = [];
-                for (var j in rawMethod.steps) {
-                    method.push({step: rawMethod.steps[j], complete:false})
-                }
-                methods.push({name: rawMethod.name, method:method});
-            }
-            $scope.method = {'name': 'select a method', 'steps': []}
-            methods.unshift($scope.method);
-            $scope.methods = {methods: methods};
-        });
+        // $http.get('/methods').success(function (data, status, headers, config) {
+        //     var methods = [];
+        //     for (var i in data.methods) {
+        //         var rawMethod = data.methods[i];
+        //         var method = [];
+        //         for (var j in rawMethod.steps) {
+        //             method.push({step: rawMethod.steps[j], complete:false})
+        //         }
+        //         methods.push({name: rawMethod.name, method:method});
+        //     }
+        //     $scope.method = {'name': 'select a method', 'steps': []}
+        //     methods.unshift($scope.method);
+        //     $scope.methods = {methods: methods};
+        // });
 
         $http.get('/gadgets').success(function (data, status, headers, config) {
             $scope.gadget = {'name': 'select a host', 'host': 'remove me'}
@@ -198,9 +198,14 @@ angular.module('myApp.controllers', []).
         }
 
         socket.subscribe(function (event, message) {
+            console.log(message);
             $scope.$apply(function() {
-                if (event == "UPDATE" || event == "status") {
+                if (event == "update" || event == "status") {
                     $scope.locations = message.locations;
+                    if ($scope.locations[message.location] == undefined) {
+                        $scope.locations[message.location] = {}
+                    }
+                    $scope.locations[message.location][message.name] = message.value
                     for (var locationKey in message.locations) {
                         var location = message.locations[locationKey];
                         for (var deviceKey in location.output) {
