@@ -48,12 +48,22 @@
       </div>
       <div class="span9">
         <div>
-          <select ng-model="method" ng-click="loadMethod()" ng-options="m.name for m in methods.methods"></select><br>
+          <select
+             ng-model="method"
+             ng-click="clearDummyMethod()"
+             ng-options="m.name for m in methods">
+          </select>
+          <br>
         </div>
-        <a href="" ng-click="addMethod()">add method</a>
-        <a href="" ng-click="runMethod()">run method</a>
+        <span ng-if="method.steps.length==0">
+          <a href="" ng-click="addMethod()">add method</a>
+        </span>
+        <span ng-if="method.steps.length>0">
+          <a href="" ng-click="addMethod()">edit method</a>
+          <a href="" ng-click="runMethod()">run method</a>
+        </span>
         <ol>
-          <li ng-repeat="step in method.method">
+          <li ng-repeat="step in method.steps">
             <a ng-class="step.complete">{{step.step}}</a>
           </li>
         </ol>

@@ -1,30 +1,11 @@
 package models
 
 import (
-	"time"
 	"os"
 	"database/sql"
 	_ "code.google.com/p/go-sqlite/go1/sqlite3"
 	"bitbucket.com/cswank/gadgetsweb/utils"
 )
-
-type Device struct {
-	Units string      `json:"units"`
-	Value interface{} `json:"value"`
-	ID    string      `json:"id"`
-}
-
-type Location struct {
-	Input  map[string]Device `json:"input"`
-	Output map[string]Device `json:"output"`
-}
-
-type Gadgets struct {
-	Sender      string      `json:"sender"`
-	Timestamp   time.Time   `json:"timestamp"`
-	Name        string      `json:"name"`
-	Locations   map[string]Location    `json:"locations"`
-}
 
 type Timeseries struct {
 	Name     string              `json:"name"`

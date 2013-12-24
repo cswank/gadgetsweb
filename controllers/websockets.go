@@ -28,6 +28,7 @@ func HandleSocket(w http.ResponseWriter, r *http.Request) error {
 	go getSubMessage(conn, ctx, host, quitSub)
 	<-sockIsDone
 	quitSub <- true
+	fmt.Println("sock exiting")
 	return nil
 }
 
@@ -46,6 +47,7 @@ func getSubMessage(conn * websocket.Conn, ctx *zmq.Context, host string, shouldQ
 		case <-shouldQuit:
 			return nil
 		case err := <-chans.Errors():
+			log.Println("get sub err", err)
 			return err
 		}
 	}
@@ -64,6 +66,7 @@ func getSockMessage(conn *websocket.Conn, ctx *zmq.Context, host string, done ch
 	for {
 		messageType, p, err := conn.ReadMessage()
 		if err != nil {
+			log.Println("get sock err", err)
 			done <- true
 			return err
 		}

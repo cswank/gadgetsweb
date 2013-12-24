@@ -61,35 +61,32 @@ var MethodCtrl = function($scope, $modalInstance, method) {
 
 angular.module('myApp.controllers', []).
     controller('GadgetsCtrl', ['$scope', '$http', '$timeout', '$modal', '$location', 'socket', function($scope, $http, $timeout, $modal, $location, socket) {
+        $scope.gadget = {'name': 'select a host', 'host': 'remove me'}
+        $scope.method = {'name': 'select a method', 'steps': []}
         var events = {};
         var promptEvent;
         $http.get('/methods').success(function (data, status, headers, config) {
-            var methods = [];
+            $scope.methods = [$scope.method];
             for (var i in data.methods) {
                 var rawMethod = data.methods[i];
-                var method = [];
+                var steps = [];
                 for (var j in rawMethod.steps) {
-                    method.push({id: rawMethod.id, step: rawMethod.steps[j], complete:false})
+                    steps.push({id: rawMethod.id, step:rawMethod.steps[j], complete:false})
                 }
-                methods.push({id: rawMethod.id, name: rawMethod.name, method:method});
+                $scope.methods.push({id: rawMethod.id, name: rawMethod.name, steps: steps});
             }
-            $scope.method = {'name': 'select a method', 'steps': []}
-            methods.unshift($scope.method);
-            $scope.methods = {methods: methods};
             console.log($scope.methods);
-            
         });
 
         $http.get('/gadgets').success(function (data, status, headers, config) {
-            $scope.gadget = {'name': 'select a host', 'host': 'remove me'}
             data.gadgets.unshift($scope.gadget);
             $scope.gadgets = data.gadgets;
         });
 
         $scope.runMethod = function() {
             var method = [];
-            for (var i in $scope.method.method) {
-                method.push($scope.method.method[i].step);
+            for (var i in $scope.method.steps) {
+                method.push($scope.method.steps[i].step);
             }
             var msg = {event: 'method', 'message': {method:method}};
             socket.send(JSON.stringify(msg));
@@ -98,7 +95,7 @@ angular.module('myApp.controllers', []).
         var saveMethod = function() {
             var method = [];
             for (var i in $scope.method.method) {
-                method.push($scope.method.method[i].step);
+                method.push($scope.method.steps[i].step);
             }
             var url, httpMethod, data
             if ($scope.method.id != undefined && $scope.method.id > 0) {
@@ -110,7 +107,6 @@ angular.module('myApp.controllers', []).
                 httpMethod = 'POST'
                 data = {name: $scope.method.name, steps:method};
             }
-            console.log(url, method, data);
             $http({
                 url: url,
                 method: httpMethod,
@@ -155,10 +151,12 @@ angular.module('myApp.controllers', []).
             });
         }
 
-        $scope.loadMethod = function() {
-            if ($scope.methods.methods[0].name == 'select a method') {
-                $scope.methods.methods.shift();
+        $scope.clearDummyMethod = function() {
+            console.log($scope.methods);
+            if ($scope.methods[0].name == 'select a method') {
+                $scope.methods.shift();
             }
+            console.log($scope.methods);
         };
 
         $scope.connect = function() {
@@ -231,7 +229,7 @@ angular.module('myApp.controllers', []).
                         }
                         countdown = (method.countdown > 0) ? 'countdown: ' + method.countdown.toString() : ''
                         $scope.method.step =  method.step;
-                        $scope.method.method =  steps;
+                        $scope.method.steps =  steps;
                         $scope.method.countdown = countdown;
                     }
                 }
