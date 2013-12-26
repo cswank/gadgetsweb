@@ -23,19 +23,26 @@
           <li class="gadgets" ng-repeat="(location, devices) in locations">
             <a>{{location}}</a>
             <ul>
-              <li class="devices" ng-repeat="(device, data) in devices.input">
+              <li class="devices" ng-repeat="(device, data) in devices">
                 <a>{{device}}</a>
                 <!--<a class="device-value">{{data.value | number:1}}</a>-->
-                <a class="device-value">{{data.value}}</a>
+                <span ng-if="data.info.direction == 'input'">
+                  <a class="device-value">{{data.value.value}}</a>
+                </span>
+                <span ng-if="data.info.direction == 'output'">
+                  <button class="device-value"
+                          ng-mousedown="getArguments(data)"
+                          ng-mouseup="toggle(data)">{{data.value.value}}</button>
+                </span>
               </li>
-              <li class="devices" ng-repeat="(device, data) in devices.output">
-                <a>{{device}}</a>
-                <!--<a class="device-value">{{data.value | number:1}}</a>-->
-                <button class="device-value"
-                        ng-mousedown="getArguments(location, device, data.value)"
-                        ng-mouseup="toggle(location, device, data.value)">{{data.value}}</button>
-                <!--<a class="device-value">{{data.value}}</a>-->
-              </li>
+              <!-- <li class="devices" ng-repeat="(device, data) in devices.output"> -->
+              <!--   <a>{{device}}</a> -->
+              <!--   <\!--<a class="device-value">{{data.value | number:1}}</a>-\-> -->
+              <!--   <button class="device-value" -->
+              <!--           ng-mousedown="getArguments(location, device, data.value)" -->
+              <!--           ng-mouseup="toggle(location, device, data.value)">{{data.value}}</button> -->
+              <!--   <\!--<a class="device-value">{{data.value}}</a>-\-> -->
+              <!-- </li> -->
               <!-- <li class="devices" ng-repeat="device in outputArray(location) | orderBy:'key':true"> -->
               <!--   <a class="device-label">{{device.key}}</a> -->
               <!--   <button class="device-value" -->

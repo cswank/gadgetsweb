@@ -65,18 +65,18 @@ angular.module('myApp.controllers', []).
         $scope.method = {'name': 'select a method', 'steps': []}
         var events = {};
         var promptEvent;
-        $http.get('/methods').success(function (data, status, headers, config) {
-            $scope.methods = [$scope.method];
-            for (var i in data.methods) {
-                var rawMethod = data.methods[i];
-                var steps = [];
-                for (var j in rawMethod.steps) {
-                    steps.push({id: rawMethod.id, step:rawMethod.steps[j], complete:false})
-                }
-                $scope.methods.push({id: rawMethod.id, name: rawMethod.name, steps: steps});
-            }
-            console.log($scope.methods);
-        });
+        // $http.get('/methods').success(function (data, status, headers, config) {
+        //     $scope.methods = [$scope.method];
+        //     for (var i in data.methods) {
+        //         var rawMethod = data.methods[i];
+        //         var steps = [];
+        //         for (var j in rawMethod.steps) {
+        //             steps.push({id: rawMethod.id, step:rawMethod.steps[j], complete:false})
+        //         }
+        //         $scope.methods.push({id: rawMethod.id, name: rawMethod.name, steps: steps});
+        //     }
+        //     console.log($scope.methods);
+        // });
 
         $http.get('/gadgets').success(function (data, status, headers, config) {
             data.gadgets.unshift($scope.gadget);
@@ -206,39 +206,36 @@ angular.module('myApp.controllers', []).
             }
             return commandValue;
         }
-
+        $scope.locations = {};
         socket.subscribe(function (event, message) {
             $scope.$apply(function() {
-                if (event == "UPDATE" || event == "status") {
-                    $scope.locations = message.locations;
-                    for (var locationKey in message.locations) {
-                        var location = message.locations[locationKey];
-                        for (var deviceKey in location.output) {
-                            var device = location.output[deviceKey];
-                            device.key = deviceKey;
-                        }
+                if (event == "status") {
+                    if ($scope.locations[message.location] == undefined) {
+                        $scope.locations[message.location] = {};
                     }
-                    var method = message.method;
-                    if (method != undefined && method.method != undefined && method.method.length > 0) {
-                        var step, countdown;
-                        var steps = [];
-                        for (var i=0; i < method.method.length; i++) {
-                            step = {step: method.method[i]};
-                            step.complete = (i < method.step) ? 'step-complete' : 'step-incomplete';
-                            steps.push(step);
-                        }
-                        countdown = (method.countdown > 0) ? 'countdown: ' + method.countdown.toString() : ''
-                        $scope.method.step =  method.step;
-                        $scope.method.steps =  steps;
-                        $scope.method.countdown = countdown;
+                    if ($scope.locations[message.location][message.name] == undefined) {
+                        $scope.locations[message.location][message.name] = {};
                     }
-                }
-                else if (event == "commands") {
-                    $scope.commands = message;
+                    $scope.locations[message.location][message.name] = message;
+                } else if (event == "update") {
+                    $scope.locations[message.location][message.name]['value'] = message.value;
+                    // var method = message.method;
+                    // if (method != undefined && method.method != undefined && method.method.length > 0) {
+                    //     var step, countdown;
+                    //     var steps = [];
+                    //     for (var i=0; i < method.method.length; i++) {
+                    //         step = {step: method.method[i]};
+                    //         step.complete = (i < method.step) ? 'step-complete' : 'step-incomplete';
+                    //         steps.push(step);
+                    //     }
+                    //     countdown = (method.countdown > 0) ? 'countdown: ' + method.countdown.toString() : ''
+                    //     $scope.method.step =  method.step;
+                    //     $scope.method.steps =  steps;
+                    //     $scope.method.countdown = countdown;
+                    // }
                 }
             });
         });
-
         $scope.sendCommand = function() {
             $scope.promptShouldBeOpen = false;
             var command = $scope.currentCommand + $scope.commandArgument;
@@ -248,7 +245,7 @@ angular.module('myApp.controllers', []).
             $scope.commandArgument = null;
         };
 
-        $scope.getArguments = function(location, device, value) {
+        $scope.getArguments = function(device) {
             promptEvent = $timeout(function() {
                 var commandValue = getCommandValue(value);
                 $scope.currentCommand = events[location][device][commandValue];
@@ -256,13 +253,16 @@ angular.module('myApp.controllers', []).
             }, 1000);
         };
 
-        $scope.toggle = function(location, device, value) {
-            
+        $scope.toggle = function(device) {
             $timeout.cancel(promptEvent);
             if (!$scope.promptShouldBeOpen) {
-                var commandValue = getCommandValue(value);
-                var command = $scope.commands[location][device][commandValue];
-                var msg = {event:command, message:{}};
+                var command;
+                if (!device.value.value) {
+                    command = device.info.on;
+                } else {
+                    command = device.info.off;
+                }
+                var msg = {event:'command', message:{type:'command', body:command}};
                 socket.send(JSON.stringify(msg));
             }
         };
