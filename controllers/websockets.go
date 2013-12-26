@@ -34,6 +34,7 @@ func HandleSocket(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
+
 func getSubMessage(conn *websocket.Conn, ctx *zmq.Context, host string, shouldQuit <-chan bool) error {
 	sub, chans, err := getSubChannels(ctx, host)
 	if err != nil {
@@ -137,8 +138,3 @@ type command struct {
 	Event string
 	Message map[string]interface{}
 }
-
-
-
-
-
