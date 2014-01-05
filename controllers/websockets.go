@@ -53,10 +53,10 @@ func getSubMessage(conn * websocket.Conn, ctx *zmq.Context, host string, shouldQ
 	return nil
 }
 
-func requestStatus(pub *zmq.Socket) {
+func requestUpdates(pub *zmq.Socket) {
 	msg := gogagets.Message{
 		Type: gogadgets.COMMAND,
-		Body: "status",
+		Body: "update",
 	}
 	pub.Send(msg)
 }
@@ -70,7 +70,7 @@ func getSockMessage(conn *websocket.Conn, ctx *zmq.Context, host string, done ch
 	if err != nil {
 		return err
 	}
-	requestStatus(pub)
+	requestUpdates(pub)
 	for {
 		messageType, p, err := conn.ReadMessage()
 		if err != nil {
@@ -117,7 +117,6 @@ func getSubChannels(ctx *zmq.Context, host string) (sub *zmq.Socket, chans *zmq.
 		return sub, chans, err
 	}
 	sub.Subscribe([]byte("update"))
-	sub.Subscribe([]byte("status"))
 	chans = sub.Channels()
 	return sub, chans, err
 }
