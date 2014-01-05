@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	"time"
 	"log"
 	"net/http"
 	"bitbucket.com/cswank/gogadgets"
@@ -29,10 +30,12 @@ func HandleSocket(w http.ResponseWriter, r *http.Request) error {
 	go getSubMessage(conn, ctx, host, quitSub)
 	<-sockIsDone
 	quitSub <- true
+	fmt.Println("sock exiting")
 	return nil
 }
 
-func getSubMessage(conn * websocket.Conn, ctx *zmq.Context, host string, shouldQuit <-chan bool) error {
+
+func getSubMessage(conn *websocket.Conn, ctx *zmq.Context, host string, shouldQuit <-chan bool) error {
 	sub, chans, err := getSubChannels(ctx, host)
 	if err != nil {
 		return err
@@ -47,6 +50,7 @@ func getSubMessage(conn * websocket.Conn, ctx *zmq.Context, host string, shouldQ
 		case <-shouldQuit:
 			return nil
 		case err := <-chans.Errors():
+			log.Println("get sub err", err)
 			return err
 		}
 	}
@@ -70,10 +74,12 @@ func getSockMessage(conn *websocket.Conn, ctx *zmq.Context, host string, done ch
 	if err != nil {
 		return err
 	}
-	requestUpdates(pub)
+	time.Sleep(100 * time.Millisecond)
+	requestStatus(pub)
 	for {
 		messageType, p, err := conn.ReadMessage()
 		if err != nil {
+			log.Println("get sock err", err)
 			done <- true
 			return err
 		}
@@ -107,8 +113,21 @@ func sendMessage(conn * websocket.Conn, message [][]byte) {
 	conn.WriteMessage(websocket.TextMessage, b)
 }
 
+func requestStatus(pub *zmq.Socket) {
+	fmt.Println("request status")
+	msg := gogadgets.Message{
+		Type: gogadgets.COMMAND,
+		Body: "status",
+        }
+	b, _ := json.Marshal(&msg)
+        pub.Send([][]byte{
+		[]byte(msg.Type),
+		b,
+	})
+}
+
 func getSubChannels(ctx *zmq.Context, host string) (sub *zmq.Socket, chans *zmq.Channels, err error) {
-	uid := "gadgets ctrl";
+	//uid := "gadgets ctrl";
 	sub, err = ctx.Socket(zmq.Sub)
 	if err != nil {
 		return sub, chans, err
@@ -117,6 +136,7 @@ func getSubChannels(ctx *zmq.Context, host string) (sub *zmq.Socket, chans *zmq.
 		return sub, chans, err
 	}
 	sub.Subscribe([]byte("update"))
+	sub.Subscribe([]byte("info"))
 	chans = sub.Channels()
 	return sub, chans, err
 }
@@ -125,8 +145,3 @@ type command struct {
 	Event string
 	Message map[string]interface{}
 }
-
-
-
-
-

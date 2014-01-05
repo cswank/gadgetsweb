@@ -93,7 +93,7 @@ func GetMethods(w http.ResponseWriter, r *http.Request) {
 func AddMethod(w http.ResponseWriter, r *http.Request) {
 	user, err := getUserFromCookie(r)
 	if err == nil && user.IsAuthorized() {
-		err = controllers.AddMethod(w, r)
+		err = controllers.SaveMethod(w, r)
 		if err != nil {
 			log.Println(err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -104,9 +104,14 @@ func AddMethod(w http.ResponseWriter, r *http.Request) {
 }
 
 func UpdateMethod(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("update method")
 	user, err := getUserFromCookie(r)
 	if err == nil && user.IsAuthorized() {
-		controllers.UpdateMethod(w, r)
+		controllers.SaveMethod(w, r)
+		if err != nil {
+			log.Println(err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
 	} else {
 		http.Error(w, "Not Authorized", http.StatusUnauthorized)
 	}

@@ -22,6 +22,26 @@ type timeseriesVars struct {
 	end time.Time
 }
 
+type Device struct {
+	Units string      `json:"units"`
+	Value interface{} `json:"value"`
+	ID    string      `json:"id"`
+}
+
+type Location struct {
+	Input  map[string]Device `json:"input"`
+	Output map[string]Device `json:"output"`
+}
+
+type Message struct {
+	Sender      string      `json:"sender"`
+	Type        string      `json:"type"`
+	Body        string      `json:"body"`
+	Timestamp   time.Time   `json:"timestamp"`
+	Name        string      `json:"name"`
+	Locations   map[string]Location `json:"locations"`
+}
+
 
 func GetSummary(w http.ResponseWriter, r *http.Request) error {
 	summary := []models.Summary{}
@@ -32,7 +52,7 @@ func GetSummary(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 	iter := c.Find(nil).Sort("-timestamp").Limit(1).Iter()
-	gadgets := &models.Gadgets{}
+	gadgets := &Message{}
 	iter.Next(gadgets)
 	for location, value := range(gadgets.Locations) {
 		for key, _ := range value.Input {
@@ -74,7 +94,7 @@ func GetTimeseries(w http.ResponseWriter, r *http.Request) error {
 
 func getTimeseries(vars * timeseriesVars) (*models.Timeseries, error) {
 	t := &models.Timeseries{Name:fmt.Sprintf("%s %s", vars.location, vars.device)}
-	gadget := &models.Gadgets{}
+	gadget := &Message{}
 	c, session, err := getCollection("updates")
 	defer session.Close()
 	if err != nil {
@@ -89,7 +109,7 @@ func getTimeseries(vars * timeseriesVars) (*models.Timeseries, error) {
 }
 
 
-func appendData(t *models.Timeseries, gadget *models.Gadgets, vars *timeseriesVars) {
+func appendData(t *models.Timeseries, gadget *Message, vars *timeseriesVars) {
 	location := gadget.Locations[vars.location]
 	device := getDevice(vars.direction, &location, vars)
 	switch v := device.Value.(type) {
@@ -101,8 +121,8 @@ func appendData(t *models.Timeseries, gadget *models.Gadgets, vars *timeseriesVa
 	}
 }
 
-func getDevice(direction string, location *models.Location, vars *timeseriesVars) *models.Device {
-	var device models.Device
+func getDevice(direction string, location *Location, vars *timeseriesVars) *Device {
+	var device Device
 	if direction == "input" {
 		device = location.Input[vars.device]
 	} else {

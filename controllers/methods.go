@@ -21,21 +21,17 @@ func GetMethods(w http.ResponseWriter, r *http.Request) error {
 	return err
 }
 
-func AddMethod(w http.ResponseWriter, r *http.Request) error {
+func SaveMethod(w http.ResponseWriter, r *http.Request) error {
 	method := &models.Method{}
 	body, err := ioutil.ReadAll(r.Body)
-	fmt.Println(string(body))
 	if err != nil {
 		return err
 	}
+	fmt.Println(string(body))
 	err = json.Unmarshal(body, method)
 	if err != nil {
 		return err
 	}
-	mmethod.Steps = 
 	return method.Save()
 }
 
-func UpdateMethod(w http.ResponseWriter, r *http.Request) error {
-	return nil
-}

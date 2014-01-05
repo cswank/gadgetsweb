@@ -40,7 +40,7 @@ var MethodCtrl = function($scope, $modalInstance, method) {
     $scope.method = method;
     var rawMethod = "";
     for (var i in method.method) {
-        rawMethod += method[i].step;
+        rawMethod += method.method[i].step + "\n";
     }
     $scope.rawMethod = rawMethod;
     
@@ -61,51 +61,59 @@ var MethodCtrl = function($scope, $modalInstance, method) {
 
 angular.module('myApp.controllers', []).
     controller('GadgetsCtrl', ['$scope', '$http', '$timeout', '$modal', '$location', 'socket', function($scope, $http, $timeout, $modal, $location, socket) {
+        $scope.gadget = {'name': 'select a host', 'host': 'remove me'}
+        $scope.method = {'name': 'select a method', 'steps': []}
         var events = {};
         var promptEvent;
         // $http.get('/methods').success(function (data, status, headers, config) {
-        //     var methods = [];
+        //     $scope.methods = [$scope.method];
         //     for (var i in data.methods) {
         //         var rawMethod = data.methods[i];
-        //         var method = [];
+        //         var steps = [];
         //         for (var j in rawMethod.steps) {
-        //             method.push({step: rawMethod.steps[j], complete:false})
+        //             steps.push({id: rawMethod.id, step:rawMethod.steps[j], complete:false})
         //         }
-        //         methods.push({name: rawMethod.name, method:method});
+        //         $scope.methods.push({id: rawMethod.id, name: rawMethod.name, steps: steps});
         //     }
-        //     $scope.method = {'name': 'select a method', 'steps': []}
-        //     methods.unshift($scope.method);
-        //     $scope.methods = {methods: methods};
+        //     console.log($scope.methods);
         // });
 
         $http.get('/gadgets').success(function (data, status, headers, config) {
-            $scope.gadget = {'name': 'select a host', 'host': 'remove me'}
             data.gadgets.unshift($scope.gadget);
             $scope.gadgets = data.gadgets;
         });
 
         $scope.runMethod = function() {
             var method = [];
-            for (var i in $scope.method.method) {
-                method.push($scope.method.method[i].step);
+            for (var i in $scope.method.steps) {
+                method.push($scope.method.steps[i].step);
             }
             var msg = {event: 'method', 'message': {method:method}};
             socket.send(JSON.stringify(msg));
         };
 
         var saveMethod = function() {
-            var method = []
             var method = [];
             for (var i in $scope.method.method) {
-                method.push($scope.method.method[i].step);
+                method.push($scope.method.steps[i].step);
+            }
+            var url, httpMethod, data
+            if ($scope.method.id != undefined && $scope.method.id > 0) {
+                url = '/methods/' + $scope.method.id.toString();
+                httpMethod = 'PUT'
+                data = {id: $scope.method.id, name: $scope.method.name, steps:method};
+            } else {
+                url = '/methods';
+                httpMethod = 'POST'
+                data = {name: $scope.method.name, steps:method};
             }
             $http({
-                url: '/methods',
-                method: "POST",
-                data: JSON.stringify({name: $scope.method.name, steps:method}),
+                url: url,
+                method: httpMethod,
+                data: JSON.stringify(data),
                 headers: {'Content-Type': 'application/json'}
             }).success(function (data, status, headers, config) {
-                
+                console.log(data, status);
             }).error(function (data, status, headers, config) {
                 
             });
@@ -143,10 +151,12 @@ angular.module('myApp.controllers', []).
             });
         }
 
-        $scope.loadMethod = function() {
-            if ($scope.methods.methods[0].name == 'select a method') {
-                $scope.methods.methods.shift();
+        $scope.clearDummyMethod = function() {
+            console.log($scope.methods);
+            if ($scope.methods[0].name == 'select a method') {
+                $scope.methods.shift();
             }
+            console.log($scope.methods);
         };
 
         $scope.connect = function() {
@@ -196,44 +206,36 @@ angular.module('myApp.controllers', []).
             }
             return commandValue;
         }
-
+        $scope.locations = {};
         socket.subscribe(function (event, message) {
-            console.log(message);
             $scope.$apply(function() {
-                if (event == "update" || event == "status") {
-                    $scope.locations = message.locations;
+                if (event == "status") {
                     if ($scope.locations[message.location] == undefined) {
-                        $scope.locations[message.location] = {}
+                        $scope.locations[message.location] = {};
                     }
-                    $scope.locations[message.location][message.name] = message.value
-                    for (var locationKey in message.locations) {
-                        var location = message.locations[locationKey];
-                        for (var deviceKey in location.output) {
-                            var device = location.output[deviceKey];
-                            device.key = deviceKey;
-                        }
+                    if ($scope.locations[message.location][message.name] == undefined) {
+                        $scope.locations[message.location][message.name] = {};
                     }
-                    var method = message.method;
-                    if (method != undefined && method.method != undefined && method.method.length > 0) {
-                        var step, countdown;
-                        var steps = [];
-                        for (var i=0; i < method.method.length; i++) {
-                            step = {step: method.method[i]};
-                            step.complete = (i < method.step) ? 'step-complete' : 'step-incomplete';
-                            steps.push(step);
-                        }
-                        countdown = (method.countdown > 0) ? 'countdown: ' + method.countdown.toString() : ''
-                        $scope.method.step =  method.step;
-                        $scope.method.method =  steps;
-                        $scope.method.countdown = countdown;
-                    }
-                }
-                else if (event == "commands") {
-                    $scope.commands = message;
+                    $scope.locations[message.location][message.name] = message;
+                } else if (event == "update") {
+                    $scope.locations[message.location][message.name]['value'] = message.value;
+                    // var method = message.method;
+                    // if (method != undefined && method.method != undefined && method.method.length > 0) {
+                    //     var step, countdown;
+                    //     var steps = [];
+                    //     for (var i=0; i < method.method.length; i++) {
+                    //         step = {step: method.method[i]};
+                    //         step.complete = (i < method.step) ? 'step-complete' : 'step-incomplete';
+                    //         steps.push(step);
+                    //     }
+                    //     countdown = (method.countdown > 0) ? 'countdown: ' + method.countdown.toString() : ''
+                    //     $scope.method.step =  method.step;
+                    //     $scope.method.steps =  steps;
+                    //     $scope.method.countdown = countdown;
+                    // }
                 }
             });
         });
-
         $scope.sendCommand = function() {
             $scope.promptShouldBeOpen = false;
             var command = $scope.currentCommand + $scope.commandArgument;
@@ -243,7 +245,7 @@ angular.module('myApp.controllers', []).
             $scope.commandArgument = null;
         };
 
-        $scope.getArguments = function(location, device, value) {
+        $scope.getArguments = function(device) {
             promptEvent = $timeout(function() {
                 var commandValue = getCommandValue(value);
                 $scope.currentCommand = events[location][device][commandValue];
@@ -251,13 +253,16 @@ angular.module('myApp.controllers', []).
             }, 1000);
         };
 
-        $scope.toggle = function(location, device, value) {
-            
+        $scope.toggle = function(device) {
             $timeout.cancel(promptEvent);
             if (!$scope.promptShouldBeOpen) {
-                var commandValue = getCommandValue(value);
-                var command = $scope.commands[location][device][commandValue];
-                var msg = {event:command, message:{}};
+                var command;
+                if (!device.value.value) {
+                    command = device.info.on;
+                } else {
+                    command = device.info.off;
+                }
+                var msg = {event:'command', message:{type:'command', body:command}};
                 socket.send(JSON.stringify(msg));
             }
         };
