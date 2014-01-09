@@ -136,7 +136,7 @@ func getSubChannels(ctx *zmq.Context, host string) (sub *zmq.Socket, chans *zmq.
 		return sub, chans, err
 	}
 	sub.Subscribe([]byte("update"))
-	sub.Subscribe([]byte("info"))
+	sub.Subscribe([]byte("command"))
 	chans = sub.Channels()
 	return sub, chans, err
 }

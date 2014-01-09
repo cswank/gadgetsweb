@@ -233,6 +233,8 @@ angular.module('myApp.controllers', []).
                     //     $scope.method.steps =  steps;
                     //     $scope.method.countdown = countdown;
                     // }
+                } else if (event == "command" && message.body.IndexOf("wait for user to") == 0 {
+                    console.log(command)
                 }
             });
         });
