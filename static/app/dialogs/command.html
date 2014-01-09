@@ -1,0 +1,16 @@
+<div class="modal-dialog">
+  <div class="modal-content">
+    <div class="modal-body">
+      <form>
+        <div class="left">
+          <a>{{command.command}} {{command.arg}}</a>
+        </div>
+        <input ng-model="command.arg"/>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-default" ng-click="cancel()">Close</button>
+      <button type="button" class="btn btn-primary" ng-click="ok()">Send</button>
+    </div>
+  </div>
+</div>

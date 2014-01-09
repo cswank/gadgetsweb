@@ -1,15 +1,16 @@
 package controllers
 
 import (
-	"fmt"
 	"io/ioutil"
+	"github.com/gorilla/mux"
 	"bitbucket.com/cswank/gadgetsweb/models"
 	"encoding/json"
 	"net/http"
 )
 
 func GetMethods(w http.ResponseWriter, r *http.Request) error {
-	methods, err := models.GetMethods()
+	vars := mux.Vars(r)
+	methods, err := models.GetMethods(vars["name"])
 	if err != nil {
 		return err
 	}
@@ -22,12 +23,14 @@ func GetMethods(w http.ResponseWriter, r *http.Request) error {
 }
 
 func SaveMethod(w http.ResponseWriter, r *http.Request) error {
-	method := &models.Method{}
+	vars := mux.Vars(r)
+	method := &models.Method{
+		Gadget: vars["name"],
+	}
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(body))
 	err = json.Unmarshal(body, method)
 	if err != nil {
 		return err
