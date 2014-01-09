@@ -57,6 +57,14 @@ func getSubMessage(conn *websocket.Conn, ctx *zmq.Context, host string, shouldQu
 	return nil
 }
 
+func requestUpdates(pub *zmq.Socket) {
+	msg := gogagets.Message{
+		Type: gogadgets.COMMAND,
+		Body: "update",
+	}
+	pub.Send(msg)
+}
+
 func getSockMessage(conn *websocket.Conn, ctx *zmq.Context, host string, done chan<- bool) error {
 	pub, err := ctx.Socket(zmq.Pub)
 	if err = pub.Connect(fmt.Sprintf("tcp://%s:6111", host)); err != nil {
