@@ -6,8 +6,8 @@ import (
 )
 
 var (
-	getMethodsQuery = "SELECT id, name, steps FROM methods"
-	addMethodQuery = "INSERT INTO methods (name, steps) VALUES (?, ?)"
+	getMethodsQuery = "SELECT id, name, steps FROM methods where gadget = ?"
+	addMethodQuery = "INSERT INTO methods (name, gadget, steps) VALUES (?, ?, ?)"
 	updateMethodQuery = "UPDATE methods set name = ?, steps = ? WHERE id = ?"
 )
 
@@ -18,14 +18,15 @@ type Methods struct {
 type Method struct {
 	Id uint64 `json:"id"`
 	Name string `json:"name"`
+	Gadget string `json:"gadget"`
 	Steps []string `json:"steps"`
 }
 
-func GetMethods() (*Methods, error) {
+func GetMethods(gadget string) (*Methods, error) {
 	db, err := getDB()
 	defer db.Close()
 	methods := &Methods{}
-	rows, err := db.Query(getMethodsQuery)
+	rows, err := db.Query(getMethodsQuery, gadget)
 	if err != nil {
 		return methods, err
 	}
@@ -68,7 +69,7 @@ func (m *Method)Save() error {
 	if m.Id > 0 {
 		_, err = db.Query(updateMethodQuery, m.Name, steps, m.Id)
 	} else {
-		_, err = db.Query(addMethodQuery, m.Name, steps)
+		_, err = db.Query(addMethodQuery, m.Name, m.Gadget, steps)
 	}
 	return err
 }

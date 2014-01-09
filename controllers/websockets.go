@@ -109,7 +109,7 @@ func requestStatus(pub *zmq.Socket) {
 	fmt.Println("request status")
 	msg := gogadgets.Message{
 		Type: gogadgets.COMMAND,
-		Body: "status",
+		Body: "update",
         }
 	b, _ := json.Marshal(&msg)
         pub.Send([][]byte{
@@ -128,7 +128,7 @@ func getSubChannels(ctx *zmq.Context, host string) (sub *zmq.Socket, chans *zmq.
 		return sub, chans, err
 	}
 	sub.Subscribe([]byte("update"))
-	sub.Subscribe([]byte("status"))
+	sub.Subscribe([]byte("method"))
 	sub.Subscribe([]byte("info"))
 	chans = sub.Channels()
 	return sub, chans, err
