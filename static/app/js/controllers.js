@@ -222,30 +222,11 @@ angular.module('myApp.controllers', []).
                     } else {
                         $scope.locations[message.location][message.name] = message;
                     }
-                } else if (event == "update") {
-                    $scope.locations[message.location][message.name]['value'] = message.value;
-<<<<<<< HEAD
-                    // var method = message.method;
-                    // if (method != undefined && method.method != undefined && method.method.length > 0) {
-                    //     var step, countdown;
-                    //     var steps = [];
-                    //     for (var i=0; i < method.method.length; i++) {
-                    //         step = {step: method.method[i]};
-                    //         step.complete = (i < method.step) ? 'step-complete' : 'step-incomplete';
-                    //         steps.push(step);
-                    //     }
-                    //     countdown = (method.countdown > 0) ? 'countdown: ' + method.countdown.toString() : ''
-                    //     $scope.method.step =  method.step;
-                    //     $scope.method.steps =  steps;
-                    //     $scope.method.countdown = countdown;
-                    // }
-                } else if (event == "command" && message.body.IndexOf("wait for user to") == 0 {
+                } else if (event == "command" && message.body.IndexOf("wait for user to") == 0) {
                     console.log(command)
-=======
                 } else if (event == "method update") {
                     $scope.method.step = message.method.step;
                     $scope.method.time = message.method.time;
->>>>>>> e85c31a33c5f1c6dfc961e768dd5d291d57b2908
                 }
             });
         });

@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 	"fmt"
-	"os"
+	//"os"
 	"net/http"
 	"encoding/json"
 	"io/ioutil"
@@ -14,10 +14,10 @@ import (
 )
 
 var (
-	hashKey        = []byte(os.Getenv("HASH_KEY"))
-	blockKey       = []byte(os.Getenv("BLOCK_KEY"))
-	//hashKey        = []byte("very-secret")
-	//blockKey       = []byte("a-lot-secrettttt")
+	//hashKey        = []byte(os.Getenv("HASH_KEY"))
+	//blockKey       = []byte(os.Getenv("BLOCK_KEY"))
+	hashKey        = []byte("very-secret")
+	blockKey       = []byte("a-lot-secrettttt")
 	SecureCookie   = securecookie.New(hashKey, blockKey)
 )
 
@@ -26,13 +26,13 @@ func main() {
 	r.HandleFunc("/login", Login).Methods("POST")
 	r.HandleFunc("/logout", Logout).Methods("POST")
 	r.HandleFunc("/gadgets", GetGadgets).Methods("GET")
-	
+
+	r.HandleFunc("/socket", GetSocket)
 	r.HandleFunc("/history/locations/summary", GetSummary).Methods("GET")
 	r.HandleFunc("/gadgets/{name}/methods", GetMethods).Methods("GET")
 	r.HandleFunc("/gadgets/{name}/methods", AddMethod).Methods("POST")
 	r.HandleFunc("/gadgets/{name}/methods/{methodId}", UpdateMethod).Methods("PUT")
 	r.HandleFunc("/history/locations/{location}/directions/{direction}/devices/{device}", GetTimeseries).Methods("GET")
-	r.HandleFunc("/socket", GetSocket)
 	r.PathPrefix("/").Handler(http.FileServer(http.Dir("./static/app")))
 	http.Handle("/", r)
 	fmt.Println("listening on 0.0.0.0:8080")
@@ -62,6 +62,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	goodPassword, err := user.CheckPassword()
+	fmt.Println(goodPassword, err)
 	if !goodPassword {
 		http.Error(w, "bad request 3", http.StatusBadRequest)
 		return 
@@ -128,6 +129,7 @@ func GetSummary(w http.ResponseWriter, r *http.Request) {
 
 func GetSocket(w http.ResponseWriter, r *http.Request) {
 	user, err := getUserFromCookie(r)
+	fmt.Println(user, err)
 	if err == nil && user.IsAuthorized() {
 		controllers.HandleSocket(w, r)
 	} else {
