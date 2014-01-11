@@ -1,0 +1,16 @@
+<div class="modal-dialog">
+  <div class="modal-content">
+    <div class="modal-body">
+      <form>
+        <label>name</label>
+        <input ng-model="recipe.name"/><br/>
+        <label>grain temperature</label>
+        <input ng-model="recipe.grainTemperature"/>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-default" ng-click="cancel()">Close</button>
+      <button type="button" class="btn btn-primary" ng-click="ok()">Ok</button>
+    </div>
+  </div>
+</div>

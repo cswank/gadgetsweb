@@ -29,6 +29,19 @@ var CommandCtrl = function ($scope, $modalInstance, command) {
     };
 }
 
+var RecipeCtrl = function ($scope, $modalInstance) {
+    $scope.recipe = {
+        name: "",
+        grainTemperature: "",
+    };
+    $scope.ok = function () {
+        $modalInstance.close($scope.recipe);
+    };
+    $scope.cancel = function () {
+        $modalInstance.dismiss('cancel');
+    };
+}
+
 var ChartCtrl = function ($scope, $modalInstance, summaries) {
     $scope.summaries = summaries;
     $scope.ok = function () {
@@ -47,7 +60,6 @@ var ChartCtrl = function ($scope, $modalInstance, summaries) {
     $scope.newValue = function(obj) {
         obj.show = !obj.show;
     };
-    
 }
 
 var MethodCtrl = function($scope, $modalInstance, method) {
@@ -123,6 +135,21 @@ angular.module('myApp.controllers', []).
                 saveMethod();
                 $scope.method = method;
             } ,function(){
+                
+            });
+        };
+
+        $scope.getRecipe = function() {
+            var dlg = $modal.open({
+                templateUrl: '/dialogs/recipe.html?c=' + new Date().getTime(),
+                controller: RecipeCtrl,
+            });
+            dlg.result.then(function(recipe) {
+                var url = '/recipes/' + recipe.name + '?grainTemperature=' + recipe.grainTemperature;
+                $http.get(url).success(function (data, status, headers, config) {
+                    $scope.method = data;
+                });
+            } ,function() {
                 
             });
         };

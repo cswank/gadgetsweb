@@ -3,7 +3,7 @@ package app
 import (
 	"log"
 	"fmt"
-	"os"
+	//"os"
 	"net/http"
 	"encoding/json"
 	"io/ioutil"
@@ -14,25 +14,27 @@ import (
 )
 
 var (
-	hashKey        = []byte(os.Getenv("HASH_KEY"))
-	blockKey       = []byte(os.Getenv("BLOCK_KEY"))
-	//hashKey        = []byte("very-secret")
-	//blockKey       = []byte("a-lot-secrettttt")
+	//hashKey        = []byte(os.Getenv("HASH_KEY"))
+	//blockKey       = []byte(os.Getenv("BLOCK_KEY"))
+	hashKey        = []byte("very-secret")
+	blockKey       = []byte("a-lot-secrettttt")
 	SecureCookie   = securecookie.New(hashKey, blockKey)
 )
 
-func GetRouter() *mux.Router {
+func GetRouter(staticPath string) *mux.Router {
 	r := mux.NewRouter()
 	r.HandleFunc("/login", Login).Methods("POST")
 	r.HandleFunc("/logout", Logout).Methods("POST")
+	r.HandleFunc("/socket", GetSocket)
+	r.HandleFunc("/recipes/{name}", GetRecipe).Methods("GET")
 	r.HandleFunc("/gadgets", GetGadgets).Methods("GET")
-	r.HandleFunc("/methods", GetMethods).Methods("GET")
-	r.HandleFunc("/methods", AddMethod).Methods("POST")
-	r.HandleFunc("/methods/{methodId}", UpdateMethod).Methods("PUT")
+	r.HandleFunc("/gadgets/{name}/methods", GetMethods).Methods("GET")
+	r.HandleFunc("/gadgets/{name}/methods", AddMethod).Methods("POST")
+	r.HandleFunc("/gadgets/{name}/methods/{methodId}", UpdateMethod).Methods("PUT")
 	r.HandleFunc("/history/locations/summary", GetSummary).Methods("GET")
 	r.HandleFunc("/history/locations/{location}/directions/{direction}/devices/{device}", GetTimeseries).Methods("GET")
-	r.HandleFunc("/socket", GetSocket)
-	r.PathPrefix("/").Handler(http.FileServer(http.Dir("../static/app")))
+	r.PathPrefix("/").Handler(http.FileServer(http.Dir(staticPath)))
+	//r.PathPrefix("/").Handler(http.FileServer(http.Dir("./static/app")))
 	return r
 }
 
@@ -113,6 +115,14 @@ func UpdateMethod(w http.ResponseWriter, r *http.Request) {
 		}
 	} else {
 		http.Error(w, "Not Authorized", http.StatusUnauthorized)
+	}
+}
+
+func GetRecipe(w http.ResponseWriter, r *http.Request) {
+	err := controllers.GetRecipe(w, r)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
