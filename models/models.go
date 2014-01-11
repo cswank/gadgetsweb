@@ -21,7 +21,7 @@ type Summary struct {
 func createTables(db *sql.DB) {
 	db.QueryRow("CREATE TABLE users (username text PRIMARY KEY, password text)")
 	db.QueryRow("CREATE TABLE gadgets (name text PRIMARY KEY, host text)")
-	db.QueryRow("CREATE TABLE methods (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, steps TEXT)")
+	db.QueryRow("CREATE TABLE methods (id INTEGER PRIMARY KEY AUTOINCREMENT, gadget TEXT, name TEXT, steps TEXT)")
 }
 
 func getDB() (*sql.DB, error) {

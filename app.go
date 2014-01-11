@@ -12,4 +12,3 @@ func main() {
 	fmt.Println("listening on 0.0.0.0:8080")
 	http.ListenAndServe(":8080", nil)
 }
-
