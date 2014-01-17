@@ -237,7 +237,10 @@ angular.module('myApp.controllers', []).
         $scope.locations = {};
         socket.subscribe(function (event, message) {
             $scope.$apply(function() {
-                if (event == "update") {
+                if (event == "update" && message.sender == "method runner") {
+                    console.log(message);
+                    $scope.method = message.method;
+                } else if (event == "update") {
                     if ($scope.locations[message.location] == undefined) {
                         $scope.locations[message.location] = {};
                     }
