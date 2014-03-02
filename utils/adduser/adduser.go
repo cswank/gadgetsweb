@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"code.google.com/p/gopass"
-	"bitbucket.com/cswank/gadgetsweb/models"
+	"bitbucket.org/cswank/gadgetsweb/models"
 	
 )
 

@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"bitbucket.com/cswank/gadgetsweb/models"
+	"bitbucket.org/cswank/gadgetsweb/models"
 )
 
 func main() {
