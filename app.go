@@ -13,10 +13,8 @@ import (
 )
 
 var (
-	//hashKey        = []byte(os.Getenv("HASH_KEY"))
-	//blockKey       = []byte(os.Getenv("BLOCK_KEY"))
-	hashKey        = []byte("very-secret")
-	blockKey       = []byte("a-lot-secrettttt")
+	hashKey        = []byte(os.Getenv("HASH_KEY"))
+	blockKey       = []byte(os.Getenv("BLOCK_KEY"))
 	SecureCookie   = securecookie.New(hashKey, blockKey)
 )
 
