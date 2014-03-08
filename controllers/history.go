@@ -8,7 +8,7 @@ import (
 	"github.com/gorilla/mux"
 	"labix.org/v2/mgo"
         "labix.org/v2/mgo/bson"
-	"bitbucket.com/cswank/gadgetsweb/models"
+	"bitbucket.org/cswank/gadgetsweb/models"
 	"net/http"
 	"encoding/json"
 )

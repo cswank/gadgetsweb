@@ -3,7 +3,7 @@ package controllers
 import (
 	"io/ioutil"
 	"github.com/gorilla/mux"
-	"bitbucket.com/cswank/gadgetsweb/models"
+	"bitbucket.org/cswank/gadgetsweb/models"
 	"encoding/json"
 	"net/http"
 )

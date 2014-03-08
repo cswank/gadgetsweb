@@ -5,7 +5,7 @@ import (
 	"time"
 	"log"
 	"net/http"
-	"bitbucket.com/cswank/gogadgets"
+	"bitbucket.org/cswank/gogadgets"
 	"github.com/gorilla/websocket"
 	"github.com/vaughan0/go-zmq"
 	"encoding/json"

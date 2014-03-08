@@ -7,17 +7,15 @@ import (
 	"net/http"
 	"encoding/json"
 	"io/ioutil"
-	"bitbucket.com/cswank/gadgetsweb/controllers"
-	"bitbucket.com/cswank/gadgetsweb/models"
+	"bitbucket.org/cswank/gadgetsweb/controllers"
+	"bitbucket.org/cswank/gadgetsweb/models"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/securecookie"
 )
 
 var (
-	//hashKey        = []byte(os.Getenv("HASH_KEY"))
-	//blockKey       = []byte(os.Getenv("BLOCK_KEY"))
-	hashKey        = []byte("very-secret")
-	blockKey       = []byte("a-lot-secrettttt")
+	hashKey        = []byte(os.Getenv("HASH_KEY"))
+	blockKey       = []byte(os.Getenv("BLOCK_KEY"))
 	SecureCookie   = securecookie.New(hashKey, blockKey)
 )
 

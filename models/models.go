@@ -4,7 +4,7 @@ import (
 	"os"
 	"database/sql"
 	_ "code.google.com/p/go-sqlite/go1/sqlite3"
-	"bitbucket.com/cswank/gadgetsweb/utils"
+	"bitbucket.org/cswank/gadgetsweb/utils"
 )
 
 type Timeseries struct {
