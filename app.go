@@ -1,6 +1,7 @@
 package main
 
 import (
+	"os"
 	"log"
 	"fmt"
 	"net/http"
@@ -32,7 +33,12 @@ func main() {
 	r.HandleFunc("/gadgets/{name}/methods/{methodId}", UpdateMethod).Methods("PUT")
 	r.HandleFunc("/history/locations/summary", GetSummary).Methods("GET")
 	r.HandleFunc("/history/locations/{location}/directions/{direction}/devices/{device}", GetTimeseries).Methods("GET")
-	r.PathPrefix("/").Handler(http.FileServer(http.Dir("./static/app")))
+	staticDir := os.Getenv("GADGETS_STATIC")
+	if staticDir == "" {
+		staticDir = "./static/app"
+	}
+	fmt.Println("static dir:", staticDir)
+	r.PathPrefix("/").Handler(http.FileServer(http.Dir(staticDir)))
 	
 	http.Handle("/", r)
 	fmt.Println("listening on 0.0.0.0:8080")
