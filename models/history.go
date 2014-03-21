@@ -25,8 +25,21 @@ type Series struct {
 	Data []interface{} `json:"data"`
 }
 
+type Link struct {
+	Name string `json:"name"`
+	Path string `json:"path"`
+}
+
 type Devices struct {
-	Links []string
+	Links []Link `json:"links"`
+}
+
+func NewLink(location, name string) Link {
+	u, _ := url.Parse(fmt.Sprintf("/history/locations/%s/devices/%s", location, name))
+	return Link{
+		Name: fmt.Sprintf("%s %s", location, name),
+		Path: u.String(),
+	}
 }
 
 func GetDevices(hq *HistoryQuery) (*Devices, error) {
@@ -38,16 +51,12 @@ func GetDevices(hq *HistoryQuery) (*Devices, error) {
 	}
 	var locations []string
 	c.Find(bson.M{}).Distinct("location", &locations)
-	links := []string{}
+	links := []Link{}
 	for _, l := range locations {
 		var devices []string
 		c.Find(bson.M{"location": l}).Distinct("name", &devices)
-		for _, d := range devices {
-			u, _ := url.Parse(fmt.Sprintf("/history/locations/%s/devices/%s", l, d))
-			links = append(
-				links,
-				u.String(),
-			)
+		for _, d := range devices {			
+			links = append(links, NewLink(l, d))
 		}
 	}
 	d.Links = links
@@ -71,7 +80,7 @@ func GetHistory(hq *HistoryQuery) ([]Series, error) {
 				"$lte": hq.End,
 			},
 		},
-	).Sort("-timestamp").All(&results)
+	).Sort("timestamp").All(&results)
 	s := Series{
 		Name: fmt.Sprintf("%s %s", hq.Location, hq.Name),
 		Data: make([]interface{}, len(results)),
@@ -81,7 +90,7 @@ func GetHistory(hq *HistoryQuery) ([]Series, error) {
 		if ! ok {
 			return []Series{}, err
 		}
-		s.Data[i] = []interface{}{r.Timestamp.Unix(), f}
+		s.Data[i] = []interface{}{r.Timestamp.Unix() * 1000, f}
 	}
 	return []Series{s}, nil
 }

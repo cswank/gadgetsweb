@@ -3,7 +3,6 @@ package models
 import (
 	"testing"
 	"time"
-	"fmt"
 )
 
 func TestGetHistory(t *testing.T) {
@@ -45,5 +44,4 @@ func TestGetDevices(t *testing.T) {
 	if len(d.Links) != 4 {
 		t.Error(d)
 	}
-	fmt.Println(d)
 }

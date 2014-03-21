@@ -82,6 +82,7 @@ angular.module('myApp.services', [])
     .factory('history', function($rootScope) {
         return {
             getChart: function(series) {
+                console.log("series", series);
                 config.series = series;
                 return config;
             }

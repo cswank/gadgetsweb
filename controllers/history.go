@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"time"
 	"strconv"
 	"github.com/gorilla/mux"
@@ -53,7 +54,7 @@ func getQuery(r *http.Request) (hq *models.HistoryQuery, err error) {
 	}
 	hq = &models.HistoryQuery{
 		Host: "localhost",
-		DBName: "brewery",
+		DBName: "gadgets",
 		Collection: "updates",
 		Location: vars["location"],
 		Name: vars["device"],
