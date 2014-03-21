@@ -6,7 +6,7 @@ import (
 )
 
 
-func TestSaveUser(t *testing.T) {
+func _TestSaveUser(t *testing.T) {
 	db, _ := getDB()
 	defer db.Close()
 	db.Query("CREATE TABLE users(username text PRIMARY KEY, password text)")
@@ -30,7 +30,7 @@ func TestSaveUser(t *testing.T) {
 	db.Query("DELETE FROM users")
 }
 
-func TestIsAuthorized(t *testing.T) {
+func _TestIsAuthorized(t *testing.T) {
 	db, _ := getDB()
 	defer db.Close()
 	db.Query("CREATE TABLE users(username text PRIMARY KEY, password text)")
@@ -51,7 +51,7 @@ func TestIsAuthorized(t *testing.T) {
 	}
 }
 
-func TestCheckPassword(t *testing.T) {
+func _TestCheckPassword(t *testing.T) {
 	db, _ := getDB()
 	defer db.Close()
 	db.Query("CREATE TABLE users(username text PRIMARY KEY, password text)")
