@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	"bitbucket.com/cswank/gadgetsweb/models"
+	"bitbucket.org/cswank/gadgetsweb/models"
 	"encoding/json"
 	"net/http"
 )

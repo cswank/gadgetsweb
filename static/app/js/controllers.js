@@ -1,3 +1,4 @@
+
 'use strict';
 
 /* Controllers */
@@ -84,8 +85,8 @@ var MethodCtrl = function($scope, $modalInstance, method) {
 angular.module('myApp.controllers', []).
     controller('GadgetsCtrl', ['$scope', '$http', '$timeout', '$modal', '$location', 'socket', function($scope, $http, $timeout, $modal, $location, socket) {
         $scope.showMethods = false;
-        $scope.gadget = {'name': 'select a host', 'host': 'remove me'}
-        $scope.method = {'name': 'select a method', 'steps': []}
+        $scope.gadget = {'name': 'select a host', 'host': 'remove me'};
+        $scope.method = {'name': 'select a method', 'steps': []};
         var events = {};
         var promptEvent;
         
@@ -97,6 +98,11 @@ angular.module('myApp.controllers', []).
 
         $scope.runMethod = function() {
             var msg = {event: 'method', message: {type: 'method', method:$scope.method}};
+            socket.send(JSON.stringify(msg));
+        };
+
+        $scope.clearMethod = function() {
+            var msg = {event: 'command', message: {type: 'command', body:'clear method'}};
             socket.send(JSON.stringify(msg));
         };
 
@@ -238,7 +244,6 @@ angular.module('myApp.controllers', []).
         socket.subscribe(function (event, message) {
             $scope.$apply(function() {
                 if (event == "update" && message.sender == "method runner") {
-                    console.log(message);
                     $scope.method = message.method;
                 } else if (event == "update") {
                     if ($scope.locations[message.location] == undefined) {
@@ -252,14 +257,30 @@ angular.module('myApp.controllers', []).
                     } else {
                         $scope.locations[message.location][message.name] = message;
                     }
-                } else if (event == "command" && message.body.IndexOf("wait for user to") == 0) {
-                    console.log(command)
                 } else if (event == "method update") {
                     $scope.method.step = message.method.step;
                     $scope.method.time = message.method.time;
                 }
             });
         });
+
+        $scope.checkUserPrompt = function(i) {
+            var step = $scope.method.steps[i];
+            return step != undefined && step.indexOf("wait for user") == 0 && i == $scope.method.step;
+        };
+
+        $scope.confirm = function(step) {
+            var msg = {
+                event: 'update',
+                message: {
+                    type: 'update',
+                    body:step,
+                }
+            };
+            socket.send(JSON.stringify(msg));
+            
+        }
+        
         $scope.sendCommand = function() {
             $scope.promptShouldBeOpen = false;
             var command = $scope.currentCommand + $scope.commandArgument;
@@ -341,7 +362,7 @@ angular.module('myApp.controllers', []).
                 
                 for (var i in selected) {
                     summary = selected[i];
-                    url = '/history/locations/' + summary.location + '/directions/'  + summary.direction + '/devices/' + summary.name;
+                    url = '/history/locations/' + summary.location + '/devices/' + summary.name;
                     $http({method:'GET', url:url, params:query}).success(function(data) {
                         chartData.push(data);
                         if (chartData.length == selected.length) {

@@ -2,8 +2,8 @@ package controllers
 
 import (
 	"github.com/gorilla/mux"
-	"bitbucket.com/cswank/gadgetsweb/models"
-	"bitbucket.com/cswank/brewery/recipes"
+	"bitbucket.org/cswank/gadgetsweb/models"
+	"bitbucket.org/cswank/brewery/recipes"
 	"encoding/json"
 	"net/http"
 )
