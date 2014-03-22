@@ -40,14 +40,13 @@
       </div>
       <div class="span9">
         <div ng-show="showMethods">
+          <a href="" ng-click="getRecipe()">get recipe</a>
           <div>
-            <a href="" ng-click="getRecipe()">get recipe</a><br/>
             <select
                ng-model="method"
                ng-click="clearDummyMethod()"
                ng-options="m.name for m in methods">
             </select>
-            <br>
           </div>
           <span ng-if="method.steps.length==0">
             <a href="" ng-click="addMethod()">add method</a>
