@@ -39,6 +39,7 @@
         </ul>
       </div>
       <div class="span9">
+<<<<<<< HEAD
         <div ng-show="showMethods">
           <a href="" ng-click="getRecipe()">get recipe</a>
           <div>
@@ -64,6 +65,41 @@
           </ol>
           <a ng-if="method.time>0">{{method.time}}</a>
         </div>
+=======
+        <tabset>
+          <tab heading="Methods">
+            <div ng-show="showMethods">
+              <div>
+                <a href="" ng-click="getRecipe()">get recipe</a><br/>
+                <select
+                   ng-model="method"
+                   ng-click="clearDummyMethod()"
+                   ng-options="m.name for m in methods">
+                </select>
+                <br>
+              </div>
+              <span ng-if="method.steps.length==0">
+                <a href="" ng-click="addMethod()">add method</a>
+              </span>
+              <span ng-if="method.steps.length>0">
+                <a href="" ng-click="addMethod()">edit method</a>
+                <a href="" ng-click="runMethod()">run method</a>
+                <a href="" ng-click="clearMethod()">clear method</a>
+              </span>
+              <ol>
+                <li ng-repeat="step in method.steps track by $index">
+                  <a ng-class="{'step-complete': method.step>$index}">{{step}}</a>
+                  <a ng-show="checkUserPrompt($index)" ng-click="confirm(step)">click to confirm</a>
+                </li>
+              </ol>
+              <a ng-if="method.time>0">{{method.time}}</a>
+            </div>
+          </tab>
+          <tab heading="Chart">
+            Chart
+          </tab>
+        </tabset>
+>>>>>>> 9b417e873822aab5feaa9a0d2896060844596d15
       </div>
     </div>
 

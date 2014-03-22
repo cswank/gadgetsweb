@@ -2,11 +2,11 @@
   <div class="modal-content">
     <div class="modal-body">
       <ul class="no-style">
-        <li ng-repeat="summary in summaries">
-          <input ng-model="summary.selected" value="{{summary}}"
+        <li ng-repeat="link in links">
+          <input ng-model="link.selected" value="{{link}}"
                  type="checkbox" name="selected"
-                 ng-click="newValue(summary)">
-          <a>{{summary.location}} {{summary.name}}</a>
+                 ng-click="newValue(link)">
+          <a>{{link.name}}</a>
         </li>
       </ul>
       <a ng-click="ok()">ok</a>

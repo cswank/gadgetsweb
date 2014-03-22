@@ -1,0 +1,20 @@
+
+server {
+	listen 443;
+	server_name gadgets.dyndns-ip.com;
+	ssl on;
+	ssl_certificate      /etc/nginx/certs/gadgets/ca.crt;
+	ssl_certificate_key  /etc/nginx/certs/gadgets/ca.key;
+
+	location / {
+	        proxy_pass http://nausori:8080;
+	}
+
+	location /socket {
+		proxy_pass http://nausori:8080;
+		# WebSocket support (nginx 1.4)
+		proxy_http_version 1.1;
+		proxy_set_header Upgrade $http_upgrade;
+		proxy_set_header Connection "upgrade";
+	}
+}

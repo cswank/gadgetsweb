@@ -26,16 +26,16 @@ func HandleSocket(w http.ResponseWriter, r *http.Request) error {
 	}
 	quitSub := make(chan bool)
 	sockIsDone := make(chan bool)
-	go getSockMessage(conn, ctx, host, sockIsDone)
-	go getSubMessage(conn, ctx, host, quitSub)
+	go getSocketMessage(conn, ctx, host, sockIsDone)
+	go getZMQMessage(conn, ctx, host, quitSub)
 	<-sockIsDone
 	quitSub <- true
 	fmt.Println("sock exiting")
 	return nil
 }
 
-
-func getSubMessage(conn *websocket.Conn, ctx *zmq.Context, host string, shouldQuit <-chan bool) error {
+//When a message is received from the zmq socket, it is passed along to the web socket.
+func getZMQMessage(conn *websocket.Conn, ctx *zmq.Context, host string, shouldQuit <-chan bool) error {
 	sub, chans, err := getSubChannels(ctx, host)
 	if err != nil {
 		return err
@@ -46,7 +46,7 @@ func getSubMessage(conn *websocket.Conn, ctx *zmq.Context, host string, shouldQu
 	for {
 		select {
 		case msg := <-chans.In():
-			sendMessage(conn, msg)
+			sendSocketMessage(conn, msg)
 		case <-shouldQuit:
 			return nil
 		case err := <-chans.Errors():
@@ -57,7 +57,8 @@ func getSubMessage(conn *websocket.Conn, ctx *zmq.Context, host string, shouldQu
 	return nil
 }
 
-func getSockMessage(conn *websocket.Conn, ctx *zmq.Context, host string, done chan<- bool) error {
+//When a message is received from the web socket it is passed along to the zmq socket.
+func getSocketMessage(conn *websocket.Conn, ctx *zmq.Context, host string, done chan<- bool) error {
 	pub, err := ctx.Socket(zmq.Pub)
 	if err = pub.Connect(fmt.Sprintf("tcp://%s:6111", host)); err != nil {
 		return err
@@ -76,18 +77,7 @@ func getSockMessage(conn *websocket.Conn, ctx *zmq.Context, host string, done ch
 			return err
 		}
 		if messageType == websocket.TextMessage {
-			cmd := &command{}
-			err := json.Unmarshal(p, cmd)
-			if err == nil {
-				b, _ := json.Marshal(cmd.Message)
-				msg := [][]byte{
-					[]byte(cmd.Event),
-					b,
-				}
-				pub.Send(msg)
-			} else {
-				log.Println(err)
-			}
+			sendZMQMessage(p)
 		} else if messageType == websocket.CloseMessage || messageType == -1 {
 			done <- true
 			return nil
@@ -96,7 +86,24 @@ func getSockMessage(conn *websocket.Conn, ctx *zmq.Context, host string, done ch
 	return nil
 }
 
-func sendMessage(conn * websocket.Conn, message [][]byte) {
+//Send a message via the zmq socket.
+func sendZMQMessage(input []byte) {
+	cmd := &command{}
+	err := json.Unmarshal(p, cmd)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	b, _ := json.Marshal(cmd.Message)
+	msg := [][]byte{
+		[]byte(cmd.Event),
+		b,
+	}
+	pub.Send(msg)
+}
+
+//Send a message via the web socket.
+func sendSocketMessage(conn * websocket.Conn, message [][]byte) {
 	payload := []string {
 		string(message[0]),
 		string(message[1]),
