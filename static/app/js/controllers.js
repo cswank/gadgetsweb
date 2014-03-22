@@ -84,11 +84,33 @@ var MethodCtrl = function($scope, $modalInstance, method) {
 
 angular.module('myApp.controllers', []).
     controller('GadgetsCtrl', ['$scope', '$http', '$timeout', '$modal', '$location', 'socket', function($scope, $http, $timeout, $modal, $location, socket) {
+        $scope.charts = {};
         $scope.showMethods = false;
         $scope.gadget = {'name': 'select a host', 'host': 'remove me'};
         $scope.method = {'name': 'select a method', 'steps': []};
         var events = {};
         var promptEvent;
+
+        $scope.chartConfig = {
+            options: {
+                chart: {
+                    type: 'line',
+                    zoomType: 'x'
+                }
+            },
+            series: [],
+            title: {
+                text: 'Gadgets'
+            },
+            xAxis: {
+                type: 'datetime',
+                dateTimeLabelFormats: { // don't display the dummy year
+                    month: '%e. %b',
+                    year: '%b'
+                }
+            },
+            loading: false
+        }
         
 
         $http.get('/gadgets').success(function (data, status, headers, config) {
@@ -256,6 +278,11 @@ angular.module('myApp.controllers', []).
                         $scope.locations[message.location][message.name]['value'] = message.value;
                     } else {
                         $scope.locations[message.location][message.name] = message;
+                    }
+                    var name = message.location + " " + message.name;
+                    if ($scope.charts[name] != undefined) {
+                        var i = $scope.charts[name];
+                        $scope.chartConfig.series[i].data.push([message.timestamp, message.value.value]);
                     }
                 } else if (event == "method update") {
                     $scope.method.step = message.method.step;
