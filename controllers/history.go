@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"time"
 	"strconv"
 	"github.com/gorilla/mux"

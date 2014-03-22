@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"fmt"
 	"time"
+	"fmt"
 	"log"
 	"net/http"
 	"bitbucket.org/cswank/gogadgets"
@@ -77,7 +77,7 @@ func getSocketMessage(conn *websocket.Conn, ctx *zmq.Context, host string, done 
 			return err
 		}
 		if messageType == websocket.TextMessage {
-			sendZMQMessage(p)
+			sendZMQMessage(p, pub)
 		} else if messageType == websocket.CloseMessage || messageType == -1 {
 			done <- true
 			return nil
@@ -87,9 +87,9 @@ func getSocketMessage(conn *websocket.Conn, ctx *zmq.Context, host string, done 
 }
 
 //Send a message via the zmq socket.
-func sendZMQMessage(input []byte) {
+func sendZMQMessage(input []byte, pub *zmq.Socket) {
 	cmd := &command{}
-	err := json.Unmarshal(p, cmd)
+	err := json.Unmarshal(input, cmd)
 	if err != nil {
 		log.Println(err)
 		return

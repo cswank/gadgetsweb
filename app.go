@@ -1,7 +1,6 @@
 package main
 
 import (
-	"os"
 	"log"
 	"fmt"
 	"os"
@@ -32,7 +31,7 @@ func main() {
 	r.HandleFunc("/gadgets/{name}/methods/{methodId}", UpdateMethod).Methods("PUT")
 	r.HandleFunc("/history/devices", GetDevices).Methods("GET")
 	r.HandleFunc("/history/locations/{location}/devices/{device}", GetTimeseries).Methods("GET")
-	r.PathPrefix("/").Handler(http.FileServer(http.Dir("./static/app")))
+	r.PathPrefix("/").Handler(http.FileServer(http.Dir(os.Getenv("GADGETS_STATIC"))))
 
 	
 	http.Handle("/", r)
