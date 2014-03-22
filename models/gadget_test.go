@@ -5,7 +5,7 @@ import (
 )
 
 
-func TestSaveGadget(t *testing.T) {
+func _TestSaveGadget(t *testing.T) {
 	db, _ := getDB()
 	defer db.Close()
 	db.Query("DELETE FROM gadgets")
@@ -32,7 +32,7 @@ func TestSaveGadget(t *testing.T) {
 }
 
 
-func TestGetGadgets(t *testing.T) {
+func _TestGetGadgets(t *testing.T) {
 	db, _ := getDB()
 	defer db.Close()
 	db.Query("DELETE FROM gadgets")

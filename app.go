@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"fmt"
+	"os"
 	"net/http"
 	"encoding/json"
 	"io/ioutil"
@@ -28,8 +29,8 @@ func main() {
 	r.HandleFunc("/gadgets/{name}/methods", GetMethods).Methods("GET")
 	r.HandleFunc("/gadgets/{name}/methods", AddMethod).Methods("POST")
 	r.HandleFunc("/gadgets/{name}/methods/{methodId}", UpdateMethod).Methods("PUT")
-	r.HandleFunc("/history/locations/summary", GetSummary).Methods("GET")
-	r.HandleFunc("/history/locations/{location}/directions/{direction}/devices/{device}", GetTimeseries).Methods("GET")
+	r.HandleFunc("/history/devices", GetDevices).Methods("GET")
+	r.HandleFunc("/history/locations/{location}/devices/{device}", GetTimeseries).Methods("GET")
 	r.PathPrefix("/").Handler(http.FileServer(http.Dir("./static/app")))
 	
 	http.Handle("/", r)
@@ -129,8 +130,8 @@ func GetTimeseries(w http.ResponseWriter, r *http.Request) {
 	controllers.GetTimeseries(w, r)
 }
 
-func GetSummary(w http.ResponseWriter, r *http.Request) {
-	controllers.GetSummary(w, r)
+func GetDevices(w http.ResponseWriter, r *http.Request) {
+	controllers.GetDevices(w, r)
 }
 
 func GetSocket(w http.ResponseWriter, r *http.Request) {
@@ -155,4 +156,3 @@ func getUserFromCookie(r *http.Request) (*models.User, error) {
 	}
 	return user, err
 }
-

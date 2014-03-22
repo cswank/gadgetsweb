@@ -1,3 +1,4 @@
+
 'use strict';
 
 /* Controllers */
@@ -42,14 +43,14 @@ var RecipeCtrl = function ($scope, $modalInstance) {
     };
 }
 
-var ChartCtrl = function ($scope, $modalInstance, summaries) {
-    $scope.summaries = summaries;
-    $scope.ok = function () {
+var ChartCtrl = function ($scope, $modalInstance, links) {
+    $scope.links = links;
+    $scope.ok = function() {
         var selected = [];
-        for (var i in $scope.summaries) {
-            var summary = $scope.summaries[i];
-            if (summary.show) {
-                selected.push(summary);
+        for (var i in $scope.links) {
+            var link = $scope.links[i];
+            if (link.selected) {
+                selected.push(link);
             }
         }
         $modalInstance.close(selected);
@@ -58,7 +59,7 @@ var ChartCtrl = function ($scope, $modalInstance, summaries) {
         $modalInstance.dismiss('cancel');
     };
     $scope.newValue = function(obj) {
-        obj.show = !obj.show;
+        obj.selected = !obj.selected;
     };
 }
 
@@ -330,44 +331,60 @@ angular.module('myApp.controllers', []).
         $scope.openPrompt = function(val) {
             $scope.promptShouldBeOpen = val;
         }
-        $http.get("/history/locations/summary").success( function(data) {
-            var summary;
-            for (var i in data) {
-                summary = data[i];
-                summary.selected = false;
-                summary.show = false;
+        $http.get("/history/devices").success( function(data) {
+            for (var i in data.links) {
+                var link = data.links[i];
+                link.selected = false;
             }
-            $scope.summaries = data;
+            $scope.links = data.links;
         });
 
+        $scope.chartConfig = {
+            options: {
+                chart: {
+                    type: 'line',
+                    zoomType: 'x'
+                }
+            },
+            series: [],
+            title: {
+                text: 'Gadgets'
+            },
+            xAxis: {
+                type: 'datetime',
+                dateTimeLabelFormats: { // don't display the dummy year
+                    month: '%e. %b',
+                    year: '%b'
+                }
+            },
+            loading: false
+        }
+        
         $scope.choose = function() {
             var dlg = $modal.open({
-                templateUrl: '/dialogs/chart.html',
+                templateUrl: '/dialogs/chart.html?x=yyy',
                 controller: ChartCtrl,
                 resolve: {
-                    summaries: function () {
-                        return $scope.summaries;
+                    links: function () {
+                        return $scope.links;
                     }
                 }
             });
             dlg.result.then(function(selected) {
+                $scope.chartConfig.series = [];
                 var now = new Date().getTime();
                 var start = now - 604800000; //one week
                 //var start = now - (86400000 * 2); //two days
-                var query = {start: start, end: now}
-                var url;
-                var summary;
-                var chartData = [];
-                
+                var query = {
+                    start: Math.round(start / 1000),
+                    end: Math.round(now / 1000)
+                }
+                var link;
                 for (var i in selected) {
-                    summary = selected[i];
-                    url = '/history/locations/' + summary.location + '/directions/'  + summary.direction + '/devices/' + summary.name;
-                    $http({method:'GET', url:url, params:query}).success(function(data) {
-                        chartData.push(data);
-                        if (chartData.length == selected.length) {
-                            $scope.history = history.getChart(chartData);
-                        }
-                    })
+                    link = selected[i];
+                    $http({method:'GET', url:link.path, params:query}).success(function(data) {
+                        $scope.chartConfig.series.push(data[0]);
+                    });
                 }
             } ,function(){
                 
