@@ -19,6 +19,8 @@ var (
 	SecureCookie   = securecookie.New(hashKey, blockKey)
 )
 
+type controller func(w http.ResponseWriter, r *http.Request) error
+
 func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/login", Login).Methods("POST")
@@ -32,12 +34,70 @@ func main() {
 	r.HandleFunc("/history/devices", GetDevices).Methods("GET")
 	r.HandleFunc("/history/locations/{location}/devices/{device}", GetTimeseries).Methods("GET")
 	r.PathPrefix("/").Handler(http.FileServer(http.Dir(os.Getenv("GADGETS_STATIC"))))
-
 	
 	http.Handle("/", r)
 	fmt.Println("listening on 0.0.0.0:8080")
 	http.ListenAndServe(":8080", nil)
 }
+
+func GetGadgets(w http.ResponseWriter, r *http.Request) {
+	controllers.GetGadgets(w, r)
+}
+
+func GetMethods(w http.ResponseWriter, r *http.Request) {
+	checkAuth(w, r , controllers.GetMethods)
+}
+
+func AddMethod(w http.ResponseWriter, r *http.Request) {
+	checkAuth(w, r, controllers.SaveMethod)
+}
+
+func UpdateMethod(w http.ResponseWriter, r *http.Request) {
+	checkAuth(w, r, controllers.SaveMethod)
+}
+
+func GetRecipe(w http.ResponseWriter, r *http.Request) {
+	checkAuth(w, r, controllers.GetRecipe)
+}
+
+func GetTimeseries(w http.ResponseWriter, r *http.Request) {
+	checkAuth(w, r, controllers.GetTimeseries)
+}
+
+func GetDevices(w http.ResponseWriter, r *http.Request) {
+	checkAuth(w, r, controllers.GetDevices)
+}
+
+func GetSocket(w http.ResponseWriter, r *http.Request) {
+	checkAuth(w, r, controllers.HandleSocket)
+}
+
+func checkAuth(w http.ResponseWriter, r *http.Request, ctrl controller) {
+	user, err := getUserFromCookie(r)
+	if err == nil && user.IsAuthorized() {
+		err = ctrl(w, r)
+		if err != nil {
+			log.Println(err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	} else {
+		http.Error(w, "Not Authorized", http.StatusUnauthorized)
+	}
+}
+
+func getUserFromCookie(r *http.Request) (*models.User, error) {
+	user := &models.User{}
+	cookie, err := r.Cookie("gadgets")
+	if err == nil {
+		m := map[string]string{}
+		err = SecureCookie.Decode("gadgets", cookie.Value, &m)
+		if err == nil {
+			user.Username = m["user"]
+		}
+	}
+	return user, err
+}
+
 
 func Logout(w http.ResponseWriter, r *http.Request) {
 	cookie := &http.Cookie{
@@ -78,82 +138,4 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		HttpOnly: false,
 	}
 	http.SetCookie(w, cookie)
-}
-
-func GetGadgets(w http.ResponseWriter, r *http.Request) {
-	controllers.GetGadgets(w, r)
-}
-
-func GetMethods(w http.ResponseWriter, r *http.Request) {
-	err := controllers.GetMethods(w, r)
-	if err != nil {
-		log.Println(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-}
-
-func AddMethod(w http.ResponseWriter, r *http.Request) {
-	user, err := getUserFromCookie(r)
-	if err == nil && user.IsAuthorized() {
-		err = controllers.SaveMethod(w, r)
-		if err != nil {
-			log.Println(err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
-	} else {
-		http.Error(w, "Not Authorized", http.StatusUnauthorized)
-	}
-}
-
-func UpdateMethod(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("update method")
-	user, err := getUserFromCookie(r)
-	if err == nil && user.IsAuthorized() {
-		controllers.SaveMethod(w, r)
-		if err != nil {
-			log.Println(err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
-	} else {
-		http.Error(w, "Not Authorized", http.StatusUnauthorized)
-	}
-}
-
-func GetRecipe(w http.ResponseWriter, r *http.Request) {
-	err := controllers.GetRecipe(w, r)
-	if err != nil {
-		log.Println(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-}
-
-func GetTimeseries(w http.ResponseWriter, r *http.Request) {
-	controllers.GetTimeseries(w, r)
-}
-
-func GetDevices(w http.ResponseWriter, r *http.Request) {
-	controllers.GetDevices(w, r)
-}
-
-func GetSocket(w http.ResponseWriter, r *http.Request) {
-	user, err := getUserFromCookie(r)
-	fmt.Println(user, err)
-	if err == nil && user.IsAuthorized() {
-		controllers.HandleSocket(w, r)
-	} else {
-		http.Error(w, "Not Authorized", http.StatusUnauthorized)
-	}
-}
-
-func getUserFromCookie(r *http.Request) (*models.User, error) {
-	user := &models.User{}
-	cookie, err := r.Cookie("gadgets")
-	if err == nil {
-		m := map[string]string{}
-		err = SecureCookie.Decode("gadgets", cookie.Value, &m)
-		if err == nil {
-			user.Username = m["user"]
-		}
-	}
-	return user, err
 }

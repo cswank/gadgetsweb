@@ -1,90 +1,71 @@
 'use strict';
 
-var config = {
-    chart: {
-        type: 'line',
-        zoomType: 'x'
-    },
-    title: {
-        text: ''
-    },
-    subtitle: {
-        text: ''
-    },
-    xAxis: {
-        type: 'datetime',
-        dateTimeLabelFormats: { // don't display the dummy year
-            month: '%e. %b',
-            year: '%b'
-        }
-    },
-    yAxis: {
-        title: {
-            text: ''
-        },
-        min: 0
-    },
-    tooltip: {
-        formatter: function() {
-            return '<b>'+ this.series.name +'</b><br/>'+
-                Highcharts.dateFormat('%e. %b', this.x) +': '+ this.y +' m';
-        }
-    },
-    plotOptions: {
-        line: {
-            marker: {
-                enabled: false
-            }
-        }
-    },
-    series: []
-};
-
-
-/* Services */
-// Demonstrate how to register services
-// In this case it is a simple value service.
 angular.module('myApp.services', [])
-    .factory('socket', ['$rootScope', function($rootScope) {
+    .value('version', '0.1')
+    .factory('sockets', ['$rootScope', function($rootScope) {
         var ws;
-        var subscribeCallback;
+        var subscribeCallbacks = [];
         return {
             connect: function(gadget, errorCallback) {
                 if(ws) {
                     ws.close();
                     ws = null;
                 }
-                ws = new WebSocket("wss://gadgets.dyndns-ip.com/socket?host=" + gadget.host);
+                ws = new WebSocket("wss://gadgets.dyndns-ip.com/socket?host=" + gadget);
                 ws.onopen = function() {
                 };
                 ws.onerror = function() {
                     errorCallback();
-                }
+                };
                 ws.onmessage = function(message) {
                     message = JSON.parse(message.data);
                     var event = message[0];
                     var payload = JSON.parse(message[1]);
-                    subscribeCallback(event, payload);
+                    for (i in subscribeCallbacks) {
+                        var cb = subscribeCallbacks[i];
+                        cb(event, payload);
+                    }
                 };
             },
             send: function(message) {
                 ws.send(message);
             },
             subscribe: function(callback) {
-                subscribeCallback = callback;
+                subscribeCallbacks.push(callback);
             },
             close: function() {
                 ws.close();
             }
         }
     }])
-    .value('version', '0.1')
-    .factory('history', function($rootScope) {
+    .factory('gadgets', ['$rootScope', '$http', function($rootScope, $http) {
         return {
-            getChart: function(series) {
-                console.log("series", series);
-                config.series = series;
-                return config;
+            get: function(callback) {
+                $http.get('/gadgets').success(function (data, status, headers, config) {
+                    
+                    callback(data);
+                }).error(function(data, status, headers, config) {
+                    
+                    $rootScope.emit("login");
+                });
             }
         }
-    });
+    }])
+    .factory('auth', ['$http', function($http) {
+        return {
+            login: function(username, password) {
+                $http({
+                    url: '/login',
+                    method: "POST",
+                    data: JSON.stringify({username:$scope.username, password: $scope.password}),
+                    headers: {'Content-Type': 'application/json'}
+                }).success(function (data, status, headers, config) {
+                    return true;
+                }).error(function (data, status, headers, config) {
+                    return false;
+                });
+            }
+        }
+    }]);
+
+

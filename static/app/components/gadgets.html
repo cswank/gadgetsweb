@@ -1,0 +1,20 @@
+<div>
+  <ul>
+    <li class="gadgets" ng-repeat="(location, devices) in locations">
+      <a>{{location}}</a>
+      <ul>
+        <li class="devices" ng-repeat="(device, data) in devices">
+          <a>{{device}}</a>
+          <span ng-if="data.info.direction == 'input'">
+            <a class="device-value">{{data.value.value | number:2}}
+          </span>
+          <span ng-if="data.info.direction == 'output'">
+            <button class="device-value"
+                    ng-mousedown="getArguments(data)"
+                    ng-mouseup="toggle(data)">{{data.value.value}}</button>
+          </span>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>

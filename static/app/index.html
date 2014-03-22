@@ -1,30 +1,27 @@
 <!doctype html>
-<html lang="en" ng-app="myApp">
+<html lang="en" ng-app="Gadgets">
 <head>
   <meta charset="utf-8">
-  <title>My AngularJS App</title>
+  <title>Gadgets</title>
   <link rel="stylesheet" href="css/app.css"/>
-  <link rel="stylesheet" href="css/bootstrap/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="lib/bootstrap-3.1.1-dist/css/bootstrap.min.css"/>
+  
 </head>
 <body>
-  <ul class="menu">
-    <li><a href="#/view1">view1</a></li>
-    <li><a href="#/view2">view2</a></li>
-  </ul>
+  <span ng-controller="NavbarCtrl">
+    <bootstrap-navbar gadgets="gadgets"></bootstrap-navbar>
+  </span>
+  
+  <div id="pages" ng-view></div>
 
-  <div ng-view></div>
-
-  <!-- In production use:
-  <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js"></script>
-  -->
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
   <script src="lib/angular/angular.js"></script>
   <script src="lib/angular/angular-route.js"></script>
-  <script src="lib/ui-bootstrap-tpls-0.7.0.js"></script>
+  <script src="lib/jquery-2.1.0.min.js"></script>
+  <script src="lib/ui-bootstrap-tpls-0.10.0.min.js"></script>
+  <script src="lib/bootstrap-hover-dropdown.min.js"></script>
   <script src="js/app.js"></script>
   <script src="js/services.js"></script>
-  <script src="lib/highcharts.js"></script>
-  <script src="lib/highcharts-ng.js"></script>
+  <script src="js/modal-controllers.js"></script>
   <script src="js/controllers.js"></script>
   <script src="js/filters.js"></script>
   <script src="js/directives.js"></script>

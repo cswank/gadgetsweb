@@ -4,56 +4,19 @@ body {
     padding-left: 40px;
 }
 
-.menu {
-  list-style: none;
-  border-bottom: 0.1em solid black;
-  margin-bottom: 2em;
-  padding: 0 0 0.5em;
+#pages {
+    margin-top:5em;
 }
 
-.modal {
-    width: auto;
-}
-
-.menu:before {
-  content: "[";
-}
-
-.menu:after {
-  content: "]";
-}
-
-.menu > li {
-  display: inline;
-}
-
-.menu > li:before {
-  content: "|";
-  padding-right: 0.3em;
-}
-
-.menu > li:nth-child(1):before {
-  content: "";
-  padding: 0;
-}
-
-.gadgets-holder {
-
-}
-
-#method-holder {
-
-}
 
 li.gadgets {
     list-style:none;
-    
 }
 
 li.devices {
     font-size:16px;
     width:200px;
-    height: 26px;
+    height: 28px;
     list-style:none;
 }
 
@@ -68,18 +31,4 @@ li.devices {
 .device-value {
     width:50px;
     float:right;
-}
-
-#methods-holder {
-    margin-top:50px;
-}
-
-.left {
-    width:100%;
-    text-align:left;
-}
-
-.step-complete {
-    text-decoration: line-through;
-    color:red;
 }

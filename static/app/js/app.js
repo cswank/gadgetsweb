@@ -2,17 +2,16 @@
 
 
 // Declare app level module which depends on filters, and services
-angular.module('myApp', [
+angular.module('Gadgets', [
     'ngRoute',
     'myApp.filters',
     'myApp.services',
     'myApp.directives',
     'myApp.controllers',
-    'ui.bootstrap',
-    'highcharts-ng'
+    'ui.bootstrap'
 ]).
 config(['$routeProvider', function($routeProvider) {
-    $routeProvider.when('/', {templateUrl: 'partials/gadgets.html', controller: 'GadgetsCtrl'});
+    $routeProvider.when('/gadgets/:gadget', {templateUrl: 'partials/gadgets.html', controller: 'GadgetsCtrl'});
     $routeProvider.when('/history', {templateUrl: 'partials/history.html', controller: 'HistoryCtrl'});
-    $routeProvider.otherwise({redirectTo: '/'});
+    $routeProvider.otherwise({redirectTo: '/gadgets'});
 }]);
