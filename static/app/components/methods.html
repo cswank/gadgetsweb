@@ -1,3 +1,33 @@
-<div>
-  Methods
+<div id="methods">
+  <div ng-show="showMethods">
+    <div>
+      <a href="" ng-click="getRecipe()">get recipe</a><br/>
+      <select
+         ng-model="method"
+         ng-click="clearDummyMethod()"
+         ng-options="m.name for m in methods">
+      </select>
+      <br>
+    </div>
+    <span ng-if="method.steps.length==0">
+      <a href="" ng-click="addMethod()">add method</a>
+    </span>
+    <span ng-if="method.steps.length>0">
+      <a href="" ng-click="runMethod()">run</a>
+      <a href="" ng-click="addMethod()">edit</a>
+      <a href="" ng-click="clearMethod()">clear</a>
+    </span>
+    <hr/>
+    <div>
+      <div class="row" ng-repeat="step in method.steps track by $index">
+        <div class="col-md-8">
+          <a ng-class="{'step-complete': method.step>$index}">{{step}}</a>
+        </div>
+        <div class="col-md-4">
+          <a ng-show="checkUserPrompt($index)" ng-click="confirm(step)">click to confirm</a>
+        <a ng-if="method.time>0 && method.step==$index">{{method.time | countdown}}</a>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

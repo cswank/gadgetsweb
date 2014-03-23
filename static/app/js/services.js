@@ -21,7 +21,7 @@ angular.module('myApp.services', [])
                     message = JSON.parse(message.data);
                     var event = message[0];
                     var payload = JSON.parse(message[1]);
-                    for (i in subscribeCallbacks) {
+                    for (var i in subscribeCallbacks) {
                         var cb = subscribeCallbacks[i];
                         cb(event, payload);
                     }
@@ -34,19 +34,49 @@ angular.module('myApp.services', [])
                 subscribeCallbacks.push(callback);
             },
             close: function() {
-                ws.close();
+                if (ws != undefined) {
+                    ws.close();
+                }
             }
         }
     }])
     .factory('gadgets', ['$rootScope', '$http', function($rootScope, $http) {
         return {
-            get: function(callback) {
+            get: function(callback, errback) {
                 $http.get('/gadgets').success(function (data, status, headers, config) {
-                    
                     callback(data);
                 }).error(function(data, status, headers, config) {
+                    errback();
+                });
+            }
+        }
+    }])
+    .factory('methods', ['$rootScope', '$http', function($rootScope, $http) {
+        return {
+            save: function(name, method) {
+                var url, httpMethod, data
+                if (method.id != undefined && method.id > 0) {
+                    url = '/gadgets/' + name + '/methods/' + method.id.toString();
+                    httpMethod = 'PUT'
+                } else {
+                    url = '/gadgets/' + name + '/methods';
+                    httpMethod = 'POST'
+                }
+                $http({
+                    url: url,
+                    method: httpMethod,
+                    data: JSON.stringify(method),
+                    headers: {'Content-Type': 'application/json'}
+                }).success(function (data, status, headers, config) {
                     
-                    $rootScope.emit("login");
+                }).error(function (data, status, headers, config) {
+                    console.log("error saving method");
+                });
+            },
+            get: function(name, callback) {
+                var url = '/gadgets/' + name + '/methods';
+                $http.get(url).success(function (data, status, headers, config) {
+                    callback(data);
                 });
             }
         }
@@ -57,15 +87,28 @@ angular.module('myApp.services', [])
                 $http({
                     url: '/login',
                     method: "POST",
-                    data: JSON.stringify({username:$scope.username, password: $scope.password}),
+                    data: JSON.stringify({username:username, password: password}),
                     headers: {'Content-Type': 'application/json'}
                 }).success(function (data, status, headers, config) {
                     return true;
                 }).error(function (data, status, headers, config) {
                     return false;
                 });
+            },
+            logout: function(callback) {
+                $http({
+                    url: '/logout',
+                    method: "POST",
+                    headers: {'Content-Type': 'application/json'}
+                }).success(function (data, status, headers, config) {
+                    callback();
+                }).error(function (data, status, headers, config) {
+                    
+                });
             }
         }
     }]);
+
+
 
 

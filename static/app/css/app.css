@@ -1,7 +1,10 @@
 /* app css stylesheet */
 
 body {
-    padding-left: 40px;
+    padding:50px;
+    font:14px/1.5 Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color:#777;
+    font-weight:300;
 }
 
 #pages {
@@ -31,4 +34,17 @@ li.devices {
 .device-value {
     width:50px;
     float:right;
+}
+
+.step-complete {
+    text-decoration: line-through;
+    color:red;
+}
+
+#methods {
+    width: 400px;
+}
+
+.right-box {
+    border-right: 1px solid #ddd;
 }

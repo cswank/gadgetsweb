@@ -41,7 +41,7 @@ func main() {
 }
 
 func GetGadgets(w http.ResponseWriter, r *http.Request) {
-	controllers.GetGadgets(w, r)
+	checkAuth(w, r , controllers.GetGadgets)
 }
 
 func GetMethods(w http.ResponseWriter, r *http.Request) {

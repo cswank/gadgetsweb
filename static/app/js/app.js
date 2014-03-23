@@ -11,7 +11,8 @@ angular.module('Gadgets', [
     'ui.bootstrap'
 ]).
 config(['$routeProvider', function($routeProvider) {
+    $routeProvider.when('/', {templateUrl: 'partials/home.html', controller: 'HomeCtrl'});
     $routeProvider.when('/gadgets/:gadget', {templateUrl: 'partials/gadgets.html', controller: 'GadgetsCtrl'});
     $routeProvider.when('/history', {templateUrl: 'partials/history.html', controller: 'HistoryCtrl'});
-    $routeProvider.otherwise({redirectTo: '/gadgets'});
+    $routeProvider.otherwise({redirectTo: '/'});
 }]);

@@ -1,15 +1,16 @@
 'use strict';
 
 angular.module('myApp.controllers', []).
-    controller('NavbarCtrl', ['$rootScope', '$scope', 'gadgets', 'auth', function($rootScope, $scope, gadgets, auth) {
+    controller('NavbarCtrl', ['$rootScope', '$scope', '$modal', 'gadgets', 'auth', function($rootScope, $scope, $modal, gadgets, auth) {
         
         $rootScope.$on("login", function(event){
             login();
         });
         
         $scope.gadgets = gadgets.get(function(data) {
-            console.log(data);
             $scope.gadgets = data.gadgets;
+        }, function(){
+            login();
         });
         
         function login() {
@@ -28,11 +29,14 @@ angular.module('myApp.controllers', []).
             }
         }
         
-    }]).
-    controller('GadgetsCtrl', ['$rootScope', '$scope', '$routeParams', 'sockets', function($rootScope, $scope, $routeParams, sockets) {
+    }])
+    .controller('GadgetsCtrl', ['$rootScope', '$scope', '$routeParams', 'sockets', function($rootScope, $scope, $routeParams, sockets) {
         $scope.name = $routeParams.gadget;
         $scope.host = $routeParams.host;
         sockets.connect($scope.host);
+    }])
+    .controller('HomeCtrl', [function() {
+        
     }])
     .controller('HistoryCtrl', [function() {
         
