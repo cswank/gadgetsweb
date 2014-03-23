@@ -70,6 +70,7 @@ var MethodCtrl = function($scope, $modalInstance, method) {
     
     $scope.cancel = function(){
         $modalInstance.dismiss('canceled');
+        $scope.method = {id:-1,name:"select"};
     };
     
     $scope.ok = function() {

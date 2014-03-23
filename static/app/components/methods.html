@@ -1,16 +1,17 @@
 <div id="methods">
   <div ng-show="showMethods">
     <div>
-      <a href="" ng-click="getRecipe()">get recipe</a><br/>
+      <a>methods</a>
+      <br/>
       <select
          ng-model="method"
-         ng-click="clearDummyMethod()"
          ng-options="m.name for m in methods">
       </select>
+      <!-- <a href="" ng-click="getRecipe()">get recipe</a><br/> -->
       <br>
     </div>
-    <span ng-if="method.steps.length==0">
-      <a href="" ng-click="addMethod()">add method</a>
+    <span ng-if="method.steps == null">
+      <a href="" ng-click="addMethod()">add</a>
     </span>
     <span ng-if="method.steps.length>0">
       <a href="" ng-click="runMethod()">run</a>

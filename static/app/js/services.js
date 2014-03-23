@@ -15,7 +15,7 @@ angular.module('myApp.services', [])
                 ws.onopen = function() {
                 };
                 ws.onerror = function() {
-                    errorCallback();
+                    
                 };
                 ws.onmessage = function(message) {
                     message = JSON.parse(message.data);
@@ -40,13 +40,13 @@ angular.module('myApp.services', [])
             }
         }
     }])
-    .factory('gadgets', ['$rootScope', '$http', function($rootScope, $http) {
+    .factory('gadgets', ['$http', '$location', function($http, $location) {
         return {
-            get: function(callback, errback) {
+            get: function(callback, error) {
                 $http.get('/gadgets').success(function (data, status, headers, config) {
                     callback(data);
                 }).error(function(data, status, headers, config) {
-                    errback();
+                    error();
                 });
             }
         }
@@ -77,20 +77,22 @@ angular.module('myApp.services', [])
                 var url = '/gadgets/' + name + '/methods';
                 $http.get(url).success(function (data, status, headers, config) {
                     callback(data);
+                }).error(function() {
+                    
                 });
             }
         }
     }])
     .factory('auth', ['$http', function($http) {
         return {
-            login: function(username, password) {
+            login: function(username, password, callback) {
                 $http({
                     url: '/login',
                     method: "POST",
                     data: JSON.stringify({username:username, password: password}),
                     headers: {'Content-Type': 'application/json'}
                 }).success(function (data, status, headers, config) {
-                    return true;
+                    callback();
                 }).error(function (data, status, headers, config) {
                     return false;
                 });

@@ -20,7 +20,7 @@ angular.module('myApp.directives', [])
                     auth.logout(function(){
                         console.log("logged out");
                         sockets.close();
-                        $location.url("/#/");
+                        $location.url("/");
                     });
                 }
             }
@@ -34,9 +34,10 @@ angular.module('myApp.directives', [])
             scope: false,
             templateUrl: "components/methods.html",
             controller: function($scope, $timeout, $modal) {
+                $scope.method = {id:-1,name:"select"};
+                $scope.methods = [$scope.method];
                 methods.get($scope.name, function(data) {
                     $scope.showMethods = true;
-                    $scope.methods = [$scope.method];
                     for (var i in data.methods) {
                         var rawMethod = data.methods[i];
                         $scope.methods.push(rawMethod);
@@ -45,7 +46,12 @@ angular.module('myApp.directives', [])
                 
                 sockets.subscribe(function (event, message) {
                     if (event == "update" && message.sender == "method runner") {
-                        $scope.method = message.method;
+                        if (message.method.steps == null) {
+                            $scope.method = {id:-1,name:"select"};
+                            $scope.methods[0] = $scope.method;
+                        } else {
+                            $scope.method = message.method;
+                        }
                     } else if (event == "method update") {
                         $scope.$apply(function() {
                             $scope.method.step = message.method.step;
@@ -76,6 +82,9 @@ angular.module('myApp.directives', [])
                 };
                 
                 $scope.addMethod = function() {
+                    if ($scope.method.name == "select") {
+                        $scope.method = {id:-1,name:""};
+                    }
                     var dlg = $modal.open({
                         templateUrl: '/dialogs/method.html',
                         controller: MethodCtrl,
@@ -88,9 +97,8 @@ angular.module('myApp.directives', [])
                     dlg.result.then(function(method) {
                         methods.save($scope.name, method);
                         $scope.method = method;
-                    } ,function(){
-                        
                     });
+                    
                 };
 
                 $scope.getRecipe = function() {

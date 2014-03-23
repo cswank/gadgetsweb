@@ -48,3 +48,7 @@ li.devices {
 .right-box {
     border-right: 1px solid #ddd;
 }
+
+.page-link {
+    font-size:30px;
+}
