@@ -51,6 +51,19 @@ angular.module('myApp.services', [])
             }
         }
     }])
+    .factory('history', ['$http', function($http) {
+        return {
+            getDevices: function(name, callback) {
+                var url = '/history/gadgets/' + name + '/devices';
+                console.log(url);
+                $http.get(url).success(function (data, status, headers, config) {
+                    callback(data);
+                }).error(function(data, status, headers, config) {
+                    console.log(data);
+                });
+            }
+        }
+    }])
     .factory('methods', ['$rootScope', '$http', function($rootScope, $http) {
         return {
             save: function(name, method) {

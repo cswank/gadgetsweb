@@ -210,19 +210,6 @@ angular.module('myApp.directives', [])
             },
             template: '<div class="switch" ng-click="toggle()" ng-class="{ \'disabled\': disabled }"><div class="switch-animate" ng-class="{\'switch-off\': !device.value.value, \'switch-on\': device.value.value}"><span class="switch-left" ng-bind="onLabel"></span><span class="knob" ng-bind="knobLabel"></span><span class="switch-right" ng-bind="offLabel"></span></div></div>',
             controller: function($scope) {
-                // $scope.toggle = function(device) {
-                //     $timeout.cancel(promptEvent);
-                //     if (!$scope.promptShouldBeOpen) {
-                //         var command;
-                //         if (!device.value.value) {
-                //             command = device.info.on;
-                //         } else {
-                //             command = device.info.off;
-                //         }
-                //         var msg = {event:'command', message:{type:'command', body:command}};
-                //         sockets.send(JSON.stringify(msg));
-                //     }
-                // };
                 $scope.toggle = function() {
                     var command;
                     if (!$scope.device.value.value) {
@@ -241,7 +228,63 @@ angular.module('myApp.directives', [])
                 if (!attrs.disabled) { attrs.disabled = false; }
             },
         };
+    }])
+    .directive('historyChart', ['$http', 'history', function ($http, history) {
+        
+        return {
+            restrict: 'E',
+            replace: true,
+            scope: {
+                gadget: '=gadget',
+            },
+            templateUrl: "components/history.html",
+            controller: function($scope) {
+                $scope.chartConfig = {
+                    options: {
+                        chart: {
+                            type: 'line',
+                            zoomType: 'x'
+                        }
+                    },
+                    series: [],
+                    title: {
+                        text: 'Gadgets'
+                    },
+                    xAxis: {
+                        type: 'datetime',
+                        dateTimeLabelFormats: { // don't display the dummy year
+                            month: '%e. %b',
+                            year: '%b'
+                        }
+                    },
+                    loading: false
+                }
+                $scope.selected = {
+                    ids:{}
+                };
+                history.getDevices($scope.gadget, function(data){
+                    $scope.links = data.links;
+                });
+                $scope.getHistory = function(){
+                    $scope.chartConfig.series = [];
+                    for (var key in $scope.selected.ids) {
+                        var val = $scope.selected.ids[key];
+                        if (val) {
+                            var e = Math.round(new Date().getTime() / 1000);
+                            var s = e - 5 * 24 * 60 * 60;
+                            var url = key + '?start=' + s + '&end=' + e;
+                            $http.get(url).success(function(data) {
+                                $scope.chartConfig.series.push(data);
+                            });
+                        }
+                    }
+                }
+            }
+        }
     }]);
+
+
+
         
 
 

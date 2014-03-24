@@ -41,7 +41,7 @@ angular.module('myApp.controllers', []).
     .controller('HomeCtrl', ['$rootScope', '$timeout', '$location', function($rootScope, $timeout, $location) {
         
     }])
-    .controller('HistoryCtrl', [function() {
-        
+    .controller('HistoryCtrl', ['$scope', '$http', '$routeParams', 'history', function($scope, $http, $routeParams, history) {
+        $scope.gadget = $routeParams.gadget;
     }]);
 

@@ -53,7 +53,7 @@ func getQuery(r *http.Request) (hq *models.HistoryQuery, err error) {
 	}
 	hq = &models.HistoryQuery{
 		Host: "localhost",
-		DBName: "gadgets",
+		DBName: vars["gadget"],
 		Collection: "updates",
 		Location: vars["location"],
 		Name: vars["device"],

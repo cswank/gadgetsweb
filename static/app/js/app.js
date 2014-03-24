@@ -8,7 +8,8 @@ angular.module('Gadgets', [
     'myApp.services',
     'myApp.directives',
     'myApp.controllers',
-    'ui.bootstrap'
+    'ui.bootstrap',
+    'highcharts-ng'
 ]).
 config(['$routeProvider', function($routeProvider) {
     $routeProvider.when('/', {templateUrl: 'partials/home.html', controller: 'HomeCtrl'});

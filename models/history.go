@@ -34,8 +34,8 @@ type Devices struct {
 	Links []Link `json:"links"`
 }
 
-func NewLink(location, name string) Link {
-	u, _ := url.Parse(fmt.Sprintf("/history/locations/%s/devices/%s", location, name))
+func NewLink(gadget, location, name string) Link {
+	u, _ := url.Parse(fmt.Sprintf("/history/gadgets/%s/locations/%s/devices/%s", gadget, location, name))
 	return Link{
 		Name: fmt.Sprintf("%s %s", location, name),
 		Path: u.String(),
@@ -56,7 +56,7 @@ func GetDevices(hq *HistoryQuery) (*Devices, error) {
 		var devices []string
 		c.Find(bson.M{"location": l}).Distinct("name", &devices)
 		for _, d := range devices {			
-			links = append(links, NewLink(l, d))
+			links = append(links, NewLink(hq.DBName, l, d))
 		}
 	}
 	d.Links = links
@@ -64,11 +64,11 @@ func GetDevices(hq *HistoryQuery) (*Devices, error) {
 	
 }
 
-func GetHistory(hq *HistoryQuery) ([]Series, error) {
+func GetHistory(hq *HistoryQuery) (Series, error) {
 	c, session, err := getCollection(hq)
 	defer session.Close()
 	if err != nil {
-		return []Series{}, err
+		return Series{}, err
 	}
 	var results []gogadgets.Message
 	err = c.Find(
@@ -88,11 +88,11 @@ func GetHistory(hq *HistoryQuery) ([]Series, error) {
 	for i, r := range results {
 		f, ok := r.Value.ToFloat()
 		if ! ok {
-			return []Series{}, err
+			return Series{}, err
 		}
 		s.Data[i] = []interface{}{r.Timestamp.Unix() * 1000, f}
 	}
-	return []Series{s}, nil
+	return s, nil
 }
 
 
