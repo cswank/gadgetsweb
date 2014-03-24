@@ -230,7 +230,6 @@ angular.module('myApp.directives', [])
         };
     }])
     .directive('historyChart', ['$http', 'history', function ($http, history) {
-        
         return {
             restrict: 'E',
             replace: true,

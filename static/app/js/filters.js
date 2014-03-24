@@ -15,9 +15,6 @@ angular.module('myApp.filters', [])
             var h = Math.floor(input / 3600);
             return h + ':' + m + ':' + s;
         }
-
-
-        
     }])
     .filter('titlecase', function () {
         return function (input) {

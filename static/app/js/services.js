@@ -70,10 +70,10 @@ angular.module('myApp.services', [])
                 var url, httpMethod, data
                 if (method.id != undefined && method.id > 0) {
                     url = '/gadgets/' + name + '/methods/' + method.id.toString();
-                    httpMethod = 'PUT'
+                    httpMethod = 'PUT';
                 } else {
                     url = '/gadgets/' + name + '/methods';
-                    httpMethod = 'POST'
+                    httpMethod = 'POST';
                 }
                 $http({
                     url: url,
