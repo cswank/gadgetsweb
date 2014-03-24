@@ -9,6 +9,7 @@ var (
 	getMethodsQuery = "SELECT id, name, steps FROM methods where gadget = ?"
 	addMethodQuery = "INSERT INTO methods (name, gadget, steps) VALUES (?, ?, ?)"
 	updateMethodQuery = "UPDATE methods set name = ?, steps = ? WHERE id = ?"
+	deleteMethodQuery = "DELETE FROM methods WHERE id = ?"
 )
 
 type Methods struct {
@@ -53,6 +54,16 @@ func GetMethod(rows *sql.Rows) (*Method, error) {
 	}
 	m.Steps = steps
 	return m, err
+}
+
+func (m *Method)Delete() error {
+	db, err := getDB()
+	defer db.Close()
+	if err != nil {
+		return err
+	}
+	_, err = db.Exec(deleteMethodQuery, m.Id)
+	return err
 }
 
 func (m *Method)Save() error {

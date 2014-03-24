@@ -31,6 +31,7 @@ func main() {
 	r.HandleFunc("/gadgets/{name}/methods", GetMethods).Methods("GET")
 	r.HandleFunc("/gadgets/{name}/methods", AddMethod).Methods("POST")
 	r.HandleFunc("/gadgets/{name}/methods/{methodId}", UpdateMethod).Methods("PUT")
+	r.HandleFunc("/gadgets/{name}/methods/{methodId}", DeleteMethod).Methods("DELETE")
 	r.HandleFunc("/history/devices", GetDevices).Methods("GET")
 	r.HandleFunc("/history/locations/{location}/devices/{device}", GetTimeseries).Methods("GET")
 	r.PathPrefix("/").Handler(http.FileServer(http.Dir(os.Getenv("GADGETS_STATIC"))))
@@ -54,6 +55,10 @@ func AddMethod(w http.ResponseWriter, r *http.Request) {
 
 func UpdateMethod(w http.ResponseWriter, r *http.Request) {
 	checkAuth(w, r, controllers.SaveMethod)
+}
+
+func DeleteMethod(w http.ResponseWriter, r *http.Request) {
+	checkAuth(w, r, controllers.DeleteMethod)
 }
 
 func GetRecipe(w http.ResponseWriter, r *http.Request) {

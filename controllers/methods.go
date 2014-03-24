@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"strconv"
 	"io/ioutil"
 	"github.com/gorilla/mux"
 	"bitbucket.org/cswank/gadgetsweb/models"
@@ -36,5 +37,18 @@ func SaveMethod(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 	return method.Save()
+}
+
+func DeleteMethod(w http.ResponseWriter, r *http.Request) error {
+	vars := mux.Vars(r)
+	id, err := strconv.ParseUint(vars["methodId"], 10, 64)
+	if err != nil {
+		return err
+	}
+	method := &models.Method{
+		Id: id,
+		Gadget: vars["name"],
+	}
+	return method.Delete()
 }
 

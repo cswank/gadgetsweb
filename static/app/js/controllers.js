@@ -39,18 +39,9 @@ angular.module('myApp.controllers', []).
         sockets.connect($scope.host);
     }])
     .controller('HomeCtrl', ['$rootScope', '$timeout', '$location', function($rootScope, $timeout, $location) {
-        // var url = $location.url();
-        // var redirect = url + '/login?camefrom=x';
-        // console.log(url);
-        // $timeout(function() {
-        //     $rootScope.$apply(function(){
-        //         $location.path(redirect);
-        //     });
-        // });
+        
     }])
     .controller('HistoryCtrl', [function() {
         
-    }])
-    .controller('LoginCtrl', [function() {
-        console.log("login");
     }]);
+

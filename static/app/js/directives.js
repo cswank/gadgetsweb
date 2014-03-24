@@ -32,18 +32,20 @@ angular.module('myApp.directives', [])
             replace: true,
             transclude: true,
             scope: false,
-            templateUrl: "components/methods.html",
+            templateUrl: "components/methods.html?x=x",
             controller: function($scope, $timeout, $modal) {
-                $scope.method = {id:-1,name:"select"};
-                $scope.methods = [$scope.method];
-                methods.get($scope.name, function(data) {
-                    $scope.showMethods = true;
-                    for (var i in data.methods) {
-                        var rawMethod = data.methods[i];
-                        $scope.methods.push(rawMethod);
-                    }
-                })
-                
+                function getMethods() {
+                    $scope.method = {id:-1,name:"select"};
+                    $scope.methods = [$scope.method];
+                    methods.get($scope.name, function(data) {
+                        $scope.showMethods = true;
+                        for (var i in data.methods) {
+                            var rawMethod = data.methods[i];
+                            $scope.methods.push(rawMethod);
+                        }
+                    })
+                }
+                getMethods();
                 sockets.subscribe(function (event, message) {
                     if (event == "update" && message.sender == "method runner") {
                         if (message.method.steps == null) {
@@ -83,7 +85,7 @@ angular.module('myApp.directives', [])
                 
                 $scope.addMethod = function() {
                     if ($scope.method.name == "select") {
-                        $scope.method = {id:-1,name:""};
+                        $scope.method = {name:""};
                     }
                     var dlg = $modal.open({
                         templateUrl: '/dialogs/method.html',
@@ -118,9 +120,15 @@ angular.module('myApp.directives', [])
 
                 $scope.clearMethod = function() {
                     var msg = {event: 'command', message: {type: 'command', body:'clear method'}};
-                    console.log(msg);
                     sockets.send(JSON.stringify(msg));
+                    getMethods();
                 };
+
+                $scope.deleteMethod = function() {
+                    methods.delete($scope.name, $scope.method, function() {
+                        getMethods();
+                    });
+                }
             }
         }
     }])

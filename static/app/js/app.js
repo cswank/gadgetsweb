@@ -14,6 +14,5 @@ config(['$routeProvider', function($routeProvider) {
     $routeProvider.when('/', {templateUrl: 'partials/home.html', controller: 'HomeCtrl'});
     $routeProvider.when('/gadgets/:gadget', {templateUrl: 'partials/gadgets.html', controller: 'GadgetsCtrl'});
     $routeProvider.when('/history', {templateUrl: 'partials/history.html', controller: 'HistoryCtrl'});
-    $routeProvider.when('/login', {templateUrl: 'partials/login.html', controller: 'LoginCtrl'});
     $routeProvider.otherwise({redirectTo: '/'});
 }]);

@@ -80,6 +80,14 @@ angular.module('myApp.services', [])
                 }).error(function() {
                     
                 });
+            },
+            delete: function(name, method, callback) {
+                var url = '/gadgets/' + name + '/methods/' + method.id.toString();
+                $http.delete(url).success(function (data, status, headers, config) {
+                    callback(data);
+                }).error(function() {
+                    
+                });
             }
         }
     }])
