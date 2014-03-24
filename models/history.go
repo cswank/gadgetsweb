@@ -105,4 +105,3 @@ func getCollection(hq *HistoryQuery) (*mgo.Collection, *mgo.Session, error) {
 	c = session.DB(hq.DBName).C(hq.Collection)
 	return c, session, nil
 }
-
