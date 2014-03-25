@@ -6,6 +6,14 @@ angular.module('myApp.filters', [])
             return String(text).replace(/\%VERSION\%/mg, version);
         }
     }])
+    .filter('ifNumber', ['$filter', function($filter) {
+        return function (input) {
+            if input == "true" || input == "false" {
+                return input
+            }
+            return $filter('number')(number, 2)
+        }
+    }
     .filter('countdown', [function() {
         return function(input) {
             var s = input % 60;
@@ -15,9 +23,6 @@ angular.module('myApp.filters', [])
             var h = Math.floor(input / 3600);
             return h + ':' + m + ':' + s;
         }
-
-
-        
     }])
     .filter('titlecase', function () {
         return function (input) {
