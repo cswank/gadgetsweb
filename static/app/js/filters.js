@@ -6,14 +6,15 @@ angular.module('myApp.filters', [])
             return String(text).replace(/\%VERSION\%/mg, version);
         }
     }])
-    .filter('ifNumber', ['$filter', function($filter) {
+    .filter('ifnumber', ['$filter', function($filter) {
         return function (input) {
-            if input == "true" || input == "false" {
+            if (input == true || input == false) {
                 return input
+            } else {
+                return $filter('number')(input, 2);
             }
-            return $filter('number')(number, 2)
         }
-    }
+    }])
     .filter('countdown', [function() {
         return function(input) {
             var s = input % 60;

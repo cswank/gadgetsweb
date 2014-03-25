@@ -6,7 +6,7 @@
         <li class="devices" ng-repeat="(device, data) in devices">
           <a>{{device}}</a>
           <span ng-if="data.info.direction == 'input'">
-            <a class="device-value">{{data.value.value | ifNumber}}
+            <a class="device-value">{{data.value.value | ifnumber}}
           </span>
           <span ng-if="data.info.direction == 'output'">
             <toggle-switch device="data"><toggle-switch>
