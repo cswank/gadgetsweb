@@ -174,15 +174,42 @@ angular.module('myApp.directives', [])
                     $scope.currentCommand = null;
                     $scope.commandArgument = null;
                 };
-
-                $scope.getArguments = function(device) {
+            }
+        }
+    }])
+    .directive('toggleSwitch', ['sockets', '$modal', '$timeout', function (sockets, $modal, $timeout) {
+        return {
+            restrict: 'EA',
+            replace: true,
+            scope: {
+                device: '=',
+                disabled: '@',
+                onLabel: '@',
+                offLabel: '@',
+                knobLabel: '@'
+            },
+            template: '<div class="switch" ng-mousedown="getArguments()" ng-click="toggle()" ng-class="{ \'disabled\': disabled }"><div class="switch-animate" ng-class="{\'switch-off\': !device.value.value, \'switch-on\': device.value.value}"><span class="switch-left" ng-bind="onLabel"></span><span class="knob" ng-bind="knobLabel"></span><span class="switch-right" ng-bind="offLabel"></span></div></div>',
+            controller: function($scope) {
+                var promptEvent;
+                $scope.toggle = function() {
+                    $timeout.cancel(promptEvent);
+                    var command;
+                    if (!$scope.device.value.value) {
+                        command = $scope.device.info.on;
+                    } else {
+                        command = $scope.device.info.off;
+                    }
+                    var msg = {event:'command', message:{type:'command', body:command}};
+                    sockets.send(JSON.stringify(msg));
+                };
+                $scope.getArguments = function() {
                     promptEvent = $timeout(function() {
                         var dlg = $modal.open({
                             templateUrl: '/dialogs/command.html?c=' + new Date().getTime(),
                             controller: CommandCtrl,
                             resolve: {
                                 command: function () {
-                                    return device.info.on;
+                                    return $scope.device.info.on;
                                 }
                             }
                         });
@@ -194,32 +221,6 @@ angular.module('myApp.directives', [])
                         });
                     }, 1000);
                 };
-            }
-        }
-    }])
-    .directive('toggleSwitch', ['sockets', function (sockets) {
-        return {
-            restrict: 'EA',
-            replace: true,
-            scope: {
-                device: '=',
-                disabled: '@',
-                onLabel: '@',
-                offLabel: '@',
-                knobLabel: '@'
-            },
-            template: '<div class="switch" ng-click="toggle()" ng-class="{ \'disabled\': disabled }"><div class="switch-animate" ng-class="{\'switch-off\': !device.value.value, \'switch-on\': device.value.value}"><span class="switch-left" ng-bind="onLabel"></span><span class="knob" ng-bind="knobLabel"></span><span class="switch-right" ng-bind="offLabel"></span></div></div>',
-            controller: function($scope) {
-                $scope.toggle = function() {
-                    var command;
-                    if (!$scope.device.value.value) {
-                        command = $scope.device.info.on;
-                    } else {
-                        command = $scope.device.info.off;
-                    }
-                    var msg = {event:'command', message:{type:'command', body:command}};
-                    sockets.send(JSON.stringify(msg));
-                };
             },
             compile: function(element, attrs) {
                 if (!attrs.onLabel) { attrs.onLabel = 'On'; }
@@ -230,7 +231,11 @@ angular.module('myApp.directives', [])
         };
     }])
     .directive('historyChart', ['$http', 'history', function ($http, history) {
-        
+        var spans = {
+            "hour": 60 * 60,
+            "day": 24 * 60 * 60,
+            "week": 7 * 24 * 60 * 60,
+        }
         return {
             restrict: 'E',
             replace: true,
@@ -239,6 +244,7 @@ angular.module('myApp.directives', [])
             },
             templateUrl: "components/history.html",
             controller: function($scope) {
+                $scope.span = "day";
                 $scope.chartConfig = {
                     options: {
                         chart: {
@@ -266,18 +272,20 @@ angular.module('myApp.directives', [])
                     $scope.links = data.links;
                 });
                 $scope.getHistory = function(){
-                    $scope.chartConfig.series = [];
+                    var series = [];
+                    
                     for (var key in $scope.selected.ids) {
                         var val = $scope.selected.ids[key];
                         if (val) {
                             var e = Math.round(new Date().getTime() / 1000);
-                            var s = e - 5 * 24 * 60 * 60;
+                            var s = e - spans[$scope.span];
                             var url = key + '?start=' + s + '&end=' + e;
                             $http.get(url).success(function(data) {
-                                $scope.chartConfig.series.push(data);
+                                series.push(data);
                             });
                         }
                     }
+                    $scope.chartConfig.series = series;
                 }
             }
         }

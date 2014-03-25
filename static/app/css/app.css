@@ -11,8 +11,15 @@ body {
     margin-top:5em;
 }
 
+ul {
+    padding: 10px;
+}
 
-li.gadgets {
+ul.no-indent {
+    padding: 0px;
+}
+
+li {
     list-style:none;
 }
 
@@ -52,3 +59,5 @@ li.devices {
 .page-link {
     font-size:30px;
 }
+
+
