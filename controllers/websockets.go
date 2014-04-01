@@ -11,6 +11,13 @@ import (
 	"encoding/json"
 )
 
+var (
+	pingMsg = [][]byte{
+		[]byte("ping"),
+		[]byte(""),
+	}
+)
+
 func HandleSocket(w http.ResponseWriter, r *http.Request) error {
 	params := r.URL.Query()
 	host := params["host"][0]
@@ -49,6 +56,8 @@ func getZMQMessage(conn *websocket.Conn, ctx *zmq.Context, host string, shouldQu
 			sendSocketMessage(conn, msg)
 		case <-shouldQuit:
 			return nil
+		case <-time.After(15 * time.Second):
+			sendSocketMessage(conn, pingMsg)
 		case err := <-chans.Errors():
 			log.Println("get sub err", err)
 			return err

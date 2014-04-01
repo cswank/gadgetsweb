@@ -3,8 +3,10 @@
   <div class="col-md-3 right-box">
     <ul class="no-indent">
       <li ng-repeat="link in links">
-        <input type="checkbox" ng-model="selected.ids[link.path]" name="group" id="{{link.path}}" ng-change="getHistory()"/>
-        <a>{{link.name}}</a>
+        <span ng-if="link.name.length > 1">
+          <input type="checkbox" ng-model="selected.ids[link.path]" name="group" id="{{link.path}}" ng-change="getHistory()"/>
+          <a>{{link.name}}</a>
+        </span>
       </li>
     </ul>
     <hr/>

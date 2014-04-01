@@ -242,9 +242,9 @@ angular.module('myApp.directives', [])
             scope: {
                 gadget: '=gadget',
             },
-            templateUrl: "components/history.html",
+            templateUrl: "components/history.html?x=x",
             controller: function($scope) {
-                $scope.span = "day";
+                $scope.span = "hour";
                 $scope.chartConfig = {
                     options: {
                         chart: {
