@@ -10,10 +10,7 @@ import (
 
 func GetMethods(w http.ResponseWriter, r *http.Request) error {
 	vars := mux.Vars(r)
-	methods, err := models.GetMethods(vars["name"])
-	if err != nil {
-		return err
-	}
+	methods := models.GetMethods(vars["name"])
 	b, err := json.Marshal(methods)
 	if err != nil {
 		return err

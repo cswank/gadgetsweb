@@ -2,15 +2,12 @@ package models
 
 import (
 	"testing"
-	
+	"io/ioutil"
+	"path"
 )
 
 
-func _TestSaveUser(t *testing.T) {
-	db, _ := getDB()
-	defer db.Close()
-	db.Query("CREATE TABLE users(username text PRIMARY KEY, password text)")
-	db.Query("DELETE FROM users")
+func TestSaveUser(t *testing.T) {
 	u := User{
 		Username: "craig",
 		Password: "xyatooks",
@@ -19,24 +16,18 @@ func _TestSaveUser(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	var pw string
-	err = db.QueryRow(getPasswordQuery, "craig").Scan(&pw)
-	if err != nil {
-		t.Error(err)
+	db := getDB()
+	u = db.Users["craig"]
+	if u.Username != "craig" {
+		t.Error(u)
 	}
-	if pw != string(u.HashedPassword) {
-		t.Error(pw)
-	}
-	db.Query("DELETE FROM users")
 }
 
-func _TestIsAuthorized(t *testing.T) {
-	db, _ := getDB()
-	defer db.Close()
-	db.Query("CREATE TABLE users(username text PRIMARY KEY, password text)")
-	db.Query("DELETE FROM users")
+func TestIsAuthorized(t *testing.T) {
+	tmp, _ := ioutil.TempDir("/tmp", "")
+	DBPath = path.Join(tmp, "gadgets.db")
 	u := User{
-		Username: "craig",
+		Username: "me",
 		Password: "xyatooks",
 	}
 
@@ -51,11 +42,9 @@ func _TestIsAuthorized(t *testing.T) {
 	}
 }
 
-func _TestCheckPassword(t *testing.T) {
-	db, _ := getDB()
-	defer db.Close()
-	db.Query("CREATE TABLE users(username text PRIMARY KEY, password text)")
-	db.Query("DELETE FROM users")
+func TestCheckPassword(t *testing.T) {
+	tmp, _ := ioutil.TempDir("/tmp", "")
+	DBPath = path.Join(tmp, "gadgets.db")
 	u := User{
 		Username: "craig",
 		Password: "xyatooks",
@@ -79,7 +68,6 @@ func _TestCheckPassword(t *testing.T) {
 	if isGood {
 		t.Error("password shouldn't have matched")
 	}
-	//db.Query("DELETE FROM users")
 }
 
 

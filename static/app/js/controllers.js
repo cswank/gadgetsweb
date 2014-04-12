@@ -1,8 +1,6 @@
 
 'use strict';
 
-/* Controllers */
-
 var LoginCtrl = function ($scope, $modalInstance) {
     $scope.user = {
         'name': '',
@@ -166,7 +164,7 @@ angular.module('myApp.controllers', []).
                 
             });
         };
-
+        
         $scope.getRecipe = function() {
             var dlg = $modal.open({
                 templateUrl: '/dialogs/recipe.html?c=' + new Date().getTime(),
@@ -262,6 +260,7 @@ angular.module('myApp.controllers', []).
             }
             return commandValue;
         }
+        
         $scope.locations = {};
         socket.subscribe(function (event, message) {
             $scope.$apply(function() {
@@ -290,7 +289,7 @@ angular.module('myApp.controllers', []).
                 }
             });
         });
-
+        
         $scope.checkUserPrompt = function(i) {
             var step = $scope.method.steps[i];
             return step != undefined && step.indexOf("wait for user") == 0 && i == $scope.method.step;

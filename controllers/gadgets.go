@@ -7,10 +7,7 @@ import (
 )
 
 func GetGadgets(w http.ResponseWriter, r *http.Request) error {
-	gadgets, err := models.GetGadgets()
-	if err != nil {
-		return err
-	}
+	gadgets := models.GetGadgets()
 	b, err := json.Marshal(gadgets)
 	if err != nil {
 		return err

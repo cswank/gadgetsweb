@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"time"
 	"log"
 	"net/http"
@@ -30,7 +29,6 @@ func HandleSocket(w http.ResponseWriter, r *http.Request) error {
 	go getZMQMessage(conn, ctx, host, quitSub)
 	<-sockIsDone
 	quitSub <- true
-	fmt.Println("sock exiting")
 	return nil
 }
 
@@ -89,7 +87,7 @@ func getSocketMessage(conn *websocket.Conn, ctx *zmq.Context, host string, done 
 //Send a message via the zmq socket.
 func sendZMQMessage(input []byte) {
 	cmd := &command{}
-	err := json.Unmarshal(p, cmd)
+	err := json.Unmarshal(input, cmd)
 	if err != nil {
 		log.Println(err)
 		return

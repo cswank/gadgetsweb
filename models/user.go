@@ -5,30 +5,12 @@ import (
 	"code.google.com/p/go.crypto/bcrypt"
 )
 
-var (
-	getPasswordQuery = "SELECT password FROM users WHERE username = ?"
-	getUserQuery = "SELECT username FROM users WHERE username = ?"
-	saveUserQuery = "INSERT INTO users (username, password) VALUES (?, ?)"
-)
-
-
-type User struct {
-	Id uint64 `json:"-"`
-	Username string `json:"username"`
-	Password string `json:"password"`
-	HashedPassword []byte `json:"-"`
-}
 
 //Is authorized if the username is in the db
 func (u *User)IsAuthorized() bool {
-	db, err := getDB()
-	defer db.Close()
-	if err != nil {
-		return false
-	}
-	var uname string
-	err = db.QueryRow(getUserQuery, u.Username).Scan(&uname)
-	return err == nil && len(uname) != 0 && uname == u.Username
+	db := getDB()
+	user := db.Users[u.Username]
+	return len(user.Username) != 0 && user.Username == u.Username
 }
 
 func (u *User)Save() error {
@@ -36,13 +18,9 @@ func (u *User)Save() error {
 		return errors.New("password is too short")
 	}
 	u.hashPassword()
-	db, err := getDB()
-	defer db.Close()
-	if err != nil {
-		return err
-	}
-	_, err = db.Query(saveUserQuery, u.Username, u.HashedPassword)
-	return nil
+	db := getDB()
+	db.Users[u.Username] = *u
+	return db.Save()
 }
 
 func (u *User)CheckPassword() (bool, error) {
@@ -62,17 +40,13 @@ func (u *User)hashPassword() {
 }
 
 func (u *User)getHashedPassword() error {
-	db, err := getDB()
-	defer db.Close()
-	if err != nil {
-		return err
+	db := getDB()
+	user, ok := db.Users[u.Username]
+	if !ok {
+		return errors.New("user not found in database")
 	}
-	var hashedPassword string
-	err = db.QueryRow(getPasswordQuery, u.Username).Scan(&hashedPassword)
-	if err == nil {
-		u.HashedPassword = []byte(hashedPassword)
-	}
-	return err
+	u.HashedPassword = user.HashedPassword
+	return nil
 }
 
 
