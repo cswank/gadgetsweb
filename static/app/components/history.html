@@ -1,0 +1,21 @@
+<div>
+  <h3>{{gadget | titlecase}}</h3>
+  <div class="col-md-3 right-box">
+    <ul class="no-indent">
+      <li ng-repeat="link in links">
+        <span ng-if="link.name.length > 1">
+          <input type="checkbox" ng-model="selected.ids[link.path]" name="group" id="{{link.path}}" ng-change="getHistory()"/>
+          <a>{{link.name}}</a>
+        </span>
+      </li>
+    </ul>
+    <hr/>
+    <input type="radio" ng-model="span" value="hour" ng-change="getHistory()">Hour<br/>
+    <input type="radio" ng-model="span" value="day" ng-change="getHistory()">Day<br/>
+    <input type="radio" ng-model="span" value="week" ng-change="getHistory()">Week<br/>
+  </div>
+  <div class="col-md-9">
+    
+    <highchart id="chart1" config="chartConfig" class="span9"></highchart>
+  </div>
+</div>
