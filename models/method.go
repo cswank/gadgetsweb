@@ -20,13 +20,9 @@ func GetMethods(gadget string) Methods {
 }
 
 func (m *Method)Delete() error {
-	db, err := getDB()
-	defer db.Close()
-	if err != nil {
-		return err
-	}
-	_, err = db.Exec(deleteMethodQuery, m.Id)
-	return err
+	db := getDB()
+	delete(db.Methods, m.Name)
+	return nil 
 }
 
 func (m *Method)Save() error {
