@@ -1,6 +1,6 @@
-
 'use strict';
 
+<<<<<<< HEAD
 var LoginCtrl = function ($scope, $modalInstance) {
     $scope.user = {
         'name': '',
@@ -294,126 +294,50 @@ angular.module('myApp.controllers', []).
             var step = $scope.method.steps[i];
             return step != undefined && step.indexOf("wait for user") == 0 && i == $scope.method.step;
         };
+=======
+angular.module('myApp.controllers', []).
+    controller('NavbarCtrl', ['$scope', '$modal', 'gadgets', 'auth', function($scope, $modal, gadgets, auth) {
+>>>>>>> dc3a151856979f508ef20a8c95b18e603d0412f8
 
-        $scope.confirm = function(step) {
-            var msg = {
-                event: 'update',
-                message: {
-                    type: 'update',
-                    body:step,
-                }
-            };
-            socket.send(JSON.stringify(msg));
-            
-        }
-        
-        $scope.sendCommand = function() {
-            $scope.promptShouldBeOpen = false;
-            var command = $scope.currentCommand + $scope.commandArgument;
-            var msg = {event: command, 'message': {}};
-            socket.send(JSON.stringify(msg));
-            $scope.currentCommand = null;
-            $scope.commandArgument = null;
-        };
-
-        $scope.getArguments = function(device) {
-            console.log(device);
-            promptEvent = $timeout(function() {
+        function login() {
+            if ($scope.username == undefined) {
                 var dlg = $modal.open({
-                    templateUrl: '/dialogs/command.html?c=' + new Date().getTime(),
-                    controller: CommandCtrl,
-                    resolve: {
-                        command: function () {
-                            return device.info.on;
-                        }
-                    }
+                    templateUrl: '/dialogs/login.html?c=' + new Date().getTime(),
+                    controller: LoginCtrl,
                 });
-                dlg.result.then(function(command) {
-                    console.log(command);
-                    var msg = {event:'command', message:{type:'command', body:command}};
-                    socket.send(JSON.stringify(msg));
-                } ,function(){
-                    
-                });
-            }, 1000);
-        };
-
-        $scope.toggle = function(device) {
-            $timeout.cancel(promptEvent);
-            if (!$scope.promptShouldBeOpen) {
-                var command;
-                if (!device.value.value) {
-                    command = device.info.on;
-                } else {
-                    command = device.info.off;
-                }
-                var msg = {event:'command', message:{type:'command', body:command}};
-                socket.send(JSON.stringify(msg));
-            }
-        };
-    }]).
-    controller('HistoryCtrl', ['$scope', '$http', '$modal', 'history', function($scope, $http, $modal, history) {
-        $scope.promptShouldBeOpen = false;
-        $scope.openPrompt = function(val) {
-            $scope.promptShouldBeOpen = val;
-        }
-        $http.get("/history/devices").success( function(data) {
-            for (var i in data.links) {
-                var link = data.links[i];
-                link.selected = false;
-            }
-            $scope.links = data.links;
-        });
-
-        $scope.chartConfig = {
-            options: {
-                chart: {
-                    type: 'line',
-                    zoomType: 'x'
-                }
-            },
-            series: [],
-            title: {
-                text: 'Gadgets'
-            },
-            xAxis: {
-                type: 'datetime',
-                dateTimeLabelFormats: { // don't display the dummy year
-                    month: '%e. %b',
-                    year: '%b'
-                }
-            },
-            loading: false
-        }
-        
-        $scope.choose = function() {
-            var dlg = $modal.open({
-                templateUrl: '/dialogs/chart.html?x=yyy',
-                controller: ChartCtrl,
-                resolve: {
-                    links: function () {
-                        return $scope.links;
-                    }
-                }
-            });
-            dlg.result.then(function(selected) {
-                $scope.chartConfig.series = [];
-                var now = new Date().getTime();
-                var start = now - 604800000; //one week
-                //var start = now - (86400000 * 2); //two days
-                var query = {
-                    start: Math.round(start / 1000),
-                    end: Math.round(now / 1000)
-                }
-                var link;
-                for (var i in selected) {
-                    link = selected[i];
-                    $http({method:'GET', url:link.path, params:query}).success(function(data) {
-                        $scope.chartConfig.series.push(data[0]);
+                dlg.result.then(function(user) {
+                    $scope.username = user.name;
+                    $scope.password = user.password;
+                    auth.login($scope.username, $scope.password, function(){
+                        getGadgets();
                     });
-                }
-            } ,function(){
-                
+                });
+            } else {
+                auth.login($scope.username, $scope.password, function(){
+                    getGadgets();
+                });
+            }
+        }
+
+        function getGadgets() {
+            $scope.gadgets = gadgets.get(function(data) {
+                $scope.gadgets = data.gadgets;
+            }, function() {
+                console.log("get gadgets failed");
+                login();
             });
         }
+        getGadgets();
     }])
+    .controller('GadgetsCtrl', ['$rootScope', '$scope', '$routeParams', 'sockets', function($rootScope, $scope, $routeParams, sockets) {
+        $scope.name = $routeParams.gadget;
+        $scope.host = $routeParams.host;
+        sockets.connect($scope.host);
+    }])
+    .controller('HomeCtrl', ['$rootScope', '$timeout', '$location', function($rootScope, $timeout, $location) {
+        
+    }])
+    .controller('HistoryCtrl', ['$scope', '$http', '$routeParams', 'history', function($scope, $http, $routeParams, history) {
+        $scope.gadget = $routeParams.gadget;
+    }]);
+

@@ -2,15 +2,13 @@
   <div class="modal-content">
     <div class="modal-body">
       <form>
-        <label>name</label>
-        <input ng-model="recipe.name"/><br/>
-        <label>grain temperature</label>
-        <input ng-model="recipe.grainTemperature"/>
+        <input placeholder="brewtoad name" ng-model="recipe.name"/><br/>
+        <input placeholder="grain temperature" ng-model="recipe.grainTemperature"/>
       </form>
     </div>
     <div class="modal-footer">
-      <button type="button" class="btn btn-default" ng-click="cancel()">Close</button>
-      <button type="button" class="btn btn-primary" ng-click="ok()">Ok</button>
+      <a type="button" class="btn btn-default" ng-click="cancel()">Close</a>
+      <a type="button" class="btn btn-primary" ng-click="ok()">Ok</a>
     </div>
   </div>
 </div>

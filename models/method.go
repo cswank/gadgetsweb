@@ -19,6 +19,16 @@ func GetMethods(gadget string) Methods {
 	return methods
 }
 
+func (m *Method)Delete() error {
+	db, err := getDB()
+	defer db.Close()
+	if err != nil {
+		return err
+	}
+	_, err = db.Exec(deleteMethodQuery, m.Id)
+	return err
+}
+
 func (m *Method)Save() error {
 	db := getDB()
 	db.Methods[m.Name] = *m

@@ -2,12 +2,20 @@ package controllers
 
 import (
 	"time"
+	"fmt"
 	"log"
 	"net/http"
 	"bitbucket.org/cswank/gogadgets"
 	"github.com/gorilla/websocket"
 	"github.com/vaughan0/go-zmq"
 	"encoding/json"
+)
+
+var (
+	pingMsg = [][]byte{
+		[]byte("ping"),
+		[]byte(""),
+	}
 )
 
 func HandleSocket(w http.ResponseWriter, r *http.Request) error {
@@ -47,6 +55,8 @@ func getZMQMessage(conn *websocket.Conn, ctx *zmq.Context, host string, shouldQu
 			sendSocketMessage(conn, msg)
 		case <-shouldQuit:
 			return nil
+		case <-time.After(15 * time.Second):
+			sendSocketMessage(conn, pingMsg)
 		case err := <-chans.Errors():
 			log.Println("get sub err", err)
 			return err
@@ -75,7 +85,7 @@ func getSocketMessage(conn *websocket.Conn, ctx *zmq.Context, host string, done 
 			return err
 		}
 		if messageType == websocket.TextMessage {
-			sendZMQMessage(p)
+			sendZMQMessage(p, pub)
 		} else if messageType == websocket.CloseMessage || messageType == -1 {
 			done <- true
 			return nil
@@ -85,7 +95,7 @@ func getSocketMessage(conn *websocket.Conn, ctx *zmq.Context, host string, done 
 }
 
 //Send a message via the zmq socket.
-func sendZMQMessage(input []byte) {
+func sendZMQMessage(input []byte, pub *zmq.Socket) {
 	cmd := &command{}
 	err := json.Unmarshal(input, cmd)
 	if err != nil {

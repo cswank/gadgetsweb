@@ -1,16 +1,14 @@
-<div ng-enter="ok()" class="modal-dialog">
-  <div class="modal-content">
-    <div class="modal-header">
-      <button type="button" class="close" ng-click="cancel()">&times;</button>
-      <h4 class="modal-title">Login</h4>
-    </div>
-    <div class="modal-body">
-      <label>username</label><input focus-me ng-model="user.name"/><br/>
-      <label>password</label><input type="password" ng-model="user.password"/>
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-default" ng-click="cancel()">Close</button>
-      <button type="button" class="btn btn-primary" ng-click="ok()">Ok</button>
-    </div>
+<div class="modal-dialog">
+  <div class="modal-header">
+    <a class="close" data-dismiss="modal">×</a>
+    <h3>Login</h3>
+  </div>
+  <div class="modal-body">
+    <input focus-me placeholder="user name" ng-model="user.name"/><br/>
+    <input placeholder="password" type="password" ng-model="user.password"/>
+  </div>
+  <div class="modal-footer">
+    <a href="" type="button" class="btn btn-default" ng-click="cancel()">Close</a>
+    <a href="" type="button" class="btn btn-primary" ng-click="ok()">Ok</a>
   </div>
 </div>

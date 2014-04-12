@@ -1,58 +1,40 @@
 /* app css stylesheet */
 
 body {
-    padding-left: 40px;
+    padding:50px;
+    font:14px/1.5 Lato, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color:#777;
+    font-weight:300;
 }
 
+<<<<<<< HEAD
 .menu {
     list-style: none;
     border-bottom: 0.1em solid black;
     margin-bottom: 2em;
     padding: 0 0 0.5em;
+=======
+#pages {
+    margin-top:5em;
+>>>>>>> dc3a151856979f508ef20a8c95b18e603d0412f8
 }
 
-.modal {
-    width: auto;
+ul {
+    padding: 10px;
 }
 
-.menu:before {
-  content: "[";
+ul.no-indent {
+    padding: 0px;
 }
 
-.menu:after {
-  content: "]";
-}
-
-.menu > li {
-  display: inline;
-}
-
-.menu > li:before {
-  content: "|";
-  padding-right: 0.3em;
-}
-
-.menu > li:nth-child(1):before {
-  content: "";
-  padding: 0;
-}
-
-.gadgets-holder {
-
-}
-
-#method-holder {
-
-}
-
-li.gadgets {
+li {
     list-style:none;
 }
 
 li.devices {
     font-size:16px;
     width:200px;
-    height: 26px;
+    height: 28px;
     list-style:none;
 }
 
@@ -69,16 +51,21 @@ li.devices {
     float:right;
 }
 
-#methods-holder {
-    margin-top:50px;
-}
-
-.left {
-    width:100%;
-    text-align:left;
-}
-
 .step-complete {
     text-decoration: line-through;
     color:red;
 }
+
+#methods {
+    width: 400px;
+}
+
+.right-box {
+    border-right: 1px solid #ddd;
+}
+
+.page-link {
+    font-size:30px;
+}
+
+

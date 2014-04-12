@@ -1,48 +1,72 @@
 'use strict';
 
 angular.module('myApp.services', [])
-    .factory('socket', ['$rootScope', function($rootScope) {
+    .value('version', '0.1')
+    .factory('sockets', ['$rootScope', function($rootScope) {
         var ws;
-        var subscribeCallback;
+        var subscribeCallbacks = [];
         return {
             connect: function(gadget, errorCallback) {
                 if(ws) {
                     ws.close();
                     ws = null;
                 }
-                ws = new WebSocket("wss://gadgets.dyndns-ip.com/socket?host=" + gadget.host);
+                ws = new WebSocket("wss://gadgets.dyndns-ip.com/socket?host=" + gadget);
                 ws.onopen = function() {
                 };
                 ws.onerror = function() {
-                    errorCallback();
-                }
+                };
                 ws.onmessage = function(message) {
                     message = JSON.parse(message.data);
                     var event = message[0];
+                    if (event == 'ping') {
+                        console.log("ping")
+                        return;
+                    }
                     var payload = JSON.parse(message[1]);
-                    subscribeCallback(event, payload);
+                    for (var i in subscribeCallbacks) {
+                        var cb = subscribeCallbacks[i];
+                        cb(event, payload);
+                    }
                 };
             },
             send: function(message) {
                 ws.send(message);
             },
             subscribe: function(callback) {
-                subscribeCallback = callback;
+                subscribeCallbacks.push(callback);
             },
             close: function() {
-                ws.close();
+                if (ws != undefined) {
+                    ws.close();
+                }
             }
         }
     }])
-    .value('version', '0.1')
-    .factory('history', function($rootScope) {
+    .factory('gadgets', ['$http', '$location', function($http, $location) {
         return {
-            getChart: function(series) {
-                console.log("series", series);
-                config.series = series;
-                return config;
+            get: function(callback, error) {
+                $http.get('/gadgets').success(function (data, status, headers, config) {
+                    callback(data);
+                }).error(function(data, status, headers, config) {
+                    error();
+                });
             }
         }
+    }])
+    .factory('history', ['$http', function($http) {
+        return {
+            getDevices: function(name, callback) {
+                var url = '/history/gadgets/' + name + '/devices';
+                console.log(url);
+                $http.get(url).success(function (data, status, headers, config) {
+                    callback(data);
+                }).error(function(data, status, headers, config) {
+                    console.log(data);
+                });
+            }
+        }
+<<<<<<< HEAD
     })
     .factory('methods', function($http, $rootScope, $modal) {
         function getMethods() {
@@ -73,6 +97,19 @@ angular.module('myApp.services', [])
                 } else {
                     url = '/gadgets/' + gadget.name + '/methods';
                     httpMethod = 'POST'
+=======
+    }])
+    .factory('methods', ['$rootScope', '$http', function($rootScope, $http) {
+        return {
+            save: function(name, method) {
+                var url, httpMethod, data
+                if (method.id != undefined && method.id > 0) {
+                    url = '/gadgets/' + name + '/methods/' + method.id.toString();
+                    httpMethod = 'PUT';
+                } else {
+                    url = '/gadgets/' + name + '/methods';
+                    httpMethod = 'POST';
+>>>>>>> dc3a151856979f508ef20a8c95b18e603d0412f8
                 }
                 $http({
                     url: url,
@@ -85,6 +122,7 @@ angular.module('myApp.services', [])
                     console.log("error saving method");
                 });
             },
+<<<<<<< HEAD
             addMethod: function(method) {
                 var dlg = $modal.open({
                     templateUrl: '/dialogs/method.html',
@@ -114,8 +152,58 @@ angular.module('myApp.services', [])
                         $scope.method = data;
                     });
                 } ,function() {
+=======
+            get: function(name, callback) {
+                var url = '/gadgets/' + name + '/methods';
+                $http.get(url).success(function (data, status, headers, config) {
+                    callback(data);
+                }).error(function() {
+                    
+                });
+            },
+            delete: function(name, method, callback) {
+                var url = '/gadgets/' + name + '/methods/' + method.id.toString();
+                $http.delete(url).success(function (data, status, headers, config) {
+                    callback(data);
+                }).error(function() {
                     
                 });
             }
         }
+    }])
+    .factory('auth', ['$http', function($http) {
+        return {
+            login: function(username, password, callback) {
+                $http({
+                    url: '/login',
+                    method: "POST",
+                    data: JSON.stringify({username:username, password: password}),
+                    headers: {'Content-Type': 'application/json'}
+                }).success(function (data, status, headers, config) {
+                    callback();
+                }).error(function (data, status, headers, config) {
+                    return false;
+                });
+            },
+            logout: function(callback) {
+                $http({
+                    url: '/logout',
+                    method: "POST",
+                    headers: {'Content-Type': 'application/json'}
+                }).success(function (data, status, headers, config) {
+                    callback();
+                }).error(function (data, status, headers, config) {
+>>>>>>> dc3a151856979f508ef20a8c95b18e603d0412f8
+                    
+                });
+            }
+        }
+<<<<<<< HEAD
     });
+=======
+    }]);
+
+
+
+
+>>>>>>> dc3a151856979f508ef20a8c95b18e603d0412f8
