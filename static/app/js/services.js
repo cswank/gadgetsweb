@@ -3,17 +3,18 @@
 angular.module('myApp.services', [])
     .value('version', '0.1')
     .factory('sockets', ['$rootScope', '$location', function($rootScope, $location) {
+        var ws;
+        var subscribeCallbacks = [];
+        
         function getWebsocket(gadget) {
             var prot = "wss";
             if ($location.protocol() == "http") {
                 prot = "ws";
             }
-            var url = prot + "://" + $location.host() + "/socket?host=" + gadget
+            var url = prot + "://" + $location.host() + "/socket?host=" + gadget;
             ws = new WebSocket(url);
-            return ws
+            return ws;
         }
-        var ws;
-        var subscribeCallbacks = [];
         return {
             connect: function(gadget, errorCallback) {
                 if(ws) {
