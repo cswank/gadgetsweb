@@ -127,7 +127,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	goodPassword, err := user.CheckPassword()
-	fmt.Println(goodPassword, err)
 	if !goodPassword {
 		http.Error(w, "bad request 3", http.StatusBadRequest)
 		return 
