@@ -3,6 +3,15 @@
 angular.module('myApp.services', [])
     .value('version', '0.1')
     .factory('sockets', ['$rootScope', '$location', function($rootScope, $location) {
+        function getWebsocket(gadget) {
+            var prot = "wss";
+            if ($location.protocol() == "http") {
+                prot = "ws";
+            }
+            var url = prot + "://" + $location.host() + "/socket?host=" + gadget
+            ws = new WebSocket(url);
+            return ws
+        }
         var ws;
         var subscribeCallbacks = [];
         return {
@@ -11,20 +20,12 @@ angular.module('myApp.services', [])
                     ws.close();
                     ws = null;
                 }
-                var prot = "wss";
-                if ($location.protocol() == "http") {
-                    prot = "ws";
-                }
-                var url = prot + "://" + $location.host() + "/socket?host=" + gadget
-                ws = new WebSocket(url);
+                ws = getWebsocket(gadget)
                 ws.onopen = function() {
-                    console.log("onopen")
                 };
                 ws.onerror = function() {
-                    console.log("onerror")
                 };
                 ws.onmessage = function(message) {
-                    console.log("onmessage")
                     message = JSON.parse(message.data);
                     var event = message[0];
                     if (event == 'ping') {
