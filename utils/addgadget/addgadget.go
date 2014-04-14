@@ -23,6 +23,7 @@ func doDel() {
 	gadgets := models.GetGadgets()
 	if len(gadgets) == 0 {
 		fmt.Println("no gadgets to delete")
+		return
 	}
 	for i, g := range gadgets {
 		fmt.Printf("%d   %s\n", i + 1, g.Name)
