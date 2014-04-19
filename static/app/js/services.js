@@ -2,16 +2,26 @@
 
 angular.module('myApp.services', [])
     .value('version', '0.1')
-    .factory('sockets', ['$rootScope', function($rootScope) {
+    .factory('sockets', ['$rootScope', '$location', function($rootScope, $location) {
         var ws;
         var subscribeCallbacks = [];
+        
+        function getWebsocket(gadget) {
+            var prot = "wss";
+            if ($location.protocol() == "http") {
+                prot = "ws";
+            }
+            var url = prot + "://" + $location.host() + "/api/socket?host=" + gadget;
+            ws = new WebSocket(url);
+            return ws;
+        }
         return {
             connect: function(gadget, errorCallback) {
                 if(ws) {
                     ws.close();
                     ws = null;
                 }
-                ws = new WebSocket("wss://gadgets.dyndns-ip.com/socket?host=" + gadget);
+                ws = getWebsocket(gadget)
                 ws.onopen = function() {
                 };
                 ws.onerror = function() {
@@ -46,7 +56,7 @@ angular.module('myApp.services', [])
     .factory('gadgets', ['$http', '$location', function($http, $location) {
         return {
             get: function(callback, error) {
-                $http.get('/gadgets').success(function (data, status, headers, config) {
+                $http.get('/api/gadgets').success(function (data, status, headers, config) {
                     callback(data);
                 }).error(function(data, status, headers, config) {
                     error();
@@ -57,7 +67,7 @@ angular.module('myApp.services', [])
     .factory('history', ['$http', function($http) {
         return {
             getDevices: function(name, callback) {
-                var url = '/history/gadgets/' + name + '/devices';
+                var url = '/api/history/gadgets/' + name + '/devices';
                 console.log(url);
                 $http.get(url).success(function (data, status, headers, config) {
                     callback(data);
@@ -72,10 +82,10 @@ angular.module('myApp.services', [])
             save: function(name, method) {
                 var url, httpMethod, data
                 if (method.id != undefined && method.id > 0) {
-                    url = '/gadgets/' + name + '/methods/' + method.id.toString();
+                    url = '/api/gadgets/' + name + '/methods/' + method.id.toString();
                     httpMethod = 'PUT';
                 } else {
-                    url = '/gadgets/' + name + '/methods';
+                    url = '/api/gadgets/' + name + '/methods';
                     httpMethod = 'POST';
                 }
                 $http({
@@ -90,7 +100,7 @@ angular.module('myApp.services', [])
                 });
             },
             get: function(name, callback) {
-                var url = '/gadgets/' + name + '/methods';
+                var url = '/api/gadgets/' + name + '/methods';
                 $http.get(url).success(function (data, status, headers, config) {
                     callback(data);
                 }).error(function() {
@@ -98,7 +108,7 @@ angular.module('myApp.services', [])
                 });
             },
             delete: function(name, method, callback) {
-                var url = '/gadgets/' + name + '/methods/' + method.id.toString();
+                var url = '/api/gadgets/' + name + '/methods/' + method.id.toString();
                 $http.delete(url).success(function (data, status, headers, config) {
                     callback(data);
                 }).error(function() {
@@ -111,7 +121,7 @@ angular.module('myApp.services', [])
         return {
             login: function(username, password, callback) {
                 $http({
-                    url: '/login',
+                    url: '/api/login',
                     method: "POST",
                     data: JSON.stringify({username:username, password: password}),
                     headers: {'Content-Type': 'application/json'}
@@ -123,7 +133,7 @@ angular.module('myApp.services', [])
             },
             logout: function(callback) {
                 $http({
-                    url: '/logout',
+                    url: '/api/logout',
                     method: "POST",
                     headers: {'Content-Type': 'application/json'}
                 }).success(function (data, status, headers, config) {

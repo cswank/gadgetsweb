@@ -22,3 +22,9 @@ func (g *Gadget)Save() error {
 	db.Gadgets[g.Name] = *g
 	return db.Save()
 }
+
+func (g *Gadget)Delete() error {
+	db := getDB()
+	delete (db.Gadgets, g.Name)
+	return db.Save()
+}

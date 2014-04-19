@@ -5,6 +5,16 @@ import (
 	"code.google.com/p/go.crypto/bcrypt"
 )
 
+func GetUsers() []User {
+	db := getDB()
+	users := make([]User, len(db.Users))
+	var i int
+	for _, u := range db.Users {
+		users[i] = u
+		i++
+	}
+	return users
+}
 
 //Is authorized if the username is in the db
 func (u *User)IsAuthorized() bool {
@@ -22,6 +32,13 @@ func (u *User)Save() error {
 	db.Users[u.Username] = *u
 	return db.Save()
 }
+
+func (u *User)Delete() error {
+	db := getDB()
+	delete (db.Users, u.Username)
+	return db.Save()
+}
+
 
 func (u *User)CheckPassword() (bool, error) {
 	err := u.getHashedPassword()

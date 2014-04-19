@@ -121,7 +121,6 @@ func sendSocketMessage(conn * websocket.Conn, message [][]byte) {
 }
 
 func requestStatus(pub *zmq.Socket) {
-	fmt.Println("request status")
 	msg := gogadgets.Message{
 		Type: gogadgets.COMMAND,
 		Body: "update",
