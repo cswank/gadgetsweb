@@ -251,7 +251,6 @@ angular.module('myApp.directives', [])
 	            }
                 });
                 $scope.chartConfig = {
-                    
                     options: {
                         chart: {
                             type: 'line',
@@ -259,7 +258,7 @@ angular.module('myApp.directives', [])
                         }
                     },
                     plotOptions: {
-                        series: {
+                        line: {
                             marker: {
                                 enabled: false
                             }
