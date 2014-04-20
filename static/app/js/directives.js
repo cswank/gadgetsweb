@@ -245,6 +245,11 @@ angular.module('myApp.directives', [])
             templateUrl: "components/history.html?x=x",
             controller: function($scope) {
                 $scope.span = "hour";
+                Highcharts.setOptions({
+	            global: {
+		        useUTC: false
+	            }
+                });
                 $scope.chartConfig = {
                     options: {
                         chart: {
