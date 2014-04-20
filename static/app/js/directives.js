@@ -251,10 +251,18 @@ angular.module('myApp.directives', [])
 	            }
                 });
                 $scope.chartConfig = {
+                    
                     options: {
                         chart: {
                             type: 'line',
                             zoomType: 'x'
+                        }
+                    },
+                    plotOptions: {
+                        series: {
+                            marker: {
+                                enabled: false
+                            }
                         }
                     },
                     series: [],
