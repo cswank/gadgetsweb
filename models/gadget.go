@@ -5,39 +5,26 @@ var (
 	saveGadgetQuery = "INSERT INTO gadgets (name, host) VALUES (?, ?)"
 )
 
-type GadgetHosts struct {
-	Gadgets []Gadget `json:"gadgets"`
-}
 
-type Gadget struct {
-	Name string `json:"name"`
-	Host string `json:"host"`
-}
-
-func GetGadgets() (*GadgetHosts, error) {
-	db, err := getDB()
-	defer db.Close()
-	gadgets := &GadgetHosts{}
-	rows, err := db.Query(getGadgetsQuery)
-	if err != nil {
-		return gadgets, err
+func GetGadgets() []Gadget {
+	db := getDB()
+	gadgets := make([]Gadget, len(db.Gadgets))
+	i := 0
+	for _, val := range db.Gadgets {
+		gadgets[i] = val
+		i += 1
 	}
-	for rows.Next() {
-		g := Gadget{}
-		if err = rows.Scan(&g.Name, &g.Host); err != nil {
-			return gadgets, err
-		}
-		gadgets.Gadgets = append(gadgets.Gadgets, g)
-	}
-	return gadgets, nil
+	return gadgets
 }
 
 func (g *Gadget)Save() error {
-	db, err := getDB()
-	defer db.Close()
-	if err != nil {
-		return err
-	}
-	_, err = db.Query(saveGadgetQuery, g.Name, g.Host)
-	return err
+	db := getDB()
+	db.Gadgets[g.Name] = *g
+	return db.Save()
+}
+
+func (g *Gadget)Delete() error {
+	db := getDB()
+	delete (db.Gadgets, g.Name)
+	return db.Save()
 }

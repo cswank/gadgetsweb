@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"os"
 	"time"
 	"strconv"
 	"github.com/gorilla/mux"
@@ -9,6 +10,16 @@ import (
 	"encoding/json"
 )
 
+var (
+	mongoHost = "localhost"
+)
+
+func init() {
+	h := os.Getenv("MONGOHOST")
+	if len(h) > 0 {
+		mongoHost = h
+	}
+}
 
 func GetDevices(w http.ResponseWriter, r *http.Request) error {
 	hq, err := getQuery(r)
@@ -52,7 +63,7 @@ func getQuery(r *http.Request) (hq *models.HistoryQuery, err error) {
 		return hq, err
 	}
 	hq = &models.HistoryQuery{
-		Host: "localhost",
+		Host: mongoHost,
 		DBName: vars["gadget"],
 		Collection: "updates",
 		Location: vars["location"],

@@ -35,7 +35,7 @@ type Devices struct {
 }
 
 func NewLink(gadget, location, name string) Link {
-	u, _ := url.Parse(fmt.Sprintf("/history/gadgets/%s/locations/%s/devices/%s", gadget, location, name))
+	u, _ := url.Parse(fmt.Sprintf("/api/history/gadgets/%s/locations/%s/devices/%s", gadget, location, name))
 	return Link{
 		Name: fmt.Sprintf("%s %s", location, name),
 		Path: u.String(),

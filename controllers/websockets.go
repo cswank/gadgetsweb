@@ -37,7 +37,6 @@ func HandleSocket(w http.ResponseWriter, r *http.Request) error {
 	go getZMQMessage(conn, ctx, host, quitSub)
 	<-sockIsDone
 	quitSub <- true
-	fmt.Println("sock exiting")
 	return nil
 }
 
@@ -122,7 +121,6 @@ func sendSocketMessage(conn * websocket.Conn, message [][]byte) {
 }
 
 func requestStatus(pub *zmq.Socket) {
-	fmt.Println("request status")
 	msg := gogadgets.Message{
 		Type: gogadgets.COMMAND,
 		Body: "update",
