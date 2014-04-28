@@ -6,7 +6,7 @@ import (
 	"labix.org/v2/mgo"
 	"net/url"
         "labix.org/v2/mgo/bson"
-	"bitbucket.org/cswank/gogadgets"	
+	"bitbucket.org/cswank/gogadgets/models"	
 )
 
 
@@ -70,7 +70,7 @@ func GetHistory(hq *HistoryQuery) (Series, error) {
 	if err != nil {
 		return Series{}, err
 	}
-	var results []gogadgets.Message
+	var results []models.Message
 	err = c.Find(
 		bson.M{
 			"location": hq.Location,
