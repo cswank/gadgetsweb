@@ -143,7 +143,7 @@ angular.module('myApp.directives', [])
                 var promptEvent;
                 $scope.locations = {};
                 sockets.subscribe(function (event, message) {
-                    if (message.location == "") {
+                    if (message.location == "" || message.location == undefined) {
                         return;
                     }
                     $scope.$apply(function() {
