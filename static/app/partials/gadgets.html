@@ -1,12 +1,17 @@
 
 <div class="row-fluid gadgets-holder">
-  <div>
+  <div ng-show="locations.length > 0">
     <h3>{{name | titlecase}}</h3>
     <div class="col-md-4 right-box">
-      <gadgets></gadgets>
+      <div>
+        <gadgets></gadgets>
+      </div>
     </div>
     <div class="col-md-8">
       <methods></methods>
     </div>
+  </div>
+  <div ng-hide="locations.length > 0">
+    <gadgets-config></gadgets-config>    
   </div>
 </div>

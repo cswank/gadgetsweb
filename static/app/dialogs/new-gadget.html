@@ -1,0 +1,16 @@
+<div>
+  <div class="modal-header">
+    <h3>{{gadget.location}} {{gadget.name}}</h3>
+  </div>
+  <div class="modal-body">
+    <input ng-model="gadget.location" placeholder="Location"/><br/>
+    <input ng-model="gadget.name" placeholder="Name"/><br/>
+    <select ng-model="gadget.type">
+      <option ng-repeat="(type, val) in types">{{type}}</option>
+    </select>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-default" ng-click="cancel()">Close</button>
+    <button type="button" class="btn btn-primary" ng-click="ok()">Save</button>
+  </div>
+</div>

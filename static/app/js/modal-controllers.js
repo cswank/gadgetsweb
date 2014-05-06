@@ -40,6 +40,20 @@ var RecipeCtrl = function ($scope, $modalInstance) {
     };
 }
 
+var NewGadgetCtrl = function ($scope, $modalInstance, types) {
+    $scope.types = types;
+    $scope.gadget = {
+        name: "",
+        location: "",
+    };
+    $scope.ok = function () {
+        $modalInstance.close($scope.gadget);
+    };
+    $scope.cancel = function () {
+        $modalInstance.dismiss('cancel');
+    };
+}
+
 var ChartCtrl = function ($scope, $modalInstance, links) {
     $scope.links = links;
     $scope.ok = function() {
