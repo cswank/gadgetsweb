@@ -16,9 +16,7 @@ angular.module('myApp.directives', [])
             controller: function($scope, $timeout, $modal) {
                 $('[data-hover="dropdown"]').dropdownHover();
                 $scope.logout = function() {
-                    console.log("loggin out");
                     auth.logout(function(){
-                        console.log("logged out");
                         sockets.close();
                         $location.url("/");
                     });
@@ -36,7 +34,6 @@ angular.module('myApp.directives', [])
             controller: function($scope, $timeout, $modal) {
                 $scope.types = [];
                 $http.get("api/gadgets/types").success(function(data) {
-                    console.log(data);
                     $scope.types = data;
                 });
                 $scope.newGadget = function() {
@@ -62,17 +59,19 @@ angular.module('myApp.directives', [])
             restrict: "E",
             replace: true,
             transclude: true,
-            scope: false,
+            scope: {
+                locations: "="
+            },
             templateUrl: "components/gadgets.html?x=x",
-            controller: function($scope, $timeout, $modal) {
+            link: function($scope, elem, attrs) {
                 var promptEvent;
-                $scope.locations = {};
                 sockets.subscribe(function (event, message) {
                     if (message.location == "" || message.location == undefined) {
                         return;
                     }
                     $scope.$apply(function() {
                         if (event == "update") {
+                            $scope.locations.live = true;
                             if ($scope.locations[message.location] == undefined) {
                                 $scope.locations[message.location] = {};
                             }
@@ -84,7 +83,6 @@ angular.module('myApp.directives', [])
                             } else {
                                 $scope.locations[message.location][message.name] = message;
                             }
-                            
                         }
                     });
                 });
@@ -161,7 +159,7 @@ angular.module('myApp.directives', [])
                         $scope.method = {name:""};
                     }
                     var dlg = $modal.open({
-                        templateUrl: '/dialogs/method.html',
+                        templateUrl: '/dialogs/method.html?x=x',
                         controller: MethodCtrl,
                         resolve: {
                             method: function () {

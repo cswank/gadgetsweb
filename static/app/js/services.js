@@ -30,7 +30,6 @@ angular.module('myApp.services', [])
                     message = JSON.parse(message.data);
                     var event = message[0];
                     if (event == 'ping') {
-                        console.log("ping")
                         return;
                     }
                     var payload = JSON.parse(message[1]);
@@ -68,7 +67,6 @@ angular.module('myApp.services', [])
         return {
             getDevices: function(name, callback) {
                 var url = '/api/history/gadgets/' + name + '/devices';
-                console.log(url);
                 $http.get(url).success(function (data, status, headers, config) {
                     callback(data);
                 }).error(function(data, status, headers, config) {

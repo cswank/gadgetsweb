@@ -8,7 +8,6 @@ angular.module('myApp.filters', [])
     }])
     .filter('ifnumber', ['$filter', function($filter) {
         return function (input) {
-            console.log(input);
             if (input == true || input == false) {
                 return input
             } else {
