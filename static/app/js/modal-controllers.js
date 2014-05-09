@@ -46,6 +46,7 @@ var NewGadgetCtrl = function ($scope, $modalInstance, types) {
     $scope.gadget = {
         name: "",
         location: "",
+        pin: {},
     };
     $scope.ok = function () {
         $modalInstance.close($scope.gadget);
@@ -54,8 +55,8 @@ var NewGadgetCtrl = function ($scope, $modalInstance, types) {
         $modalInstance.dismiss('cancel');
     };
     $scope.select = function() {
-        $scope.selectedType = $scope.types[$scope.gadget.type];
-        console.log($scope.selectedType);
+        $scope.selectedType = $scope.types[$scope.gadget.pin.type];
+        $scope.gadget.pin.type = $scope.selectedType.pinType;
     }
 }
 

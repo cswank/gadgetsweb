@@ -48,7 +48,7 @@ angular.module('myApp.directives', [])
                     });
                     
                     dlg.result.then(function(gadget) {
-                        console.log(gadget)
+                        console.log(gadget);
                     })
                 }
             }

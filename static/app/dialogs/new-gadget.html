@@ -3,7 +3,7 @@
     <h3>{{gadget.location}} {{gadget.name}}</h3>
   </div>
   <div class="modal-body">
-    <select ng-model="gadget.type" ng-change="select()">
+    <select ng-model="gadget.pin.type" ng-change="select()">
       <option ng-repeat="(type, val) in types">{{type}}</option>
     </select>
     <select placeholder="units" ng-show="selectedType.units.length > 0" ng-model="gadget.units" ng-change="selectUnits()">
@@ -18,12 +18,12 @@
     <span ng-repeat="(field, val) in selectedType.args">
       <input placeholder="{{field}}"/><br/>
     </span>
-    <select ng-show="selectedType.pins != undefined" ng-model="gadget.port">
+    <select ng-show="selectedType.pins != undefined" ng-model="gadget.pin.port">
       <option ng-repeat="(port, pins) in selectedType.pins">{{port}}</option>
     </select>
     <br/>
-    <select ng-show="gadget.port != undefined" ng-model="gadget.pin">
-      <option ng-repeat="(pin, x) in selectedType.pins[gadget.port]">{{pin}}</option>
+    <select ng-show="gadget.pin.port != undefined" ng-model="gadget.pin.pin">
+      <option ng-repeat="(pin, x) in selectedType.pins[gadget.pin.port]">{{pin}}</option>
     </select>
     <br/>
   </div>
