@@ -38,7 +38,7 @@ angular.module('myApp.directives', [])
                 });
                 $scope.newGadget = function() {
                     var dlg = $modal.open({
-                        templateUrl: '/dialogs/new-gadget.html',
+                        templateUrl: '/dialogs/new-gadget.html?x=x',
                         controller: NewGadgetCtrl,
                         resolve: {
                             types: function () {

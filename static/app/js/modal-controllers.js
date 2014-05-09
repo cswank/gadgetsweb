@@ -42,6 +42,7 @@ var RecipeCtrl = function ($scope, $modalInstance) {
 
 var NewGadgetCtrl = function ($scope, $modalInstance, types) {
     $scope.types = types;
+    $scope.type = {};
     $scope.gadget = {
         name: "",
         location: "",
@@ -52,6 +53,10 @@ var NewGadgetCtrl = function ($scope, $modalInstance, types) {
     $scope.cancel = function () {
         $modalInstance.dismiss('cancel');
     };
+    $scope.select = function() {
+        $scope.selectedType = $scope.types[$scope.gadget.type];
+        console.log($scope.selectedType);
+    }
 }
 
 var ChartCtrl = function ($scope, $modalInstance, links) {
