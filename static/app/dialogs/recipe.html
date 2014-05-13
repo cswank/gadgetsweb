@@ -1,14 +1,15 @@
-<div class="modal-dialog">
-  <div class="modal-content">
-    <div class="modal-body">
-      <form>
+<div>
+  <div class="modal-header">
+    <a>Recipe</a>
+  </div>
+  <div class="modal-body">
+    <form>
         <input placeholder="brewtoad name" ng-model="recipe.name"/><br/>
         <input placeholder="grain temperature" ng-model="recipe.grainTemperature"/>
       </form>
-    </div>
-    <div class="modal-footer">
-      <a type="button" class="btn btn-default" ng-click="cancel()">Close</a>
-      <a type="button" class="btn btn-primary" ng-click="ok()">Ok</a>
-    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-default" ng-click="cancel()">Close</button>
+    <button type="button" class="btn btn-primary" ng-click="ok()">Save</button>
   </div>
 </div>

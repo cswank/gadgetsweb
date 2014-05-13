@@ -30,7 +30,6 @@ angular.module('myApp.services', [])
                     message = JSON.parse(message.data);
                     var event = message[0];
                     if (event == 'ping') {
-                        console.log("ping")
                         return;
                     }
                     var payload = JSON.parse(message[1]);
