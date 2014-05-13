@@ -180,7 +180,7 @@ angular.module('myApp.directives', [])
                         controller: RecipeCtrl,
                     });
                     dlg.result.then(function(recipe) {
-                        var url = '/recipes/' + recipe.name + '?grainTemperature=' + recipe.grainTemperature;
+                        var url = '/api//recipes/' + recipe.name + '?grainTemperature=' + recipe.grainTemperature;
                         $http.get(url).success(function (data, status, headers, config) {
                             $scope.method = data;
                         });
