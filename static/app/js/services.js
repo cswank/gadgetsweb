@@ -68,7 +68,6 @@ angular.module('myApp.services', [])
         return {
             getDevices: function(name, callback) {
                 var url = '/api/history/gadgets/' + name + '/devices';
-                console.log(url);
                 $http.get(url).success(function (data, status, headers, config) {
                     callback(data);
                 }).error(function(data, status, headers, config) {
