@@ -28,6 +28,8 @@ func main() {
 	r.HandleFunc("/api/socket", GetSocket)
 	r.HandleFunc("/api/recipes/{name}", GetRecipe).Methods("GET")
 	r.HandleFunc("/api/gadgets", GetGadgets).Methods("GET")
+	r.HandleFunc("/api/gadgets", AddGadgets).Methods("POST")
+	r.HandleFunc("/api/gadgets/types", GetGadgetTypes).Methods("GET")
 	r.HandleFunc("/api/gadgets/{name}/methods", GetMethods).Methods("GET")
 	r.HandleFunc("/api/gadgets/{name}/methods", AddMethod).Methods("POST")
 	r.HandleFunc("/api/gadgets/{name}/methods/{methodId}", UpdateMethod).Methods("PUT")
@@ -42,6 +44,14 @@ func main() {
 
 func GetGadgets(w http.ResponseWriter, r *http.Request) {
 	checkAuth(w, r , controllers.GetGadgets)
+}
+
+func GetGadgetTypes(w http.ResponseWriter, r *http.Request) {
+	checkAuth(w, r , controllers.GetGadgetTypes)
+}
+
+func AddGadgets(w http.ResponseWriter, r *http.Request) {
+	checkAuth(w, r , controllers.AddGadgets)
 }
 
 func GetMethods(w http.ResponseWriter, r *http.Request) {

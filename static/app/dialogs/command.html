@@ -1,16 +1,17 @@
-<div class="modal-dialog">
-  <div class="modal-content">
-    <div class="modal-body">
-      <form>
-        <div class="left">
-          <a>{{command.command}} {{command.arg}}</a>
-        </div>
-        <input ng-model="command.arg"/>
-      </form>
-    </div>
-    <div class="modal-footer">
-      <a href="" type="button" class="btn btn-default" ng-click="cancel()">Close</a>
-      <a href="" type="button" class="btn btn-primary" ng-click="ok()">Send</a>
-    </div>
+<div>
+  <div class="modal-header">
+    <h3>Send Command</h3>
+  </div>
+  <div class="modal-body">
+    <form>
+      <div class="left">
+        <a>{{command.command}} {{command.arg}}</a>
+      </div>
+      <input ng-model="command.arg"/>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-default" ng-click="cancel()">Close</button>
+    <button type="button" class="btn btn-primary" ng-click="ok()">Save</button>
   </div>
 </div>

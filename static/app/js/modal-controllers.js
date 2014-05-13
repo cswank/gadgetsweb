@@ -40,6 +40,26 @@ var RecipeCtrl = function ($scope, $modalInstance) {
     };
 }
 
+var NewGadgetCtrl = function ($scope, $modalInstance, types) {
+    $scope.types = types;
+    $scope.type = {};
+    $scope.gadget = {
+        name: "",
+        location: "",
+        pin: {},
+    };
+    $scope.ok = function () {
+        $modalInstance.close($scope.gadget);
+    };
+    $scope.cancel = function () {
+        $modalInstance.dismiss('cancel');
+    };
+    $scope.select = function() {
+        $scope.selectedType = $scope.types[$scope.gadget.pin.type];
+        $scope.gadget.pin.type = $scope.selectedType.pinType;
+    }
+}
+
 var ChartCtrl = function ($scope, $modalInstance, links) {
     $scope.links = links;
     $scope.ok = function() {
