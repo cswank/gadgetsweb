@@ -18,10 +18,9 @@ var (
 	SecureCookie   = securecookie.New(hashKey, blockKey)
 )
 
-
-func CheckAuth(w http.ResponseWriter, r *http.Request, ctrl controller) {
+func CheckAuth(w http.ResponseWriter, r *http.Request, ctrl controller, permission string) {
 	user, err := getUserFromCookie(r)
-	if err == nil && user.IsAuthorized() {
+	if err == nil && user.IsAuthorized(permission) {
 		err = ctrl(w, r)
 		if err != nil {
 			log.Println(err)

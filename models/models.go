@@ -37,6 +37,7 @@ type User struct {
 	Username string `bson:"username" json:"username"`
 	Password string `bson:"-" json:"password"`
 	HashedPassword []byte `bson:"hashedPassword" json:"-"`
+	Permission string `bson:"permission" json:"permission"`
 }
 
 type Method struct {

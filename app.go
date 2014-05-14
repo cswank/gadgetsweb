@@ -20,7 +20,8 @@ func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/api/login", auth.Login).Methods("POST")
 	r.HandleFunc("/api/logout", auth.Logout).Methods("POST")
-	r.HandleFunc("/api/socket", GetSocket)
+	r.HandleFunc("/api/socket/in", GetInSocket).Methods("GET")
+	r.HandleFunc("/api/socket/out", GetOutSocket).Methods("GET")
 	r.HandleFunc("/api/gadgets", GetGadgets).Methods("GET")
 	r.HandleFunc("/api/gadgets", AddGadgets).Methods("POST")
 	r.HandleFunc("/api/gadgets/types", GetGadgetTypes).Methods("GET")
@@ -37,41 +38,45 @@ func main() {
 }
 
 func GetGadgets(w http.ResponseWriter, r *http.Request) {
-	auth.CheckAuth(w, r , controllers.GetGadgets)
+	auth.CheckAuth(w, r , controllers.GetGadgets, "read")
 }
 
 func GetGadgetTypes(w http.ResponseWriter, r *http.Request) {
-	auth.CheckAuth(w, r , controllers.GetGadgetTypes)
+	auth.CheckAuth(w, r , controllers.GetGadgetTypes, "read")
 }
 
 func AddGadgets(w http.ResponseWriter, r *http.Request) {
-	auth.CheckAuth(w, r , controllers.AddGadgets)
+	auth.CheckAuth(w, r , controllers.AddGadgets, "write")
 }
 
 func GetMethods(w http.ResponseWriter, r *http.Request) {
-	auth.CheckAuth(w, r , controllers.GetMethods)
+	auth.CheckAuth(w, r , controllers.GetMethods, "write")
 }
 
 func AddMethod(w http.ResponseWriter, r *http.Request) {
-	auth.CheckAuth(w, r, controllers.SaveMethod)
+	auth.CheckAuth(w, r, controllers.SaveMethod, "write")
 }
 
 func UpdateMethod(w http.ResponseWriter, r *http.Request) {
-	auth.CheckAuth(w, r, controllers.SaveMethod)
+	auth.CheckAuth(w, r, controllers.SaveMethod, "write")
 }
 
 func DeleteMethod(w http.ResponseWriter, r *http.Request) {
-	auth.CheckAuth(w, r, controllers.DeleteMethod)
+	auth.CheckAuth(w, r, controllers.DeleteMethod, "write")
 }
 
 func GetTimeseries(w http.ResponseWriter, r *http.Request) {
-	auth.CheckAuth(w, r, controllers.GetTimeseries)
+	auth.CheckAuth(w, r, controllers.GetTimeseries, "read")
 }
 
 func GetDevices(w http.ResponseWriter, r *http.Request) {
-	auth.CheckAuth(w, r, controllers.GetDevices)
+	auth.CheckAuth(w, r, controllers.GetDevices, "read")
 }
 
-func GetSocket(w http.ResponseWriter, r *http.Request) {
-	auth.CheckAuth(w, r, controllers.HandleSocket)
+func GetInSocket(w http.ResponseWriter, r *http.Request) {
+	auth.CheckAuth(w, r, controllers.HandleInSocket, "read")
+}
+
+func GetOutSocket(w http.ResponseWriter, r *http.Request) {
+	auth.CheckAuth(w, r, controllers.HandleOutSocket, "write")
 }

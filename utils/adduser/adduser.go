@@ -24,11 +24,16 @@ func add() {
 	u := models.User{}
 	fmt.Print("username: ")
 	fmt.Scanf("%s", &u.Username)
+	fmt.Print("can write? (y/N): ")
+	var perm string
+	fmt.Scanf("%s", &perm)
+	if perm == "y" || perm == "Y" {
+		u.Permission = "write"
+	}
 	u.Password, _ = gopass.GetPass("password: ")
 	fmt.Println(u)
 	u.Save()
 }
-
 
 func doDel() {
 	users := models.GetUsers()

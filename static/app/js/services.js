@@ -4,29 +4,41 @@ angular.module('myApp.services', [])
     .value('version', '0.1')
     .factory('sockets', ['$rootScope', '$location', function($rootScope, $location) {
         var ws;
+        var outWs;
         var subscribeCallbacks = [];
+        var canWrite;
         
-        function getWebsocket(gadget) {
+        function getWebsockets(gadget) {
+            ws = {};
             var prot = "wss";
             if ($location.protocol() == "http") {
                 prot = "ws";
             }
-            var url = prot + "://" + $location.host() + "/api/socket?host=" + gadget;
-            ws = new WebSocket(url);
+            var url = prot + "://" + $location.host() + "/api/socket/in?host=" + gadget;
+            ws.input = new WebSocket(url);
+            var url = prot + "://" + $location.host() + "/api/socket/out?host=" + gadget;
+            ws.output = new WebSocket(url);
             return ws;
         }
         return {
             connect: function(gadget, errorCallback) {
-                if(ws) {
-                    ws.close();
-                    ws = null;
+                if(ws != undefined) {
+                    ws.input.close();
+                    ws.input = null;
+                    ws.output.close();
+                    ws.output = null;
                 }
-                ws = getWebsocket(gadget)
-                ws.onopen = function() {
+                ws = getWebsockets(gadget);
+                ws.input.onopen = function() {
                 };
-                ws.onerror = function() {
+                ws.input.onerror = function() {
                 };
-                ws.onmessage = function(message) {
+                ws.output.onopen = function() {
+                };
+                ws.output.onerror = function(data) {
+                    console.log(data);
+                };
+                ws.input.onmessage = function(message) {
                     message = JSON.parse(message.data);
                     var event = message[0];
                     if (event == 'ping') {
@@ -40,14 +52,17 @@ angular.module('myApp.services', [])
                 };
             },
             send: function(message) {
-                ws.send(message);
+                if (canWrite) {
+                    ws.output.send(message);
+                }
             },
             subscribe: function(callback) {
                 subscribeCallbacks.push(callback);
             },
             close: function() {
                 if (ws != undefined) {
-                    ws.close();
+                    ws.input.close();
+                    ws.output.close();
                 }
             }
         }

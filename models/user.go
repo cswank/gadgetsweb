@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"errors"
 	"code.google.com/p/go.crypto/bcrypt"
 )
@@ -16,11 +17,16 @@ func GetUsers() []User {
 	return users
 }
 
-//Is authorized if the username is in the db
-func (u *User)IsAuthorized() bool {
+//Is authorized if the username is in the db and has the
+//requested permissions
+func (u *User)IsAuthorized(permission string) bool {
 	db := getDB()
 	user := db.Users[u.Username]
-	return len(user.Username) != 0 && user.Username == u.Username
+	a := len(user.Username) != 0 && user.Username == u.Username
+	if permission == "write" {
+		a = a && user.Permission == "write"
+	}
+	return a
 }
 
 func (u *User)Save() error {
@@ -38,7 +44,6 @@ func (u *User)Delete() error {
 	delete (db.Users, u.Username)
 	return db.Save()
 }
-
 
 func (u *User)CheckPassword() (bool, error) {
 	err := u.getHashedPassword()
