@@ -1,7 +1,6 @@
 package models
 
 import (
-	"fmt"
 	"errors"
 	"code.google.com/p/go.crypto/bcrypt"
 )
