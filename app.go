@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"bitbucket.org/cswank/gadgetsweb/controllers"
 	"bitbucket.org/cswank/gadgetsweb/models"
+	"bitbucket.org/cswank/gadgetsweb/auth"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/securecookie"
 )
@@ -19,14 +20,11 @@ var (
 	SecureCookie   = securecookie.New(hashKey, blockKey)
 )
 
-type controller func(w http.ResponseWriter, r *http.Request) error
-
 func main() {
 	r := mux.NewRouter()
-	r.HandleFunc("/api/login", Login).Methods("POST")
-	r.HandleFunc("/api/logout", Logout).Methods("POST")
+	r.HandleFunc("/api/login", auth.Login).Methods("POST")
+	r.HandleFunc("/api/logout", auth.Logout).Methods("POST")
 	r.HandleFunc("/api/socket", GetSocket)
-	r.HandleFunc("/api/recipes/{name}", GetRecipe).Methods("GET")
 	r.HandleFunc("/api/gadgets", GetGadgets).Methods("GET")
 	r.HandleFunc("/api/gadgets", AddGadgets).Methods("POST")
 	r.HandleFunc("/api/gadgets/types", GetGadgetTypes).Methods("GET")
@@ -36,6 +34,7 @@ func main() {
 	r.HandleFunc("/api/gadgets/{name}/methods/{methodId}", DeleteMethod).Methods("DELETE")
 	r.HandleFunc("/api/history/gadgets/{gadget}/devices", GetDevices).Methods("GET")
 	r.HandleFunc("/api/history/gadgets/{gadget}/locations/{location}/devices/{device}", GetTimeseries).Methods("GET")
+	r.HandleFunc("/recipes/{name}", GetRecipe).Methods("GET")
 	
 	http.Handle("/", r)
 	fmt.Println("listening on 0.0.0.0:8080")
@@ -43,112 +42,45 @@ func main() {
 }
 
 func GetGadgets(w http.ResponseWriter, r *http.Request) {
-	checkAuth(w, r , controllers.GetGadgets)
+	auth.CheckAuth(w, r , controllers.GetGadgets)
 }
 
 func GetGadgetTypes(w http.ResponseWriter, r *http.Request) {
-	checkAuth(w, r , controllers.GetGadgetTypes)
+	auth.CheckAuth(w, r , controllers.GetGadgetTypes)
 }
 
 func AddGadgets(w http.ResponseWriter, r *http.Request) {
-	checkAuth(w, r , controllers.AddGadgets)
+	auth.CheckAuth(w, r , controllers.AddGadgets)
 }
 
 func GetMethods(w http.ResponseWriter, r *http.Request) {
-	checkAuth(w, r , controllers.GetMethods)
+	auth.CheckAuth(w, r , controllers.GetMethods)
 }
 
 func AddMethod(w http.ResponseWriter, r *http.Request) {
-	checkAuth(w, r, controllers.SaveMethod)
+	auth.CheckAuth(w, r, controllers.SaveMethod)
 }
 
 func UpdateMethod(w http.ResponseWriter, r *http.Request) {
-	checkAuth(w, r, controllers.SaveMethod)
+	auth.CheckAuth(w, r, controllers.SaveMethod)
 }
 
 func DeleteMethod(w http.ResponseWriter, r *http.Request) {
-	checkAuth(w, r, controllers.DeleteMethod)
+	auth.CheckAuth(w, r, controllers.DeleteMethod)
 }
 
 func GetRecipe(w http.ResponseWriter, r *http.Request) {
-	checkAuth(w, r, controllers.GetRecipe)
+	auth.CheckAuth(w, r, controllers.GetRecipe)
 }
 
 func GetTimeseries(w http.ResponseWriter, r *http.Request) {
-	checkAuth(w, r, controllers.GetTimeseries)
+	auth.CheckAuth(w, r, controllers.GetTimeseries)
 }
 
 func GetDevices(w http.ResponseWriter, r *http.Request) {
-	checkAuth(w, r, controllers.GetDevices)
+	auth.CheckAuth(w, r, controllers.GetDevices)
 }
 
 func GetSocket(w http.ResponseWriter, r *http.Request) {
-	checkAuth(w, r, controllers.HandleSocket)
-}
-
-func checkAuth(w http.ResponseWriter, r *http.Request, ctrl controller) {
-	user, err := getUserFromCookie(r)
-	if err == nil && user.IsAuthorized() {
-		err = ctrl(w, r)
-		if err != nil {
-			log.Println(err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
-	} else {
-		http.Error(w, "Not Authorized", http.StatusUnauthorized)
-	}
-}
-
-func getUserFromCookie(r *http.Request) (*models.User, error) {
-	user := &models.User{}
-	cookie, err := r.Cookie("gadgets")
-	if err == nil {
-		m := map[string]string{}
-		err = SecureCookie.Decode("gadgets", cookie.Value, &m)
-		if err == nil {
-			user.Username = m["user"]
-		}
-	}
-	return user, err
-}
-
-
-func Logout(w http.ResponseWriter, r *http.Request) {
-	cookie := &http.Cookie{
-		Name:  "gadgets",
-		Value: "",
-		Path:  "/",
-		MaxAge: -1,
-	}
-	http.SetCookie(w, cookie)
-}
-
-func Login(w http.ResponseWriter, r *http.Request) {
-	user := &models.User{}
-	body, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		http.Error(w, "bad request 1", http.StatusBadRequest)
-		return
-	}
-	err = json.Unmarshal(body, user)
-	if err != nil {
-		http.Error(w, "bad request 2", http.StatusBadRequest)
-		return
-	}
-	goodPassword, err := user.CheckPassword()
-	if !goodPassword {
-		http.Error(w, "bad request 3", http.StatusBadRequest)
-		return 
-	}
-	value := map[string]string{
-		"user": user.Username,
-	}
-	encoded, _ := SecureCookie.Encode("gadgets", value)
-	cookie := &http.Cookie{
-		Name:  "gadgets",
-		Value: encoded,
-		Path:  "/",
-		HttpOnly: false,
-	}
-	http.SetCookie(w, cookie)
+	auth.CheckAuth(w, r, controllers.HandleSocket)
 }
