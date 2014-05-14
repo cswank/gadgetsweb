@@ -24,21 +24,24 @@ angular.module('myApp.directives', [])
             }
         }
     }])
-    .directive("gadgetsConfig", ['$modal', '$http', function($modal, $http) {
+    .directive("gadgetsConfig", ['$modal', '$http', 'sockets', function($modal, $http, sockets) {
         return {
             restrict: "E",
             replace: true,
             transclude: true,
-            scope: false,
-            templateUrl: "components/gadgets-config.html",
+            templateUrl: "components/gadgets-config.html?x=x",
             controller: function($scope, $timeout, $modal) {
+                $scope.cfg = {
+                    host:$scope.host,
+                    gadgets: []
+                };
                 $scope.types = [];
                 $http.get("api/gadgets/types").success(function(data) {
                     $scope.types = data;
                 });
                 $scope.newGadget = function() {
                     var dlg = $modal.open({
-                        templateUrl: '/dialogs/new-gadget.html?x=x',
+                        templateUrl: '/dialogs/new-gadget.html?x=y',
                         controller: NewGadgetCtrl,
                         resolve: {
                             types: function () {
@@ -48,8 +51,16 @@ angular.module('myApp.directives', [])
                     });
                     
                     dlg.result.then(function(gadget) {
-                        console.log(gadget);
+                        $scope.cfg.gadgets.push(gadget);
+                        console.log($scope.cfg);
                     })
+                }
+                $scope.saveGadgets = function() {
+                    $http.post("/api/gadgets", $scope.cfg).success(function(data) {
+                        setTimeout(function() {
+                            setTimeout(function(){sockets.connect()}, 1200);
+                        });
+                    });
                 }
             }
         }

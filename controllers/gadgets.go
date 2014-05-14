@@ -1,8 +1,11 @@
 package controllers
 
 import (
+	"fmt"
+	"time"
 	"bitbucket.org/cswank/gadgetsweb/models"
 	"bitbucket.org/cswank/gogadgets"
+	gadgets "bitbucket.org/cswank/gogadgets/models"
 	"encoding/json"
 	"net/http"
 )
@@ -25,5 +28,37 @@ func GetGadgetTypes(w http.ResponseWriter, r *http.Request) error {
 }
 
 func AddGadgets(w http.ResponseWriter, r *http.Request) error {
+	d := json.NewDecoder(r.Body)
+	defer r.Body.Close()
+	var cfg gadgets.Config
+	err := d.Decode(&cfg)
+	if err != nil {
+		return err
+	}
+	s, err := gogadgets.NewClientSockets(cfg.Host)
+	if err != nil {
+		return err
+	}
+	time.Sleep(200 * time.Millisecond)
+	defer s.Close()
+	cfg.Host = "localhost"
+	msg := gadgets.Message{
+		Config: cfg,
+	}
+	fmt.Println(msg)
+	s.SendMessage(msg)
+	time.Sleep(400 * time.Millisecond)
 	return nil
 }
+
+
+
+
+
+
+
+
+
+
+
+
