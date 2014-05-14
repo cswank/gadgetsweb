@@ -34,6 +34,7 @@ angular.module('myApp.services', [])
                 ws.input.onerror = function() {
                 };
                 ws.output.onopen = function() {
+                    canWrite = true;
                 };
                 ws.output.onerror = function(data) {
                     console.log(data);

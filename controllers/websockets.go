@@ -41,8 +41,8 @@ func HandleInSocket(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
-//InSocket (from the client's point of view) is used to send messages
-//from client to server
+//OutSocket (from the client's point of view) is used to send messages
+//from client to server.
 func HandleOutSocket(w http.ResponseWriter, r *http.Request) error {
 	params := r.URL.Query()
 	host := params["host"][0]
