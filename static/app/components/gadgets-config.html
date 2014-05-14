@@ -1,3 +1,8 @@
 <div class="row-fluid">
-  <i href="" class="glyphicon glyphicon-plus" ng-click="newGadget()"></i>
+  <i href="" class="glyphicon glyphicon-plus" ng-click="newGadget()"></i><br/>
+  <div ng-repeat="gadget in cfg.gadgets">
+    <a>{{gadget.name}}</a>
+    <a>{{gadget.location}}</a>
+  </div>
+  <button ng-show="cfg.gadgets.length > 0" ng-click="saveGadgets()">Save</button>
 </div>
