@@ -18,7 +18,32 @@ var (
 	}
 )
 
-func HandleSocket(w http.ResponseWriter, r *http.Request) error {
+//InSocket (from the client's point of view) is used to send messages
+//from server to client
+func HandleInSocket(w http.ResponseWriter, r *http.Request) error {
+	params := r.URL.Query()
+	host := params["host"][0]
+	ctx, err := zmq.NewContext()
+	defer ctx.Close()
+	if err != nil {
+		return err
+	}
+	conn, err := websocket.Upgrade(w, r, nil, 1024, 1024)
+	if _, ok := err.(websocket.HandshakeError); ok {
+		http.Error(w, "Not a websocket handshake", 400)
+		return err
+	}
+	quitSub := make(chan bool)
+	sockIsDone := make(chan bool)
+	go getZMQMessage(conn, ctx, host, quitSub)
+	<-sockIsDone
+	quitSub <- true
+	return nil
+}
+
+//InSocket (from the client's point of view) is used to send messages
+//from client to server
+func HandleOutSocket(w http.ResponseWriter, r *http.Request) error {
 	params := r.URL.Query()
 	host := params["host"][0]
 	ctx, err := zmq.NewContext()
@@ -34,7 +59,6 @@ func HandleSocket(w http.ResponseWriter, r *http.Request) error {
 	quitSub := make(chan bool)
 	sockIsDone := make(chan bool)
 	go getSocketMessage(conn, ctx, host, sockIsDone)
-	go getZMQMessage(conn, ctx, host, quitSub)
 	<-sockIsDone
 	quitSub <- true
 	return nil
