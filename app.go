@@ -1,14 +1,10 @@
 package main
 
 import (
-	"log"
 	"fmt"
 	"os"
 	"net/http"
-	"encoding/json"
-	"io/ioutil"
 	"bitbucket.org/cswank/gadgetsweb/controllers"
-	"bitbucket.org/cswank/gadgetsweb/models"
 	"bitbucket.org/cswank/gadgetsweb/auth"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/securecookie"
@@ -34,7 +30,6 @@ func main() {
 	r.HandleFunc("/api/gadgets/{name}/methods/{methodId}", DeleteMethod).Methods("DELETE")
 	r.HandleFunc("/api/history/gadgets/{gadget}/devices", GetDevices).Methods("GET")
 	r.HandleFunc("/api/history/gadgets/{gadget}/locations/{location}/devices/{device}", GetTimeseries).Methods("GET")
-	r.HandleFunc("/recipes/{name}", GetRecipe).Methods("GET")
 	
 	http.Handle("/", r)
 	fmt.Println("listening on 0.0.0.0:8080")
@@ -67,10 +62,6 @@ func UpdateMethod(w http.ResponseWriter, r *http.Request) {
 
 func DeleteMethod(w http.ResponseWriter, r *http.Request) {
 	auth.CheckAuth(w, r, controllers.DeleteMethod)
-}
-
-func GetRecipe(w http.ResponseWriter, r *http.Request) {
-	auth.CheckAuth(w, r, controllers.GetRecipe)
 }
 
 func GetTimeseries(w http.ResponseWriter, r *http.Request) {
