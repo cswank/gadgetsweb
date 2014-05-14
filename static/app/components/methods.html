@@ -11,7 +11,7 @@
     </div>
     <span ng-if="method.steps == null">
       <a href="" ng-click="addMethod()">add</a>
-      <a href="" ng-click="getRecipe()">recipe</a>
+      <a ng-show="recipesAvailable" href="" ng-click="getRecipe()">recipe</a>
     </span>
     <span ng-if="method.steps.length>0">
       <a href="" ng-click="runMethod()">run</a>

@@ -27,8 +27,11 @@
           </li>
         </ul>
         <ul class="nav pull-right navbar-nav">
-          <li>
+          <li ng-show="loggedIn">
             <a class="brand" ng-click="logout()" href="">Logout</a>
+          </li>
+          <li ng-hide="loggedIn">
+            <a class="brand" ng-click="login()" href="">Log In</a>
           </li>
         </ul>
       </div>
