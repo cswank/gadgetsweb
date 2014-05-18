@@ -100,9 +100,10 @@ angular.module('myApp.directives', [])
             replace: true,
             transclude: true,
             scope: {
-                locations: "="
+                locations: "=",
+                live: "="
             },
-            templateUrl: "components/gadgets.html?x=x",
+            templateUrl: "components/gadgets.html?x=y",
             link: function($scope, elem, attrs) {
                 var promptEvent;
                 sockets.subscribe(function (event, message) {
@@ -111,7 +112,7 @@ angular.module('myApp.directives', [])
                     }
                     $scope.$apply(function() {
                         if (event == "update") {
-                            $scope.locations.live = true;
+                            $scope.live = true;
                             if ($scope.locations[message.location] == undefined) {
                                 $scope.locations[message.location] = {};
                             }

@@ -2,7 +2,8 @@
 
 angular.module('myApp.controllers', [])
     .controller('GadgetsCtrl', ['$rootScope', '$scope', '$routeParams', 'sockets', function($rootScope, $scope, $routeParams, sockets) {
-        $scope.locations = {live:false};
+        $scope.locations = {};
+        $scope.live = false;
         $scope.name = $routeParams.gadget;
         $scope.host = $routeParams.host;
         sockets.connect($scope.host);
