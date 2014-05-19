@@ -2,29 +2,18 @@ package models
 
 import (
 	"os"
-	"labix.org/v2/mgo/bson"
-	"io/ioutil"
+	"github.com/HouzuoGuo/tiedot/db"
+	"math/rand"
+	"time"
 )
 
 var (
 	DBPath = os.Getenv("GADGETSDB")
 )
 
-type DB struct {
-	Users map[string]User     `bson:"users"`
-	Gadgets map[string]Gadget `bson:"gadgets"`
-	Methods map[string]Method `bson:"methods"`
-}
-
-func getDB() *DB {
-	db := &DB{}
-	err := db.Open()
-	if err != nil {
-		db.Gadgets = map[string]Gadget{}
-		db.Users =  map[string]User{}
-		db.Methods =  map[string]Method{}
-	}
-	return db
+func getDB() (*db.DB, error) {
+	rand.Seed(time.Now().UTC().UnixNano())
+	return db.OpenDB(DBPath)
 }
 
 type Gadget struct {
@@ -47,6 +36,12 @@ type Method struct {
 	Steps []string `json:"steps"`
 }
 
+type Note struct {
+	Text string     `json:"name"`
+	Name string     `json:"gadget"`
+	Taken time.Time `json:"steps"`
+}
+
 type Timeseries struct {
 	Name     string              `bson:"name" json:"name"`
 	Data     []interface{}       `bson:"data" json:"data"`
@@ -58,18 +53,3 @@ type Summary struct {
 	Direction string `json:"direction" json:"direction"`
 }
 
-func (d *DB) Open() error {
-	b, err := ioutil.ReadFile(DBPath)
-	if err == nil {
-		err = bson.Unmarshal(b, d)
-	}
-	return err
-}
-
-func (d *DB) Save() error {
-	b, err := bson.Marshal(d)
-	if err != nil {
-		return err
-	}
-	return ioutil.WriteFile(DBPath, b, 0644)
-}

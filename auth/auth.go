@@ -10,7 +10,7 @@ import (
 	"github.com/gorilla/securecookie"
 )
 
-type controller func(w http.ResponseWriter, r *http.Request) error
+type controller func(w http.ResponseWriter, r *http.Request, u *models.User) error
 
 var (
 	hashKey        = []byte(os.Getenv("HASH_KEY"))
@@ -21,7 +21,7 @@ var (
 func CheckAuth(w http.ResponseWriter, r *http.Request, ctrl controller, permission string) {
 	user, err := getUserFromCookie(r)
 	if err == nil && user.IsAuthorized(permission) {
-		err = ctrl(w, r)
+		err = ctrl(w, r, user)
 		if err != nil {
 			log.Println(err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)

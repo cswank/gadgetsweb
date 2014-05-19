@@ -9,7 +9,7 @@ import (
 	"net/http"
 )
 
-func GetMethods(w http.ResponseWriter, r *http.Request) error {
+func GetMethods(w http.ResponseWriter, r *http.Request, u *models.User) error {
 	vars := mux.Vars(r)
 	methods := models.GetMethods(vars["name"])
 	b, err := json.Marshal(methods)
@@ -20,7 +20,7 @@ func GetMethods(w http.ResponseWriter, r *http.Request) error {
 	return err
 }
 
-func SaveMethod(w http.ResponseWriter, r *http.Request) error {
+func SaveMethod(w http.ResponseWriter, r *http.Request, u *models.User) error {
 	vars := mux.Vars(r)
 	method := &models.Method{
 		Gadget: vars["name"],
@@ -36,7 +36,7 @@ func SaveMethod(w http.ResponseWriter, r *http.Request) error {
 	return method.Save()
 }
 
-func DeleteMethod(w http.ResponseWriter, r *http.Request) error {
+func DeleteMethod(w http.ResponseWriter, r *http.Request, u *models.User) error {
 	vars := mux.Vars(r)
 	id, err := strconv.ParseUint(vars["methodId"], 10, 64)
 	if err != nil {

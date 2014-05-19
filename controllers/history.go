@@ -21,7 +21,7 @@ func init() {
 	}
 }
 
-func GetDevices(w http.ResponseWriter, r *http.Request) error {
+func GetDevices(w http.ResponseWriter, r *http.Request, u *models.User) error {
 	hq, err := getQuery(r)
 	if err != nil {
 		return err
@@ -39,7 +39,7 @@ func GetDevices(w http.ResponseWriter, r *http.Request) error {
 }
 
 
-func GetTimeseries(w http.ResponseWriter, r *http.Request) error {
+func GetTimeseries(w http.ResponseWriter, r *http.Request, u *models.User) error {
 	hq, err := getQuery(r)
 	if err != nil {
 		return err

@@ -1,29 +1,29 @@
 package models
 
-import (
-	"testing"
-	"path"
-	"io/ioutil"
-)
+// import (
+// 	"testing"
+// 	"path"
+// 	"io/ioutil"
+// )
 
 
-func TestSaveMethod(t *testing.T) {
-	tmp, _ := ioutil.TempDir("/tmp", "")
-	DBPath = path.Join(tmp, "gadgets.db")
-	m := Method{
-		Name: "flash!",
-		Steps: []string{"turn on lab led 2", "wait 2 seconds", "turn off lab led 2"},
-	}
-	err := m.Save()
-	if err != nil {
-		t.Error(err)
-	}
-	db := getDB()
-	m2 := db.Methods["flash!"]
-	if m2.Name != "flash!" {
-		t.Error(m2)
-	}
-}
+// func TestSaveMethod(t *testing.T) {
+// 	tmp, _ := ioutil.TempDir("/tmp", "")
+// 	DBPath = path.Join(tmp, "gadgets.db")
+// 	m := Method{
+// 		Name: "flash!",
+// 		Steps: []string{"turn on lab led 2", "wait 2 seconds", "turn off lab led 2"},
+// 	}
+// 	err := m.Save()
+// 	if err != nil {
+// 		t.Error(err)
+// 	}
+// 	db := getDB()
+// 	m2 := db.Methods["flash!"]
+// 	if m2.Name != "flash!" {
+// 		t.Error(m2)
+// 	}
+// }
 
 // func _TestGetMethods(t *testing.T) {
 // 	db, _ := getDB()

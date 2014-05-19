@@ -1,5 +1,9 @@
 package models
 
+import (
+	"reflect"
+)
+
 var (
 	getGadgetsQuery = "SELECT name, host FROM gadgets"
 	saveGadgetQuery = "INSERT INTO gadgets (name, host) VALUES (?, ?)"
@@ -7,24 +11,31 @@ var (
 
 
 func GetGadgets() []Gadget {
-	db := getDB()
-	gadgets := make([]Gadget, len(db.Gadgets))
-	i := 0
-	for _, val := range db.Gadgets {
-		gadgets[i] = val
-		i += 1
-	}
-	return gadgets
+	// db, err := getDB()
+	// if err != nil {
+	// 	return []Gadget{}
+	// }
+
+	//gadgets := db.Use("gadgets")
+	return  []Gadget{}
 }
 
+func (g *Gadget) toMap() map[string]interface{} {
+	m := map[string]interface{}{}
+	s := reflect.ValueOf(g).Elem()
+        typeOfT := s.Type()
+        for i := 0; i < s.NumField(); i++ {
+                f := s.Field(i)
+                m[typeOfT.Field(i).Name] = f.Interface()
+        }
+	return m
+}
+
+
 func (g *Gadget)Save() error {
-	db := getDB()
-	db.Gadgets[g.Name] = *g
-	return db.Save()
+	return nil
 }
 
 func (g *Gadget)Delete() error {
-	db := getDB()
-	delete (db.Gadgets, g.Name)
-	return db.Save()
+	return nil
 }
