@@ -6,21 +6,50 @@ angular.module('myApp.directives', [])
             elm.text(version);
         };
     }])
-    .directive("bootstrapNavbar", ['$location', 'auth', 'sockets', function($location, auth, sockets) {
+    .directive("bootstrapNavbar", ['$location', 'auth', 'gadgets', 'sockets', function($location, auth, gadgets, sockets) {
         return {
             restrict: "E",
             replace: true,
             transclude: true,
-            scope: { gadgets:'=gadgets'},
             templateUrl: "components/navbar.html",
             controller: function($scope, $timeout, $modal) {
+                
                 $('[data-hover="dropdown"]').dropdownHover();
-                $scope.logout = function() {
-                    auth.logout(function(){
-                        sockets.close();
-                        $location.url("/");
+                $scope.login = function() {
+                    var dlg = $modal.open({
+                        templateUrl: '/dialogs/login.html?c=' + new Date().getTime(),
+                        controller: LoginCtrl,
+                    });
+                    dlg.result.then(function(user) {
+                        $scope.username = user.name;
+                        $scope.password = user.password;
+                        auth.login($scope.username, $scope.password, function(){
+                            getGadgets();
+                        });
                     });
                 }
+                
+                $scope.logout = function() {
+                    auth.logout(function() {
+                        $scope.loggedIn = false;
+                        sockets.close();
+                        $location.url("/");
+                        $scope.gadgets = [];
+                    });
+                }
+
+                $scope.loggedIn = false;
+
+                function getGadgets() {
+                    $scope.gadgets = gadgets.get(function(data) {
+                        $scope.gadgets = data.gadgets;
+                        $scope.loggedIn = true;
+                    }, function() {
+                        $scope.loggedIn = false;
+                        $scope.errMsg = "login failed"
+                    });
+                }
+                getGadgets();
             }
         }
     }])
@@ -71,9 +100,10 @@ angular.module('myApp.directives', [])
             replace: true,
             transclude: true,
             scope: {
-                locations: "="
+                locations: "=",
+                live: "="
             },
-            templateUrl: "components/gadgets.html?x=x",
+            templateUrl: "components/gadgets.html?x=y",
             link: function($scope, elem, attrs) {
                 var promptEvent;
                 sockets.subscribe(function (event, message) {
@@ -82,7 +112,7 @@ angular.module('myApp.directives', [])
                     }
                     $scope.$apply(function() {
                         if (event == "update") {
-                            $scope.locations.live = true;
+                            $scope.live = true;
                             if ($scope.locations[message.location] == undefined) {
                                 $scope.locations[message.location] = {};
                             }
@@ -114,8 +144,9 @@ angular.module('myApp.directives', [])
             replace: true,
             transclude: true,
             scope: false,
-            templateUrl: "components/methods.html?x=x",
+            templateUrl: "components/methods.html?x=z",
             controller: function($scope, $timeout, $modal) {
+                $scope.recipesAvailable = false;
                 function getMethods() {
                     $scope.method = {id:-1,name:"select"};
                     $scope.methods = [$scope.method];
@@ -128,6 +159,9 @@ angular.module('myApp.directives', [])
                     })
                 }
                 getMethods();
+                $http.get("/recipes/_ping").success(function(data) {
+                    $scope.recipesAvailable = true;
+                });
                 sockets.subscribe(function (event, message) {
                     if (event == "update" && message.sender == "method runner") {
                         if (message.method.steps == null) {
@@ -191,7 +225,7 @@ angular.module('myApp.directives', [])
                         controller: RecipeCtrl,
                     });
                     dlg.result.then(function(recipe) {
-                        var url = '/api//recipes/' + recipe.name + '?grainTemperature=' + recipe.grainTemperature;
+                        var url = '/recipes/' + recipe.name + '?grainTemperature=' + recipe.grainTemperature;
                         $http.get(url).success(function (data, status, headers, config) {
                             $scope.method = data;
                         });
@@ -337,6 +371,18 @@ angular.module('myApp.directives', [])
                     $scope.chartConfig.series = series;
                 }
             }
+        }
+    }])
+    .directive('ngEnter', [function() {
+        return function(scope, element, attrs) {
+            element.bind("keydown keypress", function(event) {
+                if(event.which === 13) {
+                    scope.$apply(function(){
+                        scope.$eval(attrs.ngEnter, {'event': event});
+                    });
+                    event.preventDefault();
+                }
+            });
         }
     }]);
 

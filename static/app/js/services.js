@@ -6,40 +6,28 @@ angular.module('myApp.services', [])
         var ws;
         var outWs;
         var subscribeCallbacks = [];
-        var canWrite;
         
         function getWebsockets(gadget) {
-            ws = {};
             var prot = "wss";
             if ($location.protocol() == "http") {
                 prot = "ws";
             }
-            var url = prot + "://" + $location.host() + "/api/socket/in?host=" + gadget;
-            ws.input = new WebSocket(url);
-            var url = prot + "://" + $location.host() + "/api/socket/out?host=" + gadget;
-            ws.output = new WebSocket(url);
+            var url = prot + "://" + $location.host() + "/api/socket?host=" + gadget;
+            ws = new WebSocket(url);
             return ws;
         }
         return {
             connect: function(gadget, errorCallback) {
                 if(ws != undefined) {
-                    ws.input.close();
-                    ws.input = null;
-                    ws.output.close();
-                    ws.output = null;
+                    ws.close();
+                    ws = null;
                 }
                 ws = getWebsockets(gadget);
-                ws.input.onopen = function() {
+                ws.onopen = function() {
                 };
-                ws.input.onerror = function() {
+                ws.onerror = function() {
                 };
-                ws.output.onopen = function() {
-                    canWrite = true;
-                };
-                ws.output.onerror = function(data) {
-                    console.log(data);
-                };
-                ws.input.onmessage = function(message) {
+                ws.onmessage = function(message) {
                     message = JSON.parse(message.data);
                     var event = message[0];
                     if (event == 'ping') {
@@ -53,17 +41,14 @@ angular.module('myApp.services', [])
                 };
             },
             send: function(message) {
-                if (canWrite) {
-                    ws.output.send(message);
-                }
+                ws.send(message);
             },
             subscribe: function(callback) {
                 subscribeCallbacks.push(callback);
             },
             close: function() {
                 if (ws != undefined) {
-                    ws.input.close();
-                    ws.output.close();
+                    ws.close();
                 }
             }
         }

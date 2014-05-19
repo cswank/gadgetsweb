@@ -1,17 +1,17 @@
 
 <div class="row-fluid gadgets-holder">
-  <div ng-show="locations.live">
+  <div ng-show="live">
     <h3>{{name | titlecase}}</h3>
     <div class="col-md-4 right-box">
       <div>
-        <gadgets locations="locations"></gadgets>
+        <gadgets locations="locations" live="live"></gadgets>
       </div>
     </div>
     <div class="col-md-8">
       <methods></methods>
     </div>
   </div>
-  <div ng-hide="locations.live">
+  <div ng-hide="live">
     <gadgets-config host="host"></gadgets-config>
   </div>
 </div>
