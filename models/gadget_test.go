@@ -36,7 +36,6 @@ func TestSaveGadget(t *testing.T) {
 	os.RemoveAll(tmp)
 }
 
-
 func TestDeleteGadget(t *testing.T) {
 	tmp, _ := ioutil.TempDir("", "")
 	os.Setenv("GADGETSDB", path.Join(tmp, "db"))
@@ -64,8 +63,6 @@ func TestDeleteGadget(t *testing.T) {
 	}
 	os.RemoveAll(tmp)
 }	
-	
-
 
 func TestGetGadgets(t *testing.T) {
 	tmp, _ := ioutil.TempDir("", "")
