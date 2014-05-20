@@ -6,7 +6,9 @@ import (
 )
 
 var (
+	getUsersQuery = "SELECT username FROM users"
 	getPasswordQuery = "SELECT password FROM users WHERE username = ?"
+	deleteUserQuery = "DELETE FROM users WHERE username = ?"
 	getUserQuery = "SELECT username, permission FROM users WHERE username = ?"
 	saveUserQuery = "INSERT INTO users (username, password, permission) VALUES (?, ?, ?)"
 )
@@ -17,6 +19,28 @@ type User struct {
 	Password string `json:"password"`
 	HashedPassword []byte `json:"-"`
 	Permission string `json:"permission"`
+}
+
+func GetUsers() ([]User, error) {
+	users := []User{}
+	db, err := getDB()
+	if err != nil {
+		return users, err
+	}
+	defer db.Close()
+	rows, err := db.Query(getUsersQuery)
+	if err != nil {
+		return users, err
+	}
+	for rows.Next() {
+		u := User{}
+		err := rows.Scan(&u.Username)
+		if err != nil {
+			return []User{}, err
+		}
+		users = append(users, u)
+	}
+	return users, err
 }
 
 //Is authorized if the username is in the db
@@ -47,6 +71,16 @@ func (u *User)Save() error {
 	}
 	_, err = db.Query(saveUserQuery, u.Username, u.HashedPassword, u.Permission)
 	return nil
+}
+
+func (u *User)Delete() error {
+	db, err := getDB()
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+	_, err = db.Exec(deleteUserQuery, u.Username)
+	return err
 }
 
 func (u *User)CheckPassword() (bool, error) {

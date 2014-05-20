@@ -35,6 +35,75 @@ func TestSaveUser(t *testing.T) {
 	os.RemoveAll(tmp)
 }
 
+func TestDeleteUser(t *testing.T) {
+	tmp, _ := ioutil.TempDir("", "")
+	os.Setenv("GADGETSDB", path.Join(tmp, "db"))
+	db, err := getDB()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	u := User{
+		Username: "craig",
+		Password: "xyatooks",
+	}
+	u.Save()
+	users, err := GetUsers()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(users) != 1 {
+		t.Fatal(users)
+	}
+
+	u = users[0]
+	err = u.Delete()
+	if err != nil {
+		t.Fatal(err)
+	}
+	users, err = GetUsers()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(users) != 0 {
+		t.Error(users)
+	}
+	os.RemoveAll(tmp)
+}
+
+
+func TestGetUsers(t *testing.T) {
+	tmp, _ := ioutil.TempDir("", "")
+	os.Setenv("GADGETSDB", path.Join(tmp, "db"))
+	db, err := getDB()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	u := User{
+		Username: "craig",
+		Password: "xyatooks",
+	}
+	u.Save()
+	u = User{
+		Username: "laura",
+		Password: "xyatookss",
+	}
+	u.Save()
+
+	users, err := GetUsers()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(users) != 2 {
+		t.Fatal(users)
+	}
+	if users[0].Username != "craig" {
+		t.Fatal(users[0])
+	}
+	os.RemoveAll(tmp)
+}
+
 func TestIsAuthorized(t *testing.T) {
 	tmp, _ := ioutil.TempDir("", "")
 	os.Setenv("GADGETSDB", path.Join(tmp, "db"))

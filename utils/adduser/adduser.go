@@ -36,7 +36,11 @@ func add() {
 }
 
 func doDel() {
-	users := models.GetUsers()
+	users, err := models.GetUsers()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 	if len(users) == 0 {
 		fmt.Println("no users to delete")
 		return

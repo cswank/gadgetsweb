@@ -8,7 +8,7 @@ import (
 )
 
 
-func _TestSaveGadget(t *testing.T) {
+func TestSaveGadget(t *testing.T) {
 	tmp, _ := ioutil.TempDir("", "")
 	os.Setenv("GADGETSDB", path.Join(tmp, "db"))
 	db, _ := getDB()
@@ -37,7 +37,37 @@ func _TestSaveGadget(t *testing.T) {
 }
 
 
-func _TestGetGadgets(t *testing.T) {
+func TestDeleteGadget(t *testing.T) {
+	tmp, _ := ioutil.TempDir("", "")
+	os.Setenv("GADGETSDB", path.Join(tmp, "db"))
+	db, _ := getDB()
+	defer db.Close()
+	g := Gadget{
+		Name: "brewery",
+		Host: "192.168.1.16",
+	}
+	g.Save()
+	g = Gadget{
+		Name: "lab",
+		Host: "192.168.1.17",
+	}
+	g.Save()
+	gadgets, _ := GetGadgets()
+	if len(gadgets.Gadgets) != 2 {
+		t.Fatal(gadgets)
+	}
+	g = gadgets.Gadgets[0]
+	g.Delete()
+	gadgets, _ = GetGadgets()
+	if len(gadgets.Gadgets) != 1 {
+		t.Fatal(gadgets)
+	}
+	os.RemoveAll(tmp)
+}	
+	
+
+
+func TestGetGadgets(t *testing.T) {
 	tmp, _ := ioutil.TempDir("", "")
 	os.Setenv("GADGETSDB", path.Join(tmp, "db"))
 	db, _ := getDB()
