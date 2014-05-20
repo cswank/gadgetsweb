@@ -2,63 +2,68 @@ package models
 
 import (
 	"testing"
+	"io/ioutil"
+	"os"
+	"path"
 )
 
 
-func TestToMap(t *testing.T) {
+func _TestSaveGadget(t *testing.T) {
+	tmp, _ := ioutil.TempDir("", "")
+	os.Setenv("GADGETSDB", path.Join(tmp, "db"))
+	db, _ := getDB()
+	defer db.Close()
 	g := Gadget{
- 		Name: "brewery",
- 		Host: "192.168.1.16",
- 	}
-	m := g.toMap()
-	if m["Name"] != "brewery" {
-		t.Error(m["Name"])
+		Name: "brewery",
+		Host: "192.168.1.16",
 	}
+	err := g.Save()
+	if err != nil {
+		t.Error(err)
+	}
+	g2 := Gadget{}
+	err = db.QueryRow("SELECT * from gadgets WHERE name = ?", "brewery").Scan(&g2.Name, &g2.Host)
+	if err != nil {
+		t.Error(err)
+	}
+	if g2.Name != "brewery" {
+		t.Error(g2)
+	}
+	if g2.Host != "192.168.1.16" {
+		t.Error(g2)
+	}
+	db.Query("DELETE FROM gadgets")
+	os.RemoveAll(tmp)
 }
 
-// func _TestSaveGadget(t *testing.T) {
-// 	DBPath = "/tmp/gadgetsdb"
-// 	os.RemoveAll(DBPath)
-// 	defer os.RemoveAll(DBPath)
 
-// 	if err := myDB.Create("gadgets", 2); err != nil {
-// 		t.Fatal(err)
-// 	}
-	
-// 	g := Gadget{
-// 		Name: "brewery",
-// 		Host: "192.168.1.16",
-// 	}
-// 	err := g.Save()
-// 	if err != nil {
-// 		t.Error(err)
-// 	}
-
-// 	// db, _ := getDB()
-// 	// if db.Gadgets["brewery"].Host != "192.168.1.16" {
-// 	// 	t.Error(db)
-// 	// }
-// }
-
-
-
-// func _TestGetGadgets(t *testing.T) {
-// 	g := Gadget{
-// 		Name: "brewery",
-// 		Host: "192.168.1.16",
-// 	}
-// 	g.Save()
-// 	g = Gadget{
-// 		Name: "greenhouse",
-// 		Host: "192.168.1.13",
-// 	}
-// 	g.Save()
-// 	gadgets := GetGadgets()
-// 	if len(gadgets) != 2 {
-// 		t.Error(gadgets)
-// 	}
-// 	g1 := gadgets[0]
-// 	if g1.Name != "brewery" {
-// 		t.Error(gadgets)
-// 	}
-// }
+func _TestGetGadgets(t *testing.T) {
+	tmp, _ := ioutil.TempDir("", "")
+	os.Setenv("GADGETSDB", path.Join(tmp, "db"))
+	db, _ := getDB()
+	defer db.Close()
+	db.Query("DELETE FROM gadgets")
+	g := Gadget{
+		Name: "brewery",
+		Host: "192.168.1.16",
+	}
+	g.Save()
+	g = Gadget{
+		Name: "greenhouse",
+		Host: "192.168.1.13",
+	}
+	g.Save()
+	gadgets, err := GetGadgets()
+	if err != nil {
+		t.Error(err)
+	}
+	if len(gadgets.Gadgets) != 2 {
+		t.Error(gadgets)
+	}
+	g1 := gadgets.Gadgets[0]
+	if g1.Name != "brewery" {
+		t.Error(gadgets)
+	}
+	db.Query("DELETE FROM gadgets")
+	os.RemoveAll(tmp)
+}

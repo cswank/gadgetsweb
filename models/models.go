@@ -1,55 +1,44 @@
 package models
 
 import (
-	"os"
-	"github.com/HouzuoGuo/tiedot/db"
-	"math/rand"
-	"time"
+        "os"
+        "database/sql"
+        _ "code.google.com/p/go-sqlite/go1/sqlite3"
+	//_ "github.com/mxk/go-sqlite/sqlite3"
+	//_ "github.com/mattn/go-sqlite3"
+        "bitbucket.org/cswank/gadgetsweb/utils"
 )
-
-var (
-	DBPath = os.Getenv("GADGETSDB")
-)
-
-func getDB() (*db.DB, error) {
-	rand.Seed(time.Now().UTC().UnixNano())
-	return db.OpenDB(DBPath)
-}
-
-type Gadget struct {
-	Name string `bson:"name" json:"name"`
-	Host string `bson:"host" json:"host"`
-}
-
-type User struct {
-	Id uint64 `bson:"0" json:"-"`
-	Username string `bson:"username" json:"username"`
-	Password string `bson:"-" json:"password"`
-	HashedPassword []byte `bson:"hashedPassword" json:"-"`
-	Permission string `bson:"permission" json:"permission"`
-}
-
-type Method struct {
-	Id uint64 `json:"id"`
-	Name string `json:"name"`
-	Gadget string `json:"gadget"`
-	Steps []string `json:"steps"`
-}
-
-type Note struct {
-	Text string     `json:"name"`
-	Name string     `json:"gadget"`
-	Taken time.Time `json:"steps"`
-}
 
 type Timeseries struct {
-	Name     string              `bson:"name" json:"name"`
-	Data     []interface{}       `bson:"data" json:"data"`
+        Name     string              `json:"name"`
+        Data     []interface{}       `json:"data"`
 }
 
 type Summary struct {
-	Location string `json:"location" json:"location"`
-	Name string `json:"name" json:"name"`
-	Direction string `json:"direction" json:"direction"`
+        Location string `json:"location"`
+        Name string `json:"name"`
+        Direction string `json:"direction"`
+}
+
+func createTables(db *sql.DB) {
+        db.Exec("CREATE TABLE users (username text PRIMARY KEY, password text, permission text)")
+        db.Exec("CREATE TABLE gadgets (name text PRIMARY KEY, host text)")
+        db.Exec("CREATE TABLE methods (id INTEGER PRIMARY KEY AUTOINCREMENT, gadget TEXT, name TEXT, steps TEXT)")
+	db.Exec("CREATE TABLE notes (id INTEGER PRIMARY KEY AUTOINCREMENT, gadget TEXT, text TEXT, taken INTEGER)")
+}
+
+func getDB() (*sql.DB, error) {
+        p := os.Getenv("GADGETSDB")
+        if p == "" {
+                p = ":memory:"
+        }
+        db, err := sql.Open("sqlite3", p)
+        if err != nil {
+                return db, err
+        }
+        if p == ":memory:" || !utils.FileExists(p) {
+                createTables(db)
+        }
+        return db, err
 }
 
