@@ -9,12 +9,12 @@ import (
 	"net/http"
 )
 
-func GetGadgets(w http.ResponseWriter, r *http.Request, u *models.User) error {
+func GetGadgets(w http.ResponseWriter, r *http.Request, u *models.User, vars map[string]string) error {
 	gadgets, err := models.GetGadgets()
 	if err != nil {
 		return err
 	}
-	b, err := json.Marshal(map[string][]models.Gadget{"gadgets": gadgets})
+	b, err := json.Marshal(gadgets)
 	if err != nil {
 		return err
 	}
@@ -22,14 +22,14 @@ func GetGadgets(w http.ResponseWriter, r *http.Request, u *models.User) error {
 	return nil
 }
 
-func GetGadgetTypes(w http.ResponseWriter, r *http.Request, u *models.User) error {
+func GetGadgetTypes(w http.ResponseWriter, r *http.Request, u *models.User, vars map[string]string) error {
 	types := gogadgets.GetTypes()
 	d, _ := json.Marshal(types)
 	w.Write(d)
 	return nil
 }
 
-func AddGadgets(w http.ResponseWriter, r *http.Request, u *models.User) error {
+func AddGadgets(w http.ResponseWriter, r *http.Request, u *models.User, vars map[string]string) error {
 	d := json.NewDecoder(r.Body)
 	defer r.Body.Close()
 	var cfg gadgets.Config

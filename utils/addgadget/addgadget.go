@@ -20,12 +20,16 @@ func main() {
 }
 
 func doDel() {
-	gadgets := models.GetGadgets()
-	if len(gadgets) == 0 {
+	gadgets, err := models.GetGadgets()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	if len(gadgets.Gadgets) == 0 {
 		fmt.Println("no gadgets to delete")
 		return
 	}
-	for i, g := range gadgets {
+	for i, g := range gadgets.Gadgets {
 		fmt.Printf("%d   %s\n", i + 1, g.Name)
 	}
 	var j int
@@ -35,7 +39,7 @@ func doDel() {
 	fmt.Printf("really delete %d (y/N)? ", j)
 	fmt.Scanf("%s", &confirm)
 	if confirm == "y" || confirm == "Y" {
-		g := gadgets[j - 1]
+		g := gadgets.Gadgets[j - 1]
 		g.Delete()
 	}
 }

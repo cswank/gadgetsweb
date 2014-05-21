@@ -52,7 +52,9 @@ func (n *Note)Save() error {
 		return err
 	}
 	defer db.Close()
-	n.Taken = time.Now()
+	if n.Taken.Equal(time.Time{}) {
+		n.Taken = time.Now()
+	}
 	_, err = db.Query(saveNoteQuery, n.Text, n.Gadget, n.Taken)
 	return err
 }

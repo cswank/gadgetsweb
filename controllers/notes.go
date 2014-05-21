@@ -1,18 +1,21 @@
 package controllers
 
 import (
-	"strconv"
+	"time"
 	"io/ioutil"
-	"github.com/gorilla/mux"
 	"bitbucket.org/cswank/gadgetsweb/models"
 	"encoding/json"
 	"net/http"
 )
 
-func GetNotes(w http.ResponseWriter, r *http.Request, u *models.User) error {
-	vars := mux.Vars(r)
-	notes := models.GetNotes(vars["name"])
-	b, err := json.Marshal(methods)
+func GetNotes(w http.ResponseWriter, r *http.Request, u *models.User, vars map[string]string) error {
+	
+	start, end, err := getStartandEnd(r)
+	if err != nil {
+		return err
+	}
+	notes := models.GetNotes(vars["name"], start, end)
+	b, err := json.Marshal(notes)
 	if err != nil {
 		return err
 	}
@@ -20,20 +23,19 @@ func GetNotes(w http.ResponseWriter, r *http.Request, u *models.User) error {
 	return err
 }
 
-func SaveNote(w http.ResponseWriter, r *http.Request, u *models.User) error {
+func SaveNote(w http.ResponseWriter, r *http.Request, u *models.User, vars map[string]string) error {
 	vars := mux.Vars(r)
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		return err
 	}
 	note := &models.Note{
-		Name: vars["name"],
-		Taken: time.Now(),
+		Gadget: vars["name"],
 	}
-	err = json.Unmarshal(body, notes)
+	err = json.Unmarshal(body, note)
 	if err != nil {
 		return err
 	}
-	return notes.Save()
+	return note.Save()
 }
 

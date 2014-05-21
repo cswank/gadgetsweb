@@ -19,7 +19,7 @@ var (
 	}
 )
 
-func HandleSocket(w http.ResponseWriter, r *http.Request, u *models.User) error {
+func HandleSocket(w http.ResponseWriter, r *http.Request, u *models.User, vars map[string]string) error {
 	params := r.URL.Query()
 	host := params["host"][0]
 	ctx, err := zmq.NewContext()

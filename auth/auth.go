@@ -4,13 +4,14 @@ import (
 	"log"
 	"os"
 	"net/http"
+	"github.com/gorilla/mux"
 	"encoding/json"
 	"io/ioutil"
 	"bitbucket.org/cswank/gadgetsweb/models"
 	"github.com/gorilla/securecookie"
 )
 
-type controller func(w http.ResponseWriter, r *http.Request, u *models.User) error
+type controller func(w http.ResponseWriter, r *http.Request, u *models.User, vars map[string]string) error
 
 var (
 	hashKey        = []byte(os.Getenv("HASH_KEY"))
@@ -21,7 +22,8 @@ var (
 func CheckAuth(w http.ResponseWriter, r *http.Request, ctrl controller, permission string) {
 	user, err := getUserFromCookie(r)
 	if err == nil && user.IsAuthorized(permission) {
-		err = ctrl(w, r, user)
+		vars := mux.Vars(r)
+		err = ctrl(w, r, user, vars)
 		if err != nil {
 			log.Println(err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -63,11 +65,13 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 	err = json.Unmarshal(body, user)
 	if err != nil {
+		
 		http.Error(w, "bad request 2", http.StatusBadRequest)
 		return
 	}
 	goodPassword, err := user.CheckPassword()
 	if !goodPassword {
+		log.Println(err)
 		http.Error(w, "bad request 3", http.StatusBadRequest)
 		return 
 	}

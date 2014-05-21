@@ -63,7 +63,7 @@ func GetNotes(w http.ResponseWriter, r *http.Request) {
 }
 
 func AddNotes(w http.ResponseWriter, r *http.Request) {
-	auth.CheckAuth(w, r, controllers.SaveNotes, "write")
+	auth.CheckAuth(w, r, controllers.SaveNote, "write")
 }
 
 func UpdateMethod(w http.ResponseWriter, r *http.Request) {

@@ -4,7 +4,6 @@ import (
 	"os"
 	"time"
 	"strconv"
-	"github.com/gorilla/mux"
 	"bitbucket.org/cswank/gadgetsweb/models"
 	"net/http"
 	"encoding/json"
@@ -21,8 +20,8 @@ func init() {
 	}
 }
 
-func GetDevices(w http.ResponseWriter, r *http.Request, u *models.User) error {
-	hq, err := getQuery(r)
+func GetDevices(w http.ResponseWriter, r *http.Request, u *models.User, vars map[string]string) error {
+	hq, err := getQuery(r, vars)
 	if err != nil {
 		return err
 	}
@@ -38,9 +37,8 @@ func GetDevices(w http.ResponseWriter, r *http.Request, u *models.User) error {
 	return nil
 }
 
-
-func GetTimeseries(w http.ResponseWriter, r *http.Request, u *models.User) error {
-	hq, err := getQuery(r)
+func GetTimeseries(w http.ResponseWriter, r *http.Request, u *models.User, vars map[string]string) error {
+	hq, err := getQuery(r, vars)
 	if err != nil {
 		return err
 	}
@@ -56,8 +54,7 @@ func GetTimeseries(w http.ResponseWriter, r *http.Request, u *models.User) error
 	return nil
 }
 
-func getQuery(r *http.Request) (hq *models.HistoryQuery, err error) {
-	vars := mux.Vars(r)
+func getQuery(r *http.Request, vars map[string]string) (hq *models.HistoryQuery, err error) {
 	start, end, err := getStartandEnd(r)
 	if err != nil {
 		return hq, err
@@ -88,4 +85,3 @@ func getStartandEnd(r *http.Request) (time.Time, time.Time, error) {
 	end, err := strconv.ParseInt(endStr, 10, 64)
 	return time.Unix(start, 0), time.Unix(end, 0), err
 }
-
