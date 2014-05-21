@@ -7,11 +7,11 @@ import (
 
 var (
 	saveNoteQuery = "INSERT INTO notes (text, gadget, taken) VALUES (?, ?, ?)"
-	getNotesQuery = "select text, gadget, taken from notes where gadget = ? and taken >= ? and taken <= ?"
+	getNotesQuery = "select text, gadget, taken from notes where gadget = ? and taken >= ? and taken <= ? ORDER BY taken DESC"
 )
 
 type Note struct {
-	Text string     `json:"name"`
+	Text string     `json:"text"`
 	Gadget string   `json:"gadget"`
 	Taken time.Time `json:"time"`
 }
