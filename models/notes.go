@@ -17,7 +17,7 @@ type Note struct {
 }
 
 func GetNotes(gadget string, start, end time.Time) []Note {
-	db, err := getDB()
+	db, err := GetDB()
 	if err != nil {
 		log.Println(err)
 		return []Note{}
@@ -47,7 +47,7 @@ func GetNotes(gadget string, start, end time.Time) []Note {
 // }
 
 func (n *Note)Save() error {
-	db, err := getDB()
+	db, err := GetDB()
 	if err != nil {
 		return err
 	}

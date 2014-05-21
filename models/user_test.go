@@ -11,7 +11,7 @@ import (
 func TestSaveUser(t *testing.T) {
 	tmp, _ := ioutil.TempDir("", "")
 	os.Setenv("GADGETSDB", path.Join(tmp, "db"))
-	db, err := getDB()
+	db, err := GetDB()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -38,7 +38,7 @@ func TestSaveUser(t *testing.T) {
 func TestDeleteUser(t *testing.T) {
 	tmp, _ := ioutil.TempDir("", "")
 	os.Setenv("GADGETSDB", path.Join(tmp, "db"))
-	db, err := getDB()
+	db, err := GetDB()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -75,7 +75,7 @@ func TestDeleteUser(t *testing.T) {
 func TestGetUsers(t *testing.T) {
 	tmp, _ := ioutil.TempDir("", "")
 	os.Setenv("GADGETSDB", path.Join(tmp, "db"))
-	db, err := getDB()
+	db, err := GetDB()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -107,7 +107,7 @@ func TestGetUsers(t *testing.T) {
 func TestIsAuthorized(t *testing.T) {
 	tmp, _ := ioutil.TempDir("", "")
 	os.Setenv("GADGETSDB", path.Join(tmp, "db"))
-	db, _ := getDB()
+	db, _ := GetDB()
 	defer db.Close()
 	u := User{
 		Username: "craig",
@@ -133,7 +133,7 @@ func TestIsAuthorized(t *testing.T) {
 func TestIsAuthorizedWithWrite(t *testing.T) {
 	tmp, _ := ioutil.TempDir("", "")
 	os.Setenv("GADGETSDB", path.Join(tmp, "db"))
-	db, _ := getDB()
+	db, _ := GetDB()
 	defer db.Close()
 	u := User{
 		Username: "craig",
@@ -154,7 +154,7 @@ func TestIsAuthorizedWithWrite(t *testing.T) {
 func TestCheckPassword(t *testing.T) {
 	tmp, _ := ioutil.TempDir("", "")
 	os.Setenv("GADGETSDB", path.Join(tmp, "db"))
-	db, _ := getDB()
+	db, _ := GetDB()
 	defer db.Close()
 	db.Query("CREATE TABLE users(username text PRIMARY KEY, password text)")
 	db.Query("DELETE FROM users")

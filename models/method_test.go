@@ -11,7 +11,7 @@ import (
 func TestSaveMethod(t *testing.T) {
 	tmp, _ := ioutil.TempDir("", "")
 	os.Setenv("GADGETSDB", path.Join(tmp, "db"))
-	db, _ := getDB()
+	db, _ := GetDB()
 	defer db.Close()
 	m := Method{
 		Name: "flash!",
@@ -36,7 +36,7 @@ func TestSaveMethod(t *testing.T) {
 func TestGetMethods(t *testing.T) {
 	tmp, _ := ioutil.TempDir("", "")
 	os.Setenv("GADGETSDB", path.Join(tmp, "db"))
-	db, _ := getDB()
+	db, _ := GetDB()
 	defer db.Close()
 	m := Method{
 		Name: "flash!",

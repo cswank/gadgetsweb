@@ -24,7 +24,7 @@ type Method struct {
 }
 
 func GetMethods(gadget string) (*Methods, error) {
-	db, err := getDB()
+	db, err := GetDB()
 	defer db.Close()
 	methods := &Methods{}
 	rows, err := db.Query(getMethodsQuery, gadget)
@@ -57,7 +57,7 @@ func GetMethod(rows *sql.Rows) (*Method, error) {
 }
 
 func (m *Method)Delete() error {
-	db, err := getDB()
+	db, err := GetDB()
 	defer db.Close()
 	if err != nil {
 		return err
@@ -67,7 +67,7 @@ func (m *Method)Delete() error {
 }
 
 func (m *Method)Save() error {
-	db, err := getDB()
+	db, err := GetDB()
 	defer db.Close()
 	if err != nil {
 		return err

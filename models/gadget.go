@@ -16,7 +16,7 @@ type Gadget struct {
 }
 
 func GetGadgets() (*GadgetHosts, error) {
-	db, err := getDB()
+	db, err := GetDB()
 	defer db.Close()
 	gadgets := &GadgetHosts{}
 	rows, err := db.Query(getGadgetsQuery)
@@ -34,7 +34,7 @@ func GetGadgets() (*GadgetHosts, error) {
 }
 
 func (g *Gadget)Save() error {
-	db, err := getDB()
+	db, err := GetDB()
 	defer db.Close()
 	if err != nil {
 		return err
@@ -44,7 +44,7 @@ func (g *Gadget)Save() error {
 }
 
 func (g *Gadget)Delete() error {
-	db, err := getDB()
+	db, err := GetDB()
 	defer db.Close()
 	if err != nil {
 		return err

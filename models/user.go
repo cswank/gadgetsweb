@@ -23,7 +23,7 @@ type User struct {
 
 func GetUsers() ([]User, error) {
 	users := []User{}
-	db, err := getDB()
+	db, err := GetDB()
 	if err != nil {
 		return users, err
 	}
@@ -45,7 +45,7 @@ func GetUsers() ([]User, error) {
 
 //Is authorized if the username is in the db
 func (u *User)IsAuthorized(permission string) bool {
-	db, err := getDB()
+	db, err := GetDB()
 	defer db.Close()
 	if err != nil {
 		return false
@@ -64,7 +64,7 @@ func (u *User)Save() error {
 		return errors.New("password is too short")
 	}
 	u.hashPassword()
-	db, err := getDB()
+	db, err := GetDB()
 	defer db.Close()
 	if err != nil {
 		return err
@@ -74,7 +74,7 @@ func (u *User)Save() error {
 }
 
 func (u *User)Delete() error {
-	db, err := getDB()
+	db, err := GetDB()
 	if err != nil {
 		return err
 	}
@@ -100,7 +100,7 @@ func (u *User)hashPassword() {
 }
 
 func (u *User)getHashedPassword() error {
-	db, err := getDB()
+	db, err := GetDB()
 	defer db.Close()
 	if err != nil {
 		return err

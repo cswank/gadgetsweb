@@ -12,7 +12,7 @@ import (
 func TestSaveNote(t *testing.T) {
 	tmp, _ := ioutil.TempDir("", "")
 	os.Setenv("GADGETSDB", path.Join(tmp, "db"))
-	db, err := getDB()
+	db, err := GetDB()
 	if err != nil {
 		t.Fatal(err)
 	}

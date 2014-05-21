@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"time"
 	"io/ioutil"
 	"bitbucket.org/cswank/gadgetsweb/models"
 	"encoding/json"
@@ -9,7 +8,6 @@ import (
 )
 
 func GetNotes(w http.ResponseWriter, r *http.Request, u *models.User, vars map[string]string) error {
-	
 	start, end, err := getStartandEnd(r)
 	if err != nil {
 		return err
@@ -24,18 +22,26 @@ func GetNotes(w http.ResponseWriter, r *http.Request, u *models.User, vars map[s
 }
 
 func SaveNote(w http.ResponseWriter, r *http.Request, u *models.User, vars map[string]string) error {
-	vars := mux.Vars(r)
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		return err
 	}
-	note := &models.Note{
-		Gadget: vars["name"],
-	}
+	note := &models.Note{}
 	err = json.Unmarshal(body, note)
 	if err != nil {
 		return err
 	}
+	note.Gadget = vars["name"]
 	return note.Save()
 }
+
+
+
+
+
+
+
+
+
+
 

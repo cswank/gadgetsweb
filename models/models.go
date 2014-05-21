@@ -25,7 +25,7 @@ func createTables(db *sql.DB) {
 	db.Exec("CREATE TABLE notes (id INTEGER PRIMARY KEY AUTOINCREMENT, gadget TEXT, text TEXT, taken INTEGER)")
 }
 
-func getDB() (*sql.DB, error) {
+func GetDB() (*sql.DB, error) {
         p := os.Getenv("GADGETSDB")
         if p == "" {
                 p = ":memory:"

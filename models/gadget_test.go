@@ -11,7 +11,7 @@ import (
 func TestSaveGadget(t *testing.T) {
 	tmp, _ := ioutil.TempDir("", "")
 	os.Setenv("GADGETSDB", path.Join(tmp, "db"))
-	db, _ := getDB()
+	db, _ := GetDB()
 	defer db.Close()
 	g := Gadget{
 		Name: "brewery",
@@ -39,7 +39,7 @@ func TestSaveGadget(t *testing.T) {
 func TestDeleteGadget(t *testing.T) {
 	tmp, _ := ioutil.TempDir("", "")
 	os.Setenv("GADGETSDB", path.Join(tmp, "db"))
-	db, _ := getDB()
+	db, _ := GetDB()
 	defer db.Close()
 	g := Gadget{
 		Name: "brewery",
@@ -67,7 +67,7 @@ func TestDeleteGadget(t *testing.T) {
 func TestGetGadgets(t *testing.T) {
 	tmp, _ := ioutil.TempDir("", "")
 	os.Setenv("GADGETSDB", path.Join(tmp, "db"))
-	db, _ := getDB()
+	db, _ := GetDB()
 	defer db.Close()
 	db.Query("DELETE FROM gadgets")
 	g := Gadget{
