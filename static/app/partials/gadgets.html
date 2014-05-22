@@ -4,11 +4,14 @@
     <h3>{{name | titlecase}}</h3>
     <div class="col-md-4 right-box">
       <div>
-        <gadgets locations="locations" live="live"></gadgets>
+        <gadgets locations="locations" live="live" name="name"></gadgets>
       </div>
     </div>
-    <div class="col-md-8">
+    <div class="col-md-4 right-box">
       <methods></methods>
+    </div>
+    <div class="col-md-4">
+      <notes name="name"></notes>
     </div>
   </div>
   <div ng-hide="live">

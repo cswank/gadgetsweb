@@ -34,6 +34,7 @@ angular.module('myApp.services', [])
                         return;
                     }
                     var payload = JSON.parse(message[1]);
+                    console.log(payload);
                     for (var i in subscribeCallbacks) {
                         var cb = subscribeCallbacks[i];
                         cb(event, payload);
@@ -50,6 +51,23 @@ angular.module('myApp.services', [])
                 if (ws != undefined) {
                     ws.close();
                 }
+            }
+        }
+    }])
+    .factory('notes', ['$http', function($http) {
+        return {
+            save: function(name, note, callback) {
+                var url = '/api/gadgets/' + name + '/notes';
+                $http.post(url, note).success(function (data) {
+                    callback();
+                });
+            },
+            get: function(name, callback) {
+                var url = '/api/gadgets/' + name + '/notes';
+                $http.get(url).success(function (data) {
+                    console.log(data);
+                    callback(data);
+                });
             }
         }
     }])

@@ -40,6 +40,16 @@ var RecipeCtrl = function ($scope, $modalInstance) {
     };
 }
 
+var NotesCtrl = function ($scope, $modalInstance) {
+    $scope.notes = {text:""};
+    $scope.ok = function () {
+        $modalInstance.close($scope.notes);
+    };
+    $scope.cancel = function () {
+        $modalInstance.dismiss('cancel');
+    };
+}
+
 var NewGadgetCtrl = function ($scope, $modalInstance, types) {
     $scope.types = types;
     $scope.type = {};

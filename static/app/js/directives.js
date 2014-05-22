@@ -94,16 +94,17 @@ angular.module('myApp.directives', [])
             }
         }
     }])
-    .directive("gadgets", ['$modal', 'sockets', function($modal, sockets) {
+    .directive("gadgets", ['$http', '$modal', 'sockets', function($http, $modal, sockets) {
         return {
             restrict: "E",
             replace: true,
             transclude: true,
             scope: {
                 locations: "=",
-                live: "="
+                live: "=",
+                name: "="
             },
-            templateUrl: "components/gadgets.html?x=y",
+            templateUrl: "components/gadgets.html",
             link: function($scope, elem, attrs) {
                 var promptEvent;
                 sockets.subscribe(function (event, message) {
@@ -135,6 +136,41 @@ angular.module('myApp.directives', [])
                     $scope.currentCommand = null;
                     $scope.commandArgument = null;
                 };
+
+            }
+        }
+    }])
+    .directive("notes", ['$http', '$modal', 'notes', function($http, $modal, notes) {
+        return {
+            restrict: "E",
+            replace: true,
+            transclude: true,
+            scope: {
+                name: "="
+            },
+            templateUrl: "components/notes.html",
+            link: function($scope, elem, attrs) {
+                console.log(notes);
+
+                function getNotes() {
+                    notes.get($scope.name, function(data) {
+                        $scope.notes = data;
+                    });
+                }
+                $scope.addNote = function() {
+                    var dlg = $modal.open({
+                        templateUrl: '/dialogs/notes.html?c=' + new Date().getTime(),
+                        controller: NotesCtrl,
+                    });
+                    dlg.result.then(function(note) {
+                        notes.save($scope.name, note, function() {
+                           getNotes(); 
+                        });
+                    } ,function() {
+                        
+                    });
+                }
+                getNotes();
             }
         }
     }])
@@ -204,7 +240,7 @@ angular.module('myApp.directives', [])
                         $scope.method = {name:""};
                     }
                     var dlg = $modal.open({
-                        templateUrl: '/dialogs/method.html?x=x',
+                        templateUrl: '/dialogs/method.html?x=z',
                         controller: MethodCtrl,
                         resolve: {
                             method: function () {
@@ -356,14 +392,14 @@ angular.module('myApp.directives', [])
                 });
                 $scope.getHistory = function(){
                     var series = [];
-                    
+                    var e = Math.round(new Date().getTime() / 1000);
+                    var s = e - spans[$scope.span];
                     for (var key in $scope.selected.ids) {
                         var val = $scope.selected.ids[key];
                         if (val) {
-                            var e = Math.round(new Date().getTime() / 1000);
-                            var s = e - spans[$scope.span];
                             var url = key + '?start=' + s + '&end=' + e;
                             $http.get(url).success(function(data) {
+                                console.log(data);
                                 series.push(data);
                             });
                         }
