@@ -2,12 +2,17 @@ package models
 
 import (
 	"testing"
+	"io/ioutil"
+	"os"
+	"path"
 )
 
 
-
 func TestSaveGadget(t *testing.T) {
-	DBPath = "/tmp/gadgets.db"
+	tmp, _ := ioutil.TempDir("", "")
+	os.Setenv("GADGETSDB", path.Join(tmp, "db"))
+	db, _ := GetDB()
+	defer db.Close()
 	g := Gadget{
 		Name: "brewery",
 		Host: "192.168.1.16",
@@ -16,15 +21,55 @@ func TestSaveGadget(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-
-	db := getDB()
-	if db.Gadgets["brewery"].Host != "192.168.1.16" {
-		t.Error(db)
+	g2 := Gadget{}
+	err = db.QueryRow("SELECT * from gadgets WHERE name = ?", "brewery").Scan(&g2.Name, &g2.Host)
+	if err != nil {
+		t.Error(err)
 	}
+	if g2.Name != "brewery" {
+		t.Error(g2)
+	}
+	if g2.Host != "192.168.1.16" {
+		t.Error(g2)
+	}
+	db.Query("DELETE FROM gadgets")
+	os.RemoveAll(tmp)
 }
 
+func TestDeleteGadget(t *testing.T) {
+	tmp, _ := ioutil.TempDir("", "")
+	os.Setenv("GADGETSDB", path.Join(tmp, "db"))
+	db, _ := GetDB()
+	defer db.Close()
+	g := Gadget{
+		Name: "brewery",
+		Host: "192.168.1.16",
+	}
+	g.Save()
+	g = Gadget{
+		Name: "lab",
+		Host: "192.168.1.17",
+	}
+	g.Save()
+	gadgets, _ := GetGadgets()
+	if len(gadgets.Gadgets) != 2 {
+		t.Fatal(gadgets)
+	}
+	g = gadgets.Gadgets[0]
+	g.Delete()
+	gadgets, _ = GetGadgets()
+	if len(gadgets.Gadgets) != 1 {
+		t.Fatal(gadgets)
+	}
+	os.RemoveAll(tmp)
+}	
 
 func TestGetGadgets(t *testing.T) {
+	tmp, _ := ioutil.TempDir("", "")
+	os.Setenv("GADGETSDB", path.Join(tmp, "db"))
+	db, _ := GetDB()
+	defer db.Close()
+	db.Query("DELETE FROM gadgets")
 	g := Gadget{
 		Name: "brewery",
 		Host: "192.168.1.16",
@@ -35,12 +80,17 @@ func TestGetGadgets(t *testing.T) {
 		Host: "192.168.1.13",
 	}
 	g.Save()
-	gadgets := GetGadgets()
-	if len(gadgets) != 2 {
+	gadgets, err := GetGadgets()
+	if err != nil {
+		t.Error(err)
+	}
+	if len(gadgets.Gadgets) != 2 {
 		t.Error(gadgets)
 	}
-	g1 := gadgets[0]
+	g1 := gadgets.Gadgets[0]
 	if g1.Name != "brewery" {
 		t.Error(gadgets)
 	}
+	db.Query("DELETE FROM gadgets")
+	os.RemoveAll(tmp)
 }

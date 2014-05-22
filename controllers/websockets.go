@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"bitbucket.org/cswank/gogadgets/models"
+	gadgets "bitbucket.org/cswank/gogadgets/models"
+	"bitbucket.org/cswank/gadgetsweb/models"
 	"github.com/gorilla/websocket"
 	"github.com/vaughan0/go-zmq"
 	"encoding/json"
@@ -18,9 +19,7 @@ var (
 	}
 )
 
-//InSocket (from the client's point of view) is used to send messages
-//from server to client
-func HandleInSocket(w http.ResponseWriter, r *http.Request) error {
+func HandleSocket(w http.ResponseWriter, r *http.Request, u *models.User, vars map[string]string) error {
 	params := r.URL.Query()
 	host := params["host"][0]
 	ctx, err := zmq.NewContext()
@@ -35,30 +34,8 @@ func HandleInSocket(w http.ResponseWriter, r *http.Request) error {
 	}
 	quitSub := make(chan bool)
 	sockIsDone := make(chan bool)
+	go getSocketMessage(conn, ctx, host, sockIsDone, u)
 	go getZMQMessage(conn, ctx, host, quitSub)
-	<-sockIsDone
-	quitSub <- true
-	return nil
-}
-
-//OutSocket (from the client's point of view) is used to send messages
-//from client to server.
-func HandleOutSocket(w http.ResponseWriter, r *http.Request) error {
-	params := r.URL.Query()
-	host := params["host"][0]
-	ctx, err := zmq.NewContext()
-	defer ctx.Close()
-	if err != nil {
-		return err
-	}
-	conn, err := websocket.Upgrade(w, r, nil, 1024, 1024)
-	if _, ok := err.(websocket.HandshakeError); ok {
-		http.Error(w, "Not a websocket handshake", 400)
-		return err
-	}
-	quitSub := make(chan bool)
-	sockIsDone := make(chan bool)
-	go getSocketMessage(conn, ctx, host, sockIsDone)
 	<-sockIsDone
 	quitSub <- true
 	return nil
@@ -90,7 +67,7 @@ func getZMQMessage(conn *websocket.Conn, ctx *zmq.Context, host string, shouldQu
 }
 
 //When a message is received from the web socket it is passed along to the zmq socket.
-func getSocketMessage(conn *websocket.Conn, ctx *zmq.Context, host string, done chan<- bool) error {
+func getSocketMessage(conn *websocket.Conn, ctx *zmq.Context, host string, done chan<- bool, u *models.User) error {
 	pub, err := ctx.Socket(zmq.Pub)
 	if err = pub.Connect(fmt.Sprintf("tcp://%s:6111", host)); err != nil {
 		return err
@@ -108,7 +85,7 @@ func getSocketMessage(conn *websocket.Conn, ctx *zmq.Context, host string, done 
 			done <- true
 			return err
 		}
-		if messageType == websocket.TextMessage {
+		if messageType == websocket.TextMessage && u.Permission == "write" {
 			sendZMQMessage(p, pub)
 		} else if messageType == websocket.CloseMessage || messageType == -1 {
 			done <- true
@@ -145,8 +122,8 @@ func sendSocketMessage(conn * websocket.Conn, message [][]byte) {
 }
 
 func requestStatus(pub *zmq.Socket) {
-	msg := models.Message{
-		Type: models.COMMAND,
+	msg := gadgets.Message{
+		Type: gadgets.COMMAND,
 		Body: "update",
         }
 	b, _ := json.Marshal(&msg)

@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"time"
 	"bitbucket.org/cswank/gadgetsweb/models"
 	"bitbucket.org/cswank/gogadgets"
@@ -10,9 +9,12 @@ import (
 	"net/http"
 )
 
-func GetGadgets(w http.ResponseWriter, r *http.Request) error {
-	gadgets := models.GetGadgets()
-	b, err := json.Marshal(map[string][]models.Gadget{"gadgets": gadgets})
+func GetGadgets(w http.ResponseWriter, r *http.Request, u *models.User, vars map[string]string) error {
+	gadgets, err := models.GetGadgets()
+	if err != nil {
+		return err
+	}
+	b, err := json.Marshal(gadgets)
 	if err != nil {
 		return err
 	}
@@ -20,14 +22,14 @@ func GetGadgets(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
-func GetGadgetTypes(w http.ResponseWriter, r *http.Request) error {
+func GetGadgetTypes(w http.ResponseWriter, r *http.Request, u *models.User, vars map[string]string) error {
 	types := gogadgets.GetTypes()
 	d, _ := json.Marshal(types)
 	w.Write(d)
 	return nil
 }
 
-func AddGadgets(w http.ResponseWriter, r *http.Request) error {
+func AddGadgets(w http.ResponseWriter, r *http.Request, u *models.User, vars map[string]string) error {
 	d := json.NewDecoder(r.Body)
 	defer r.Body.Close()
 	var cfg gadgets.Config
@@ -45,7 +47,6 @@ func AddGadgets(w http.ResponseWriter, r *http.Request) error {
 	msg := gadgets.Message{
 		Config: cfg,
 	}
-	fmt.Println(msg)
 	s.SendMessage(msg)
 	time.Sleep(400 * time.Millisecond)
 	return nil

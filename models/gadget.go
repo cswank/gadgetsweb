@@ -3,28 +3,52 @@ package models
 var (
 	getGadgetsQuery = "SELECT name, host FROM gadgets"
 	saveGadgetQuery = "INSERT INTO gadgets (name, host) VALUES (?, ?)"
+	deleteGadgetQuery = "DELETE FROM gadgets where name = ?"
 )
 
+type GadgetHosts struct {
+	Gadgets []Gadget `json:"gadgets"`
+}
 
-func GetGadgets() []Gadget {
-	db := getDB()
-	gadgets := make([]Gadget, len(db.Gadgets))
-	i := 0
-	for _, val := range db.Gadgets {
-		gadgets[i] = val
-		i += 1
+type Gadget struct {
+	Name string `json:"name"`
+	Host string `json:"host"`
+}
+
+func GetGadgets() (*GadgetHosts, error) {
+	db, err := GetDB()
+	defer db.Close()
+	gadgets := &GadgetHosts{}
+	rows, err := db.Query(getGadgetsQuery)
+	if err != nil {
+		return gadgets, err
 	}
-	return gadgets
+	for rows.Next() {
+		g := Gadget{}
+		if err = rows.Scan(&g.Name, &g.Host); err != nil {
+			return gadgets, err
+		}
+		gadgets.Gadgets = append(gadgets.Gadgets, g)
+	}
+	return gadgets, nil
 }
 
 func (g *Gadget)Save() error {
-	db := getDB()
-	db.Gadgets[g.Name] = *g
-	return db.Save()
+	db, err := GetDB()
+	defer db.Close()
+	if err != nil {
+		return err
+	}
+	_, err = db.Query(saveGadgetQuery, g.Name, g.Host)
+	return err
 }
 
 func (g *Gadget)Delete() error {
-	db := getDB()
-	delete (db.Gadgets, g.Name)
-	return db.Save()
+	db, err := GetDB()
+	defer db.Close()
+	if err != nil {
+		return err
+	}
+	_, err = db.Query(deleteGadgetQuery, g.Name)
+	return err
 }

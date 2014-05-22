@@ -3,15 +3,16 @@ package controllers
 import (
 	"strconv"
 	"io/ioutil"
-	"github.com/gorilla/mux"
 	"bitbucket.org/cswank/gadgetsweb/models"
 	"encoding/json"
 	"net/http"
 )
 
-func GetMethods(w http.ResponseWriter, r *http.Request) error {
-	vars := mux.Vars(r)
-	methods := models.GetMethods(vars["name"])
+func GetMethods(w http.ResponseWriter, r *http.Request, u *models.User, vars map[string]string) error {
+	methods, err := models.GetMethods(vars["name"])
+	if err != nil {
+		return err
+	}
 	b, err := json.Marshal(methods)
 	if err != nil {
 		return err
@@ -20,8 +21,7 @@ func GetMethods(w http.ResponseWriter, r *http.Request) error {
 	return err
 }
 
-func SaveMethod(w http.ResponseWriter, r *http.Request) error {
-	vars := mux.Vars(r)
+func SaveMethod(w http.ResponseWriter, r *http.Request, u *models.User, vars map[string]string) error {
 	method := &models.Method{
 		Gadget: vars["name"],
 	}
@@ -36,8 +36,7 @@ func SaveMethod(w http.ResponseWriter, r *http.Request) error {
 	return method.Save()
 }
 
-func DeleteMethod(w http.ResponseWriter, r *http.Request) error {
-	vars := mux.Vars(r)
+func DeleteMethod(w http.ResponseWriter, r *http.Request, u *models.User, vars map[string]string) error {
 	id, err := strconv.ParseUint(vars["methodId"], 10, 64)
 	if err != nil {
 		return err

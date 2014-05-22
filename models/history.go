@@ -95,7 +95,6 @@ func GetHistory(hq *HistoryQuery) (Series, error) {
 	return s, nil
 }
 
-
 func getCollection(hq *HistoryQuery) (*mgo.Collection, *mgo.Session, error) {
 	session, err := mgo.Dial(hq.Host)
 	c := &mgo.Collection{}
