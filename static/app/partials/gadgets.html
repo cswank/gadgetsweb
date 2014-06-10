@@ -1,13 +1,24 @@
 
 <div class="row-fluid gadgets-holder">
-  <div ng-show="live">
-    <h3>{{name | titlecase}}</h3>
-    <div class="col-md-4 right-box">
+  <div ng-show="live" class="row">
+    <div class="col-md-4">
+      <h3>{{name | titlecase}}</h3>
+    </div>
+    <div class="col-md-4">
+      <h3>methods</h3>
+    </div>
+    <div class="col-md-4">
+      <h3>notes</h3>
+    </div>
+  </div>
+  <hr/>
+  <div ng-show="live" class="row">
+    <div class="col-md-4">
       <div>
         <gadgets locations="locations" live="live" name="name"></gadgets>
       </div>
     </div>
-    <div class="col-md-4 right-box">
+    <div class="col-md-4">
       <methods></methods>
     </div>
     <div class="col-md-4">
