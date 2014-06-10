@@ -5,7 +5,7 @@ var LoginCtrl = function ($scope, $modalInstance) {
         'name': '',
         'password': ''
     };
-    $scope.ok = function () {
+    $scope.ok = function (event) {
         $modalInstance.close($scope.user);
     };
     $scope.cancel = function () {

@@ -81,7 +81,6 @@ angular.module('myApp.directives', [])
                     
                     dlg.result.then(function(gadget) {
                         $scope.cfg.gadgets.push(gadget);
-                        console.log($scope.cfg);
                     })
                 }
                 $scope.saveGadgets = function() {
@@ -148,10 +147,8 @@ angular.module('myApp.directives', [])
             scope: {
                 name: "="
             },
-            templateUrl: "components/notes.html",
+            templateUrl: "components/notes.html?x=y",
             link: function($scope, elem, attrs) {
-                console.log(notes);
-
                 function getNotes() {
                     notes.get($scope.name, function(data) {
                         $scope.notes = data;
@@ -399,7 +396,6 @@ angular.module('myApp.directives', [])
                         if (val) {
                             var url = key + '?start=' + s + '&end=' + e;
                             $http.get(url).success(function(data) {
-                                console.log(data);
                                 series.push(data);
                             });
                         }
@@ -420,7 +416,18 @@ angular.module('myApp.directives', [])
                 }
             });
         }
-    }]);
+    }])
+    .directive('autoFocus', function($timeout) {
+        return {
+            restrict: 'AC',
+            link: function(_scope, _element) {
+                $timeout(function(){
+                    _element[0].focus();
+                }, 10);
+            }
+        };
+    });
+
 
 
 

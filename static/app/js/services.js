@@ -34,7 +34,6 @@ angular.module('myApp.services', [])
                         return;
                     }
                     var payload = JSON.parse(message[1]);
-                    console.log(payload);
                     for (var i in subscribeCallbacks) {
                         var cb = subscribeCallbacks[i];
                         cb(event, payload);
@@ -65,7 +64,6 @@ angular.module('myApp.services', [])
             get: function(name, callback) {
                 var url = '/api/gadgets/' + name + '/notes';
                 $http.get(url).success(function (data) {
-                    console.log(data);
                     callback(data);
                 });
             }
@@ -89,7 +87,7 @@ angular.module('myApp.services', [])
                 $http.get(url).success(function (data, status, headers, config) {
                     callback(data);
                 }).error(function(data, status, headers, config) {
-                    console.log(data);
+                    console.log("error", data);
                 });
             }
         }
