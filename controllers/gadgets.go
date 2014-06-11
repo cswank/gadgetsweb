@@ -4,7 +4,6 @@ import (
 	"time"
 	"bitbucket.org/cswank/gadgetsweb/models"
 	"bitbucket.org/cswank/gogadgets"
-	gadgets "bitbucket.org/cswank/gogadgets/models"
 	"encoding/json"
 	"net/http"
 )
@@ -32,7 +31,7 @@ func GetGadgetTypes(w http.ResponseWriter, r *http.Request, u *models.User, vars
 func AddGadgets(w http.ResponseWriter, r *http.Request, u *models.User, vars map[string]string) error {
 	d := json.NewDecoder(r.Body)
 	defer r.Body.Close()
-	var cfg gadgets.Config
+	var cfg gogadgets.Config
 	err := d.Decode(&cfg)
 	if err != nil {
 		return err
@@ -44,7 +43,7 @@ func AddGadgets(w http.ResponseWriter, r *http.Request, u *models.User, vars map
 	time.Sleep(200 * time.Millisecond)
 	defer s.Close()
 	cfg.Host = "localhost"
-	msg := gadgets.Message{
+	msg := gogadgets.Message{
 		Config: cfg,
 	}
 	s.SendMessage(msg)

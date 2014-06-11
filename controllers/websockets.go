@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	gadgets "bitbucket.org/cswank/gogadgets/models"
+	"bitbucket.org/cswank/gogadgets"
 	"bitbucket.org/cswank/gadgetsweb/models"
 	"github.com/gorilla/websocket"
 	"github.com/vaughan0/go-zmq"
@@ -122,8 +122,8 @@ func sendSocketMessage(conn * websocket.Conn, message [][]byte) {
 }
 
 func requestStatus(pub *zmq.Socket) {
-	msg := gadgets.Message{
-		Type: gadgets.COMMAND,
+	msg := gogadgets.Message{
+		Type: gogadgets.COMMAND,
 		Body: "update",
         }
 	b, _ := json.Marshal(&msg)
