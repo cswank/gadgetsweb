@@ -1,6 +1,7 @@
 'use strict';
 
-var LoginCtrl = function ($scope, $modalInstance) {
+var LoginCtrl = function ($scope, $modalInstance, message) {
+    $scope.message = message;
     $scope.user = {
         'name': '',
         'password': ''

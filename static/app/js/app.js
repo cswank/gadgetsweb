@@ -10,7 +10,8 @@ angular.module('Gadgets', [
     'myApp.controllers',
     'ui.bootstrap',
     'highcharts-ng',
-    'ng-context-menu'
+    'ng-context-menu',
+    'ngStorage'
 ]).
 config(['$routeProvider', function($routeProvider) {
     $routeProvider.when('/', {templateUrl: 'partials/home.html', controller: 'HomeCtrl'});

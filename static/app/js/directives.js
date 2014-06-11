@@ -6,25 +6,36 @@ angular.module('myApp.directives', [])
             elm.text(version);
         };
     }])
-    .directive("bootstrapNavbar", ['$location', 'auth', 'gadgets', 'sockets', function($location, auth, gadgets, sockets) {
+    .directive("bootstrapNavbar", ['$location', '$localStorage', 'auth', 'gadgets', 'sockets', function($location, $localStorage, auth, gadgets, sockets) {
         return {
             restrict: "E",
             replace: true,
             transclude: true,
-            templateUrl: "components/navbar.html",
+            templateUrl: "components/navbar.html?x=z",
             controller: function($scope, $timeout, $modal) {
-                
+                $scope.$storage = $localStorage.$default({
+                    username: ""
+                });
+                $scope.username = "";
                 $('[data-hover="dropdown"]').dropdownHover();
-                $scope.login = function() {
+                $scope.login = function(errorMessage) {
                     var dlg = $modal.open({
                         templateUrl: '/dialogs/login.html?c=' + new Date().getTime(),
                         controller: LoginCtrl,
+                        resolve: {
+                            message: function () {
+                                return errorMessage;
+                            }
+                        }
                     });
                     dlg.result.then(function(user) {
                         $scope.username = user.name;
+                        $scope.$storage.username = user.name;
                         $scope.password = user.password;
                         auth.login($scope.username, $scope.password, function(){
                             getGadgets();
+                        }, function(){
+                            $scope.login("username or password not correct, please try again");
                         });
                     });
                 }

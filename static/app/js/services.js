@@ -134,7 +134,7 @@ angular.module('myApp.services', [])
     }])
     .factory('auth', ['$http', function($http) {
         return {
-            login: function(username, password, callback) {
+            login: function(username, password, callback, errorCallback) {
                 $http({
                     url: '/api/login',
                     method: "POST",
@@ -143,7 +143,7 @@ angular.module('myApp.services', [])
                 }).success(function (data, status, headers, config) {
                     callback();
                 }).error(function (data, status, headers, config) {
-                    return false;
+                    errorCallback();
                 });
             },
             logout: function(callback) {
