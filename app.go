@@ -25,6 +25,8 @@ func main() {
 	r.HandleFunc("/api/gadgets", AddGadgets).Methods("POST")
 	r.HandleFunc("/api/gadgets/types", GetGadgetTypes).Methods("GET")
 	r.HandleFunc("/api/gadgets/{name}/methods", GetMethods).Methods("GET")
+	r.HandleFunc("/api/gadgets/{name}/status", GetStatus).Methods("GET")
+	r.HandleFunc("/api/gadgets/{name}/commands", SendCommand).Methods("POST")
 	r.HandleFunc("/api/gadgets/{name}/methods", AddMethod).Methods("POST")
 	r.HandleFunc("/api/gadgets/{name}/notes", GetNotes).Methods("GET")
 	r.HandleFunc("/api/gadgets/{name}/notes", AddNotes).Methods("POST")
@@ -80,6 +82,14 @@ func GetTimeseries(w http.ResponseWriter, r *http.Request) {
 
 func GetDevices(w http.ResponseWriter, r *http.Request) {
 	auth.CheckAuth(w, r, controllers.GetDevices, "read")
+}
+
+func GetStatus(w http.ResponseWriter, r *http.Request) {
+	auth.CheckAuth(w, r, controllers.GetStatus, "read")
+}
+
+func SendCommand(w http.ResponseWriter, r *http.Request) {
+	auth.CheckAuth(w, r, controllers.SendCommand, "read")
 }
 
 func GetSocket(w http.ResponseWriter, r *http.Request) {
