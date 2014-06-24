@@ -6,25 +6,36 @@ angular.module('myApp.directives', [])
             elm.text(version);
         };
     }])
-    .directive("bootstrapNavbar", ['$location', 'auth', 'gadgets', 'sockets', function($location, auth, gadgets, sockets) {
+    .directive("bootstrapNavbar", ['$location', '$localStorage', 'auth', 'gadgets', 'sockets', function($location, $localStorage, auth, gadgets, sockets) {
         return {
             restrict: "E",
             replace: true,
             transclude: true,
-            templateUrl: "components/navbar.html",
+            templateUrl: "components/navbar.html?x=z",
             controller: function($scope, $timeout, $modal) {
-                
+                $scope.$storage = $localStorage.$default({
+                    username: ""
+                });
+                $scope.username = "";
                 $('[data-hover="dropdown"]').dropdownHover();
-                $scope.login = function() {
+                $scope.login = function(errorMessage) {
                     var dlg = $modal.open({
                         templateUrl: '/dialogs/login.html?c=' + new Date().getTime(),
                         controller: LoginCtrl,
+                        resolve: {
+                            message: function () {
+                                return errorMessage;
+                            }
+                        }
                     });
                     dlg.result.then(function(user) {
                         $scope.username = user.name;
+                        $scope.$storage.username = user.name;
                         $scope.password = user.password;
                         auth.login($scope.username, $scope.password, function(){
                             getGadgets();
+                        }, function(){
+                            $scope.login("username or password not correct, please try again");
                         });
                     });
                 }
@@ -81,7 +92,6 @@ angular.module('myApp.directives', [])
                     
                     dlg.result.then(function(gadget) {
                         $scope.cfg.gadgets.push(gadget);
-                        console.log($scope.cfg);
                     })
                 }
                 $scope.saveGadgets = function() {
@@ -148,10 +158,8 @@ angular.module('myApp.directives', [])
             scope: {
                 name: "="
             },
-            templateUrl: "components/notes.html",
+            templateUrl: "components/notes.html?x=y",
             link: function($scope, elem, attrs) {
-                console.log(notes);
-
                 function getNotes() {
                     notes.get($scope.name, function(data) {
                         $scope.notes = data;
@@ -399,7 +407,6 @@ angular.module('myApp.directives', [])
                         if (val) {
                             var url = key + '?start=' + s + '&end=' + e;
                             $http.get(url).success(function(data) {
-                                console.log(data);
                                 series.push(data);
                             });
                         }
@@ -420,7 +427,18 @@ angular.module('myApp.directives', [])
                 }
             });
         }
-    }]);
+    }])
+    .directive('autoFocus', function($timeout) {
+        return {
+            restrict: 'AC',
+            link: function(_scope, _element) {
+                $timeout(function(){
+                    _element[0].focus();
+                }, 10);
+            }
+        };
+    });
+
 
 
 

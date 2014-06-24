@@ -28,10 +28,10 @@
         </ul>
         <ul class="nav pull-right navbar-nav">
           <li ng-show="loggedIn">
-            <a class="brand" ng-click="logout()" href="">Logout</a>
+            <a class="brand" ng-click="logout()" href="">log out {{$storage.username}}</a>
           </li>
           <li ng-hide="loggedIn">
-            <a class="brand" ng-click="login()" href="">Log In</a>
+            <a class="brand" ng-click="login()" href="">log in</a>
           </li>
         </ul>
       </div>

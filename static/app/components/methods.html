@@ -1,8 +1,6 @@
 <div id="methods">
   <div ng-show="showMethods">
     <div>
-      <a>methods</a>
-      <br/>
       <select
          ng-model="method"
          ng-options="m.name for m in methods">
@@ -19,7 +17,6 @@
       <a href="" ng-click="clearMethod()">clear</a>
       <a href="" ng-click="deleteMethod()">delete</a>
     </span>
-    <hr/>
     <div>
       <div class="row" ng-repeat="step in method.steps track by $index">
         <div class="col-md-8">

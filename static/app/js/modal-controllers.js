@@ -1,11 +1,12 @@
 'use strict';
 
-var LoginCtrl = function ($scope, $modalInstance) {
+var LoginCtrl = function ($scope, $modalInstance, message) {
+    $scope.message = message;
     $scope.user = {
         'name': '',
         'password': ''
     };
-    $scope.ok = function () {
+    $scope.ok = function (event) {
         $modalInstance.close($scope.user);
     };
     $scope.cancel = function () {

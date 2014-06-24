@@ -7,7 +7,7 @@
       <div class="left">
         <a>{{command.command}} {{command.arg}}</a>
       </div>
-      <input ng-model="command.arg"/>
+      <input ng-model="command.arg" auto-focus ng-enter="ok()"/>
     </form>
   </div>
   <div class="modal-footer">
