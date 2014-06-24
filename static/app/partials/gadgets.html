@@ -1,28 +1,28 @@
 
 <div class="row-fluid gadgets-holder">
   <div ng-show="live" class="row">
-    <div class="col-md-4">
+    <div ng-class="{'col-md-12': mobile, 'col-md-4': !mobile}">
       <h3>{{name | titlecase}}</h3>
     </div>
-    <div class="col-md-4">
+    <div ng-hide="mobile" class="col-md-4">
       <h3>methods</h3>
     </div>
-    <div class="col-md-4">
+    <div ng-hide="mobile" class="col-md-4">
       <h3>notes</h3>
     </div>
   </div>
   <hr/>
   <div ng-show="live" class="row">
-    <div class="col-md-4">
+    <div ng-class="{'col-md-12': mobile, 'col-md-4': !mobile}">
       <div>
-        <gadgets locations="locations" live="live" name="name"></gadgets>
+        <gadgets mobile="mobile" locations="locations" live="live" name="name"></gadgets>
       </div>
     </div>
-    <div class="col-md-4">
+    <div ng-hide="mobile" class="col-md-4">
       <methods></methods>
     </div>
     <div class="col-md-4">
-      <notes name="name"></notes>
+      <notes ng-hide="mobile" name="name"></notes>
     </div>
   </div>
   <div ng-hide="live">

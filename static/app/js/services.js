@@ -2,10 +2,14 @@
 
 angular.module('myApp.services', [])
     .value('version', '0.1')
-    .factory('sockets', ['$rootScope', '$location', function($rootScope, $location) {
+    .factory('sockets', ['$rootScope', '$location', '$http', '$timeout', function($rootScope, $location, $http, $timeout) {
         var ws;
         var outWs;
         var subscribeCallbacks = [];
+        var isMobile = false;
+        var statusUrl;
+        var statusPromise;
+        var host;
         
         function getWebsockets(gadget) {
             var prot = "wss";
@@ -16,32 +20,74 @@ angular.module('myApp.services', [])
             ws = new WebSocket(url);
             return ws;
         }
-        return {
-            connect: function(gadget, errorCallback) {
-                if(ws != undefined) {
-                    ws.close();
-                    ws = null;
+
+        function getStatus() {
+            $http.get(statusUrl).success(function (data) {
+                for (var i in subscribeCallbacks) {
+                    var cb = subscribeCallbacks[i];
+                    angular.forEach(data, function(value, key) {
+                        cb("update", value);
+                    })
                 }
-                ws = getWebsockets(gadget);
-                ws.onopen = function() {
-                };
-                ws.onerror = function() {
-                };
-                ws.onmessage = function(message) {
-                    message = JSON.parse(message.data);
-                    var event = message[0];
-                    if (event == 'ping') {
-                        return;
-                    }
-                    var payload = JSON.parse(message[1]);
-                    for (var i in subscribeCallbacks) {
-                        var cb = subscribeCallbacks[i];
-                        cb(event, payload);
-                    }
-                };
+            });
+            statusPromise = $timeout(getStatus, 2000);
+        }
+        
+        function doConnectMobile(errorCallback) {
+            //websockets over https doesn't work on ios mobile, hence this
+            statusUrl = "/api/gadgets/" + host + "/status";
+            getStatus();
+        }
+
+        function sendMessage(message) {
+            message = JSON.parse(message);
+            $timeout.cancel(statusPromise);
+            var url = "/api/gadgets/" + host + "/commands";
+            $http.post(url, message.message).success(function(data) {
+                getStatus();
+            });
+        }
+        
+        function doConnect(errorCallback) {
+            if(ws != undefined) {
+                ws.close();
+                ws = null;
+            }
+            ws = getWebsockets(host);
+            ws.onopen = function() {
+            };
+            ws.onerror = function() {
+            };
+            ws.onmessage = function(message) {
+                message = JSON.parse(message.data);
+                var event = message[0];
+                if (event == 'ping') {
+                    return;
+                }
+                var payload = JSON.parse(message[1]);
+                for (var i in subscribeCallbacks) {
+                    var cb = subscribeCallbacks[i];
+                    cb(event, payload);
+                }
+            };
+        }
+        
+        return {
+            connect: function(gadget, mobile, errorCallback) {
+                host = gadget;
+                isMobile = mobile;
+                if (mobile) {
+                    doConnectMobile(errorCallback);
+                } else {
+                    doConnect(errorCallback);
+                }
             },
             send: function(message) {
-                ws.send(message);
+                if (isMobile) {
+                    sendMessage(message);
+                } else {
+                    ws.send(message);
+                }
             },
             subscribe: function(callback) {
                 subscribeCallbacks.push(callback);
