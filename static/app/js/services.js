@@ -30,7 +30,7 @@ angular.module('myApp.services', [])
                     })
                 }
             });
-            statusPromise = $timeout(getStatus, 2000);
+            statusPromise = $timeout(getStatus, 1000);
         }
         
         function doConnectMobile(errorCallback) {
