@@ -1,15 +1,15 @@
 package controllers
 
 import (
-	"time"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
-	"bitbucket.org/cswank/gogadgets"
-	"bitbucket.org/cswank/gadgetsweb/models"
+	"time"
+
+	"github.com/cswank/gadgetsweb/models"
+	"github.com/cswank/gogadgets"
 	"github.com/gorilla/websocket"
-	"github.com/vaughan0/go-zmq"
-	"encoding/json"
 )
 
 var (
@@ -49,7 +49,7 @@ func getZMQMessage(conn *websocket.Conn, ctx *zmq.Context, host string, shouldQu
 	}
 	defer sub.Close()
 	defer chans.Close()
-	
+
 	for {
 		select {
 		case msg := <-chans.In():
@@ -112,8 +112,8 @@ func sendZMQMessage(input []byte, pub *zmq.Socket) {
 }
 
 //Send a message via the web socket.
-func sendSocketMessage(conn * websocket.Conn, message [][]byte) {
-	payload := []string {
+func sendSocketMessage(conn *websocket.Conn, message [][]byte) {
+	payload := []string{
 		string(message[0]),
 		string(message[1]),
 	}
@@ -125,9 +125,9 @@ func requestStatus(pub *zmq.Socket) {
 	msg := gogadgets.Message{
 		Type: gogadgets.COMMAND,
 		Body: "update",
-        }
+	}
 	b, _ := json.Marshal(&msg)
-        pub.Send([][]byte{
+	pub.Send([][]byte{
 		[]byte(msg.Type),
 		b,
 	})
@@ -150,6 +150,6 @@ func getSubChannels(ctx *zmq.Context, host string) (sub *zmq.Socket, chans *zmq.
 }
 
 type command struct {
-	Event string
+	Event   string
 	Message map[string]interface{}
 }

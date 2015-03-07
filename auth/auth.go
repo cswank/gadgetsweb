@@ -1,22 +1,23 @@
 package auth
 
 import (
-	"log"
-	"os"
-	"net/http"
-	"github.com/gorilla/mux"
 	"encoding/json"
 	"io/ioutil"
-	"bitbucket.org/cswank/gadgetsweb/models"
+	"log"
+	"net/http"
+	"os"
+
+	"github.com/cswank/gadgetsweb/models"
+	"github.com/gorilla/mux"
 	"github.com/gorilla/securecookie"
 )
 
 type controller func(w http.ResponseWriter, r *http.Request, u *models.User, vars map[string]string) error
 
 var (
-	hashKey        = []byte(os.Getenv("HASH_KEY"))
-	blockKey       = []byte(os.Getenv("BLOCK_KEY"))
-	SecureCookie   = securecookie.New(hashKey, blockKey)
+	hashKey      = []byte(os.Getenv("HASH_KEY"))
+	blockKey     = []byte(os.Getenv("BLOCK_KEY"))
+	SecureCookie = securecookie.New(hashKey, blockKey)
 )
 
 func CheckAuth(w http.ResponseWriter, r *http.Request, ctrl controller, permission string) {
@@ -48,9 +49,9 @@ func getUserFromCookie(r *http.Request) (*models.User, error) {
 
 func Logout(w http.ResponseWriter, r *http.Request) {
 	cookie := &http.Cookie{
-		Name:  "gadgets",
-		Value: "",
-		Path:  "/",
+		Name:   "gadgets",
+		Value:  "",
+		Path:   "/",
 		MaxAge: -1,
 	}
 	http.SetCookie(w, cookie)
@@ -65,7 +66,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 	err = json.Unmarshal(body, user)
 	if err != nil {
-		
+
 		http.Error(w, "bad request 2", http.StatusBadRequest)
 		return
 	}
@@ -73,16 +74,16 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	if !goodPassword {
 		log.Println(err)
 		http.Error(w, "bad request 3", http.StatusBadRequest)
-		return 
+		return
 	}
 	value := map[string]string{
 		"user": user.Username,
 	}
 	encoded, _ := SecureCookie.Encode("gadgets", value)
 	cookie := &http.Cookie{
-		Name:  "gadgets",
-		Value: encoded,
-		Path:  "/",
+		Name:     "gadgets",
+		Value:    encoded,
+		Path:     "/",
 		HttpOnly: false,
 	}
 	http.SetCookie(w, cookie)

@@ -2,26 +2,26 @@ package models
 
 import (
 	"fmt"
-	"time"
-	"labix.org/v2/mgo"
 	"net/url"
-        "labix.org/v2/mgo/bson"
-	"bitbucket.org/cswank/gogadgets"	
+	"time"
+
+	"github.com/cswank/gogadgets"
+	"labix.org/v2/mgo"
+	"labix.org/v2/mgo/bson"
 )
 
-
 type HistoryQuery struct {
-	Host string
-	DBName string
+	Host       string
+	DBName     string
 	Collection string
-	Location string
-	Name string
-	Start time.Time
-	End time.Time
+	Location   string
+	Name       string
+	Start      time.Time
+	End        time.Time
 }
 
 type Series struct {
-	Name string `json:"name"`
+	Name string        `json:"name"`
 	Data []interface{} `json:"data"`
 }
 
@@ -55,13 +55,13 @@ func GetDevices(hq *HistoryQuery) (*Devices, error) {
 	for _, l := range locations {
 		var devices []string
 		c.Find(bson.M{"location": l}).Distinct("name", &devices)
-		for _, d := range devices {			
+		for _, d := range devices {
 			links = append(links, NewLink(hq.DBName, l, d))
 		}
 	}
 	d.Links = links
 	return d, nil
-	
+
 }
 
 func GetHistory(hq *HistoryQuery) (Series, error) {
@@ -74,7 +74,7 @@ func GetHistory(hq *HistoryQuery) (Series, error) {
 	err = c.Find(
 		bson.M{
 			"location": hq.Location,
-			"name": hq.Name,
+			"name":     hq.Name,
 			"timestamp": bson.M{
 				"$gte": hq.Start,
 				"$lte": hq.End,
@@ -87,7 +87,7 @@ func GetHistory(hq *HistoryQuery) (Series, error) {
 	}
 	for i, r := range results {
 		f, ok := r.Value.ToFloat()
-		if ! ok {
+		if !ok {
 			return Series{}, err
 		}
 		s.Data[i] = []interface{}{r.Timestamp.Unix() * 1000, f}
@@ -100,7 +100,7 @@ func getCollection(hq *HistoryQuery) (*mgo.Collection, *mgo.Session, error) {
 	c := &mgo.Collection{}
 	if err != nil {
 		return c, session, err
-        }
+	}
 	c = session.DB(hq.DBName).C(hq.Collection)
 	return c, session, nil
 }

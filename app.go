@@ -2,18 +2,19 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"net/http"
-	"bitbucket.org/cswank/gadgetsweb/controllers"
-	"bitbucket.org/cswank/gadgetsweb/auth"
+	"os"
+
+	"github.com/cswank/gadgetsweb/auth"
+	"github.com/cswank/gadgetsweb/controllers"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/securecookie"
 )
 
 var (
-	hashKey        = []byte(os.Getenv("HASH_KEY"))
-	blockKey       = []byte(os.Getenv("BLOCK_KEY"))
-	SecureCookie   = securecookie.New(hashKey, blockKey)
+	hashKey      = []byte(os.Getenv("HASH_KEY"))
+	blockKey     = []byte(os.Getenv("BLOCK_KEY"))
+	SecureCookie = securecookie.New(hashKey, blockKey)
 )
 
 func main() {
@@ -34,26 +35,26 @@ func main() {
 	r.HandleFunc("/api/gadgets/{name}/methods/{methodId}", DeleteMethod).Methods("DELETE")
 	r.HandleFunc("/api/history/gadgets/{gadget}/devices", GetDevices).Methods("GET")
 	r.HandleFunc("/api/history/gadgets/{gadget}/locations/{location}/devices/{device}", GetTimeseries).Methods("GET")
-	
+
 	http.Handle("/", r)
 	fmt.Println("listening on 0.0.0.0:8080")
 	http.ListenAndServe(":8080", nil)
 }
 
 func GetGadgets(w http.ResponseWriter, r *http.Request) {
-	auth.CheckAuth(w, r , controllers.GetGadgets, "read")
+	auth.CheckAuth(w, r, controllers.GetGadgets, "read")
 }
 
 func GetGadgetTypes(w http.ResponseWriter, r *http.Request) {
-	auth.CheckAuth(w, r , controllers.GetGadgetTypes, "read")
+	auth.CheckAuth(w, r, controllers.GetGadgetTypes, "read")
 }
 
 func AddGadgets(w http.ResponseWriter, r *http.Request) {
-	auth.CheckAuth(w, r , controllers.AddGadgets, "write")
+	auth.CheckAuth(w, r, controllers.AddGadgets, "write")
 }
 
 func GetMethods(w http.ResponseWriter, r *http.Request) {
-	auth.CheckAuth(w, r , controllers.GetMethods, "write")
+	auth.CheckAuth(w, r, controllers.GetMethods, "write")
 }
 
 func AddMethod(w http.ResponseWriter, r *http.Request) {
@@ -61,7 +62,7 @@ func AddMethod(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetNotes(w http.ResponseWriter, r *http.Request) {
-	auth.CheckAuth(w, r , controllers.GetNotes, "write")
+	auth.CheckAuth(w, r, controllers.GetNotes, "write")
 }
 
 func AddNotes(w http.ResponseWriter, r *http.Request) {

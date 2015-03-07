@@ -1,12 +1,13 @@
 package controllers
 
 import (
-	"time"
-	"errors"
-	"bitbucket.org/cswank/gadgetsweb/models"
-	"bitbucket.org/cswank/gogadgets"
 	"encoding/json"
+	"errors"
 	"net/http"
+	"time"
+
+	"github.com/cswank/gadgetsweb/models"
+	"github.com/cswank/gogadgets"
 )
 
 func GetStatus(w http.ResponseWriter, r *http.Request, u *models.User, vars map[string]string) error {
@@ -93,15 +94,3 @@ func AddGadgets(w http.ResponseWriter, r *http.Request, u *models.User, vars map
 	time.Sleep(400 * time.Millisecond)
 	return nil
 }
-
-
-
-
-
-
-
-
-
-
-
-

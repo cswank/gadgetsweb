@@ -1,12 +1,13 @@
 package controllers
 
 import (
-	"os"
-	"time"
-	"strconv"
-	"bitbucket.org/cswank/gadgetsweb/models"
-	"net/http"
 	"encoding/json"
+	"net/http"
+	"os"
+	"strconv"
+	"time"
+
+	"github.com/cswank/gadgetsweb/models"
 )
 
 var (
@@ -60,13 +61,13 @@ func getQuery(r *http.Request, vars map[string]string) (hq *models.HistoryQuery,
 		return hq, err
 	}
 	hq = &models.HistoryQuery{
-		Host: mongoHost,
-		DBName: vars["gadget"],
+		Host:       mongoHost,
+		DBName:     vars["gadget"],
 		Collection: "updates",
-		Location: vars["location"],
-		Name: vars["device"],
-		Start: start,
-		End: end,
+		Location:   vars["location"],
+		Name:       vars["device"],
+		Start:      start,
+		End:        end,
 	}
 	return hq, err
 }

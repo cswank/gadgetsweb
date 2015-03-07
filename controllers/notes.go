@@ -1,12 +1,13 @@
 package controllers
 
 import (
-	"time"
-	"io/ioutil"
-	"strconv"
-	"bitbucket.org/cswank/gadgetsweb/models"
 	"encoding/json"
+	"io/ioutil"
 	"net/http"
+	"strconv"
+	"time"
+
+	"github.com/cswank/gadgetsweb/models"
 )
 
 func GetNotes(w http.ResponseWriter, r *http.Request, u *models.User, vars map[string]string) error {
@@ -37,7 +38,6 @@ func SaveNote(w http.ResponseWriter, r *http.Request, u *models.User, vars map[s
 	return note.Save()
 }
 
-
 func getNotesStartandEnd(r *http.Request) (time.Time, time.Time, error) {
 	params := r.URL.Query()
 	var start, end time.Time
@@ -57,15 +57,3 @@ func getNotesStartandEnd(r *http.Request) (time.Time, time.Time, error) {
 	}
 	return start, end, err
 }
-
-
-
-
-
-
-
-
-
-
-
-

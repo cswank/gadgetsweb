@@ -1,24 +1,25 @@
 package controllers
 
 import (
-	"os"
-	"time"
 	"bytes"
-	"testing"
+	"database/sql"
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
-	"encoding/json"
-	"bitbucket.org/cswank/gadgetsweb/models"
-	"database/sql"
-	"io/ioutil"
+	"os"
 	"path"
-	"fmt"
+	"testing"
+	"time"
+
+	"github.com/cswank/gadgetsweb/models"
 )
 
 var (
 	testStartTime = time.Date(2014, 0, 0, 0, 0, 0, 0, time.UTC)
-	testEndTime = time.Date(2014, 0, 0, 2, 0, 0, 0, time.UTC)
-	testTime = time.Date(2014, 0, 0, 1, 0, 0, 0, time.UTC)
+	testEndTime   = time.Date(2014, 0, 0, 2, 0, 0, 0, time.UTC)
+	testTime      = time.Date(2014, 0, 0, 1, 0, 0, 0, time.UTC)
 )
 
 func cleanup(db *sql.DB, tmp string) {
@@ -33,9 +34,9 @@ func saveTestNote() (*sql.DB, string) {
 	os.Setenv("GADGETSDB", path.Join(tmp, "db"))
 	db, _ := models.GetDB()
 	n := models.Note{
-		Text: "me do this",
+		Text:   "me do this",
 		Gadget: "lab",
-		Taken: testTime,
+		Taken:  testTime,
 	}
 	n.Save()
 	return db, tmp
@@ -46,7 +47,7 @@ func TestGetNotes(t *testing.T) {
 	defer cleanup(db, tmp)
 	w := httptest.NewRecorder()
 	r, _ := http.NewRequest("GET", fmt.Sprintf("http://gadgetsweb/api/lab/notes?start=%d&end=%d", testStartTime.Unix(), testEndTime.Unix()), nil)
-	vars := map[string]string{"name":"lab"}
+	vars := map[string]string{"name": "lab"}
 	GetNotes(w, r, nil, vars)
 	d := w.Body.Bytes()
 	notes := []models.Note{}
@@ -62,8 +63,7 @@ func TestGetNotes(t *testing.T) {
 		t.Fatal(n)
 	}
 
-
-	vars = map[string]string{"name":"overthere"}
+	vars = map[string]string{"name": "overthere"}
 	GetNotes(w, r, nil, vars)
 	d = w.Body.Bytes()
 	notes = []models.Note{}
@@ -77,23 +77,23 @@ func TestSaveNote(t *testing.T) {
 	tmp, _ := ioutil.TempDir("", "")
 	os.Setenv("GADGETSDB", path.Join(tmp, "db"))
 	defer cleanup(nil, tmp)
-	
+
 	n := &models.Note{
-		Text: "hiya",
+		Text:  "hiya",
 		Taken: testTime,
 	}
 	d, _ := json.Marshal(n)
 	buf := bytes.NewBuffer(d)
 	w := httptest.NewRecorder()
 	r, _ := http.NewRequest("POST", "http://gadgetsweb/api/lab/notes", buf)
-	vars := map[string]string{"name":"lab"}
-	
+	vars := map[string]string{"name": "lab"}
+
 	err := SaveNote(w, r, nil, vars)
 
 	if err != nil {
 		t.Fatal(err)
 	}
-	
+
 	notes := models.GetNotes("lab", testStartTime, testEndTime)
 
 	if len(notes) != 1 {
@@ -104,22 +104,3 @@ func TestSaveNote(t *testing.T) {
 		t.Fatal(n2)
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -3,8 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
+
 	"code.google.com/p/gopass"
-	"bitbucket.org/cswank/gadgetsweb/models"
+	"github.com/cswank/gadgetsweb/models"
 )
 
 var (
@@ -46,7 +47,7 @@ func doDel() {
 		return
 	}
 	for i, u := range users {
-		fmt.Printf("%d   %s\n", i + 1, u.Username)
+		fmt.Printf("%d   %s\n", i+1, u.Username)
 	}
 	var j int
 	var confirm string
@@ -55,8 +56,7 @@ func doDel() {
 	fmt.Printf("really delete %d (y/N)? ", j)
 	fmt.Scanf("%s", &confirm)
 	if confirm == "y" || confirm == "Y" {
-		u := users[j - 1]
+		u := users[j-1]
 		u.Delete()
 	}
 }
-

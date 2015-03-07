@@ -1,9 +1,10 @@
 package main
 
 import (
-	"fmt"
 	"flag"
-	"bitbucket.org/cswank/gadgetsweb/models"
+	"fmt"
+
+	"github.com/cswank/gadgetsweb/models"
 )
 
 var (
@@ -30,7 +31,7 @@ func doDel() {
 		return
 	}
 	for i, g := range gadgets.Gadgets {
-		fmt.Printf("%d   %s\n", i + 1, g.Name)
+		fmt.Printf("%d   %s\n", i+1, g.Name)
 	}
 	var j int
 	var confirm string
@@ -39,7 +40,7 @@ func doDel() {
 	fmt.Printf("really delete %d (y/N)? ", j)
 	fmt.Scanf("%s", &confirm)
 	if confirm == "y" || confirm == "Y" {
-		g := gadgets.Gadgets[j - 1]
+		g := gadgets.Gadgets[j-1]
 		g.Delete()
 	}
 }

@@ -1,11 +1,12 @@
 package controllers
 
 import (
-	"strconv"
-	"io/ioutil"
-	"bitbucket.org/cswank/gadgetsweb/models"
 	"encoding/json"
+	"io/ioutil"
 	"net/http"
+	"strconv"
+
+	"github.com/cswank/gadgetsweb/models"
 )
 
 func GetMethods(w http.ResponseWriter, r *http.Request, u *models.User, vars map[string]string) error {
@@ -42,9 +43,8 @@ func DeleteMethod(w http.ResponseWriter, r *http.Request, u *models.User, vars m
 		return err
 	}
 	method := &models.Method{
-		Id: id,
+		Id:     id,
 		Gadget: vars["name"],
 	}
 	return method.Delete()
 }
-
