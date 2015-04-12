@@ -27,7 +27,7 @@ func createTables(db *sql.DB) {
 }
 
 func GetDB() (*sql.DB, error) {
-	p := os.Getenv("GADGETSDB")
+	p := os.Getenv("GADGETS_DB")
 	if p == "" {
 		p = ":memory:"
 	}

@@ -13,12 +13,23 @@ import (
 )
 
 var (
-	hashKey      = []byte(os.Getenv("HASH_KEY"))
-	blockKey     = []byte(os.Getenv("BLOCK_KEY"))
-	cert         = os.Getenv("CERT")
-	key          = os.Getenv("KEY")
-	SecureCookie = securecookie.New(hashKey, blockKey)
+	hashKey      []byte
+	blockKey     []byte
+	cert         string
+	key          string
+	SecureCookie *securecookie.SecureCookie
 )
+
+func init() {
+	hashKey = []byte(os.Getenv("GADGETS_HASH_KEY"))
+	blockKey = []byte(os.Getenv("GADGETS_BLOCK_KEY"))
+	cert = os.Getenv("GADGETS_CERT")
+	key = os.Getenv("GADGETS_KEY")
+	if len(cert) == 0 || len(key) == 0 {
+		log.Fatal("you must set CERT and KEY env vars")
+	}
+	SecureCookie = securecookie.New(hashKey, blockKey)
+}
 
 func main() {
 	r := mux.NewRouter()
