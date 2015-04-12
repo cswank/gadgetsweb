@@ -10,6 +10,7 @@ import (
 	"github.com/cswank/gadgetsweb/models"
 	"github.com/cswank/gogadgets"
 	"github.com/gorilla/websocket"
+	"github.com/vaughan0/go-zmq"
 )
 
 var (
