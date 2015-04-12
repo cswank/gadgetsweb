@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 
@@ -37,8 +38,9 @@ func main() {
 	r.HandleFunc("/api/history/gadgets/{gadget}/locations/{location}/devices/{device}", GetTimeseries).Methods("GET")
 
 	http.Handle("/", r)
-	fmt.Println("listening on 0.0.0.0:8080")
-	http.ListenAndServe(":8080", nil)
+	fmt.Println("listening on 0.0.0.0:443")
+	err := http.ListenAndServeTLS(":443", "../cert/TestCA.CAcert.pem", "../cert/TestCA.CAkey.pem", nil)
+	log.Println(err)
 }
 
 func GetGadgets(w http.ResponseWriter, r *http.Request) {
