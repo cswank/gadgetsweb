@@ -15,6 +15,8 @@ import (
 var (
 	hashKey      = []byte(os.Getenv("HASH_KEY"))
 	blockKey     = []byte(os.Getenv("BLOCK_KEY"))
+	cert         = os.Getenv("CERT")
+	key          = os.Getenv("KEY")
 	SecureCookie = securecookie.New(hashKey, blockKey)
 )
 
@@ -39,7 +41,7 @@ func main() {
 
 	http.Handle("/", r)
 	fmt.Println("listening on 0.0.0.0:443")
-	err := http.ListenAndServeTLS(":443", "../cert/TestCA.CAcert.pem", "../cert/TestCA.CAkey.pem", nil)
+	err := http.ListenAndServeTLS(":443", cert, key, nil)
 	log.Println(err)
 }
 
