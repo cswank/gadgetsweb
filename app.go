@@ -17,6 +17,7 @@ var (
 	blockKey     []byte
 	cert         string
 	key          string
+	static       string
 	SecureCookie *securecookie.SecureCookie
 )
 
@@ -25,8 +26,13 @@ func init() {
 	blockKey = []byte(os.Getenv("GADGETS_BLOCK_KEY"))
 	cert = os.Getenv("GADGETS_CERT")
 	key = os.Getenv("GADGETS_KEY")
+	static = os.Getenv("GADGETS_STATIC")
 	if len(cert) == 0 || len(key) == 0 {
 		log.Fatal("you must set CERT and KEY env vars")
+	}
+
+	if len(static) == 0 {
+		log.Fatal("you must set the GADGETS_STATIC env var")
 	}
 	SecureCookie = securecookie.New(hashKey, blockKey)
 }
@@ -49,6 +55,8 @@ func main() {
 	r.HandleFunc("/api/gadgets/{name}/methods/{methodId}", DeleteMethod).Methods("DELETE")
 	r.HandleFunc("/api/history/gadgets/{gadget}/devices", GetDevices).Methods("GET")
 	r.HandleFunc("/api/history/gadgets/{gadget}/locations/{location}/devices/{device}", GetTimeseries).Methods("GET")
+
+	r.Handle("/", http.FileServer(http.Dir(static)))
 
 	http.Handle("/", r)
 	fmt.Println("listening on 0.0.0.0:443")
