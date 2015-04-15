@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 
 	"code.google.com/p/gopass"
 	"github.com/cswank/gadgetsweb/models"
@@ -33,7 +34,7 @@ func add() {
 	}
 	u.Password, _ = gopass.GetPass("password: ")
 	fmt.Println(u)
-	u.Save()
+	log.Println(u.Save())
 }
 
 func doDel() {

@@ -24,3 +24,4 @@ build/*
 *.xcworkspace
 xcuserdata
 .vagrant
+utils/addgadget/addgadget

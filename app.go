@@ -39,6 +39,7 @@ func init() {
 
 func main() {
 	r := mux.NewRouter()
+
 	r.HandleFunc("/api/login", auth.Login).Methods("POST")
 	r.HandleFunc("/api/logout", auth.Logout).Methods("POST")
 	r.HandleFunc("/api/socket", GetSocket).Methods("GET")
@@ -55,11 +56,10 @@ func main() {
 	r.HandleFunc("/api/gadgets/{name}/methods/{methodId}", DeleteMethod).Methods("DELETE")
 	r.HandleFunc("/api/history/gadgets/{gadget}/devices", GetDevices).Methods("GET")
 	r.HandleFunc("/api/history/gadgets/{gadget}/locations/{location}/devices/{device}", GetTimeseries).Methods("GET")
-
-	r.Handle("/", http.FileServer(http.Dir(static)))
+	r.PathPrefix("/").Handler(http.FileServer(http.Dir(static)))
 
 	http.Handle("/", r)
-	fmt.Println("listening on 0.0.0.0:443")
+	fmt.Println("listening on 0.0.0.0:443", cert, key, static)
 	err := http.ListenAndServeTLS(":443", cert, key, nil)
 	log.Println(err)
 }

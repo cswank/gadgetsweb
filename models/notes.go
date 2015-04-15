@@ -11,20 +11,14 @@ var (
 )
 
 type Note struct {
-	Text string     `json:"text"`
-	Gadget string   `json:"gadget"`
-	Taken time.Time `json:"time"`
+	Text   string    `json:"text"`
+	Gadget string    `json:"gadget"`
+	Taken  time.Time `json:"time"`
 }
 
 func GetNotes(gadget string, start, end time.Time) []Note {
-	db, err := GetDB()
-	if err != nil {
-		log.Println(err)
-		return []Note{}
-	}
-	defer db.Close()
 	notes := []Note{}
-	rows, err := db.Query(getNotesQuery, gadget, start.Unix(), end.Unix())
+	rows, err := DB.Query(getNotesQuery, gadget, start.Unix(), end.Unix())
 	if err != nil {
 		log.Println(err)
 		return []Note{}
@@ -46,25 +40,10 @@ func GetNotes(gadget string, start, end time.Time) []Note {
 // 	return nil
 // }
 
-func (n *Note)Save() error {
-	db, err := GetDB()
-	if err != nil {
-		return err
-	}
-	defer db.Close()
+func (n *Note) Save() error {
 	if n.Taken.Equal(time.Time{}) {
 		n.Taken = time.Now()
 	}
-	_, err = db.Query(saveNoteQuery, n.Text, n.Gadget, n.Taken)
+	_, err := DB.Query(saveNoteQuery, n.Text, n.Gadget, n.Taken)
 	return err
 }
-
-
-
-
-
-
-
-
-
-

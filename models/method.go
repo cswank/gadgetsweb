@@ -1,13 +1,13 @@
 package models
 
 import (
-	"encoding/json"
 	"database/sql"
+	"encoding/json"
 )
 
 var (
-	getMethodsQuery = "SELECT id, name, steps FROM methods where gadget = ?"
-	addMethodQuery = "INSERT INTO methods (name, gadget, steps) VALUES (?, ?, ?)"
+	getMethodsQuery   = "SELECT id, name, steps FROM methods where gadget = ?"
+	addMethodQuery    = "INSERT INTO methods (name, gadget, steps) VALUES (?, ?, ?)"
 	updateMethodQuery = "UPDATE methods set name = ?, steps = ? WHERE id = ?"
 	deleteMethodQuery = "DELETE FROM methods WHERE id = ?"
 )
@@ -17,17 +17,15 @@ type Methods struct {
 }
 
 type Method struct {
-	Id uint64 `json:"id"`
-	Name string `json:"name"`
-	Gadget string `json:"gadget"`
-	Steps []string `json:"steps"`
+	Id     uint64   `json:"id"`
+	Name   string   `json:"name"`
+	Gadget string   `json:"gadget"`
+	Steps  []string `json:"steps"`
 }
 
 func GetMethods(gadget string) (*Methods, error) {
-	db, err := GetDB()
-	defer db.Close()
 	methods := &Methods{}
-	rows, err := db.Query(getMethodsQuery, gadget)
+	rows, err := DB.Query(getMethodsQuery, gadget)
 	if err != nil {
 		return methods, err
 	}
@@ -56,31 +54,21 @@ func GetMethod(rows *sql.Rows) (*Method, error) {
 	return m, err
 }
 
-func (m *Method)Delete() error {
-	db, err := GetDB()
-	defer db.Close()
-	if err != nil {
-		return err
-	}
-	_, err = db.Exec(deleteMethodQuery, m.Id)
+func (m *Method) Delete() error {
+	_, err := DB.Exec(deleteMethodQuery, m.Id)
 	return err
 }
 
-func (m *Method)Save() error {
-	db, err := GetDB()
-	defer db.Close()
-	if err != nil {
-		return err
-	}
+func (m *Method) Save() error {
 	b, err := json.Marshal(m.Steps)
 	if err != nil {
 		return err
 	}
 	steps := string(b)
 	if m.Id > 0 {
-		_, err = db.Query(updateMethodQuery, m.Name, steps, m.Id)
+		_, err = DB.Query(updateMethodQuery, m.Name, steps, m.Id)
 	} else {
-		_, err = db.Query(addMethodQuery, m.Name, m.Gadget, steps)
+		_, err = DB.Query(addMethodQuery, m.Name, m.Gadget, steps)
 	}
 	return err
 }

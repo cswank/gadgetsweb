@@ -1,18 +1,15 @@
 package models
 
 import (
-	"testing"
 	"io/ioutil"
 	"os"
 	"path"
+	"testing"
 )
-
 
 func TestSaveGadget(t *testing.T) {
 	tmp, _ := ioutil.TempDir("", "")
 	os.Setenv("GADGETSDB", path.Join(tmp, "db"))
-	db, _ := GetDB()
-	defer db.Close()
 	g := Gadget{
 		Name: "brewery",
 		Host: "192.168.1.16",
@@ -62,7 +59,7 @@ func TestDeleteGadget(t *testing.T) {
 		t.Fatal(gadgets)
 	}
 	os.RemoveAll(tmp)
-}	
+}
 
 func TestGetGadgets(t *testing.T) {
 	tmp, _ := ioutil.TempDir("", "")

@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"bytes"
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -22,29 +21,28 @@ var (
 	testTime      = time.Date(2014, 0, 0, 1, 0, 0, 0, time.UTC)
 )
 
-func cleanup(db *sql.DB, tmp string) {
-	if db != nil {
-		db.Close()
+func cleanup(tmp string) {
+	if models.DB != nil {
+		models.DB.Close()
 	}
 	os.RemoveAll(tmp)
 }
 
-func saveTestNote() (*sql.DB, string) {
+func saveTestNote() string {
 	tmp, _ := ioutil.TempDir("", "")
 	os.Setenv("GADGETSDB", path.Join(tmp, "db"))
-	db, _ := models.GetDB()
 	n := models.Note{
 		Text:   "me do this",
 		Gadget: "lab",
 		Taken:  testTime,
 	}
 	n.Save()
-	return db, tmp
+	return tmp
 }
 
 func TestGetNotes(t *testing.T) {
-	db, tmp := saveTestNote()
-	defer cleanup(db, tmp)
+	tmp := saveTestNote()
+	defer cleanup(tmp)
 	w := httptest.NewRecorder()
 	r, _ := http.NewRequest("GET", fmt.Sprintf("http://gadgetsweb/api/lab/notes?start=%d&end=%d", testStartTime.Unix(), testEndTime.Unix()), nil)
 	vars := map[string]string{"name": "lab"}

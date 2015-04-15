@@ -1,8 +1,8 @@
 package models
 
 var (
-	getGadgetsQuery = "SELECT name, host FROM gadgets"
-	saveGadgetQuery = "INSERT INTO gadgets (name, host) VALUES (?, ?)"
+	getGadgetsQuery   = "SELECT name, host FROM gadgets"
+	saveGadgetQuery   = "INSERT INTO gadgets (name, host) VALUES (?, ?)"
 	deleteGadgetQuery = "DELETE FROM gadgets where name = ?"
 )
 
@@ -16,10 +16,8 @@ type Gadget struct {
 }
 
 func GetGadgets() (*GadgetHosts, error) {
-	db, err := GetDB()
-	defer db.Close()
 	gadgets := &GadgetHosts{}
-	rows, err := db.Query(getGadgetsQuery)
+	rows, err := DB.Query(getGadgetsQuery)
 	if err != nil {
 		return gadgets, err
 	}
@@ -33,22 +31,12 @@ func GetGadgets() (*GadgetHosts, error) {
 	return gadgets, nil
 }
 
-func (g *Gadget)Save() error {
-	db, err := GetDB()
-	defer db.Close()
-	if err != nil {
-		return err
-	}
-	_, err = db.Query(saveGadgetQuery, g.Name, g.Host)
+func (g *Gadget) Save() error {
+	_, err := DB.Query(saveGadgetQuery, g.Name, g.Host)
 	return err
 }
 
-func (g *Gadget)Delete() error {
-	db, err := GetDB()
-	defer db.Close()
-	if err != nil {
-		return err
-	}
-	_, err = db.Query(deleteGadgetQuery, g.Name)
+func (g *Gadget) Delete() error {
+	_, err := DB.Query(deleteGadgetQuery, g.Name)
 	return err
 }

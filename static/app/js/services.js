@@ -181,12 +181,14 @@ angular.module('myApp.services', [])
     .factory('auth', ['$http', function($http) {
         return {
             login: function(username, password, callback, errorCallback) {
+                console.log("loggin in", username, password);
                 $http({
                     url: '/api/login',
                     method: "POST",
                     data: JSON.stringify({username:username, password: password}),
                     headers: {'Content-Type': 'application/json'}
                 }).success(function (data, status, headers, config) {
+                    console.log("success", data);
                     callback();
                 }).error(function (data, status, headers, config) {
                     errorCallback();
