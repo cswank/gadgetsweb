@@ -2,7 +2,6 @@ package models
 
 import (
 	"errors"
-	"fmt"
 
 	"code.google.com/p/go.crypto/bcrypt"
 )
@@ -83,7 +82,6 @@ func (u *User) hashPassword() {
 func (u *User) getHashedPassword() error {
 	var hashedPassword string
 	err := DB.QueryRow(getPasswordQuery, u.Username).Scan(&hashedPassword)
-	fmt.Println("get hashed pw", hashedPassword, err)
 	if err == nil {
 		u.HashedPassword = []byte(hashedPassword)
 	}

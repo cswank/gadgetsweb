@@ -59,7 +59,6 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 }
 
 func Login(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("login")
 	user := &models.User{}
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -67,16 +66,13 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	err = json.Unmarshal(body, user)
-	fmt.Println("user", user)
 	if err != nil {
 
 		http.Error(w, "bad request 2", http.StatusBadRequest)
 		return
 	}
 	goodPassword, err := user.CheckPassword()
-	fmt.Println("goodPw", goodPassword)
 	if !goodPassword {
-		log.Println(err)
 		http.Error(w, "bad request 3", http.StatusBadRequest)
 		return
 	}
@@ -85,7 +81,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	encoded, err := SecureCookie.Encode("gadgets", value)
-	fmt.Println("user:", user, err)
 	cookie := &http.Cookie{
 		Name:     "gadgets",
 		Value:    encoded,
