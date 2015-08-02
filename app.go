@@ -15,8 +15,6 @@ import (
 var (
 	hashKey      []byte
 	blockKey     []byte
-	cert         string
-	key          string
 	static       string
 	SecureCookie *securecookie.SecureCookie
 )
@@ -24,13 +22,7 @@ var (
 func init() {
 	hashKey = []byte(os.Getenv("GADGETS_HASH_KEY"))
 	blockKey = []byte(os.Getenv("GADGETS_BLOCK_KEY"))
-	cert = os.Getenv("GADGETS_CERT")
-	key = os.Getenv("GADGETS_KEY")
 	static = os.Getenv("GADGETS_STATIC")
-	if len(cert) == 0 || len(key) == 0 {
-		log.Fatal("you must set CERT and KEY env vars")
-	}
-
 	if len(static) == 0 {
 		log.Fatal("you must set the GADGETS_STATIC env var")
 	}
@@ -59,8 +51,8 @@ func main() {
 	r.PathPrefix("/").Handler(http.FileServer(http.Dir(static)))
 
 	http.Handle("/", r)
-	fmt.Println("listening on 0.0.0.0:443", cert, key, static)
-	err := http.ListenAndServeTLS(":443", cert, key, nil)
+	fmt.Println("listening on 0.0.0.0:8080", static)
+	err := http.ListenAndServe(":8080", r)
 	log.Println(err)
 }
 
@@ -73,7 +65,7 @@ func GetGadgetTypes(w http.ResponseWriter, r *http.Request) {
 }
 
 func AddGadgets(w http.ResponseWriter, r *http.Request) {
-	auth.CheckAuth(w, r, controllers.AddGadgets, "write")
+	//auth.CheckAuth(w, r, controllers.AddGadgets, "write")
 }
 
 func GetMethods(w http.ResponseWriter, r *http.Request) {

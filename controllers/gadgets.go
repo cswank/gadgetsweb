@@ -15,7 +15,12 @@ func GetStatus(w http.ResponseWriter, r *http.Request, u *models.User, vars map[
 	if !ok {
 		return errors.New("you must supply a host arg")
 	}
-	s, err := gogadgets.NewClientSockets(host)
+	cfg := gogadgets.SocketsConfig{
+		Host:   host,
+		Master: false,
+	}
+	s := gogadgets.NewClientSockets(cfg)
+	err := s.Connect()
 	if err != nil {
 		return err
 	}
@@ -34,7 +39,12 @@ func SendCommand(w http.ResponseWriter, r *http.Request, u *models.User, vars ma
 	if !ok {
 		return errors.New("you must supply a host arg")
 	}
-	s, err := gogadgets.NewClientSockets(host)
+	cfg := gogadgets.SocketsConfig{
+		Host:   host,
+		Master: false,
+	}
+	s := gogadgets.NewClientSockets(cfg)
+	err := s.Connect()
 	if err != nil {
 		return err
 	}
@@ -72,25 +82,26 @@ func GetGadgetTypes(w http.ResponseWriter, r *http.Request, u *models.User, vars
 	return nil
 }
 
-func AddGadgets(w http.ResponseWriter, r *http.Request, u *models.User, vars map[string]string) error {
-	d := json.NewDecoder(r.Body)
-	defer r.Body.Close()
-	var cfg gogadgets.Config
-	err := d.Decode(&cfg)
-	if err != nil {
-		return err
-	}
-	s, err := gogadgets.NewClientSockets(cfg.Host)
-	if err != nil {
-		return err
-	}
-	time.Sleep(200 * time.Millisecond)
-	defer s.Close()
-	cfg.Host = "localhost"
-	msg := gogadgets.Message{
-		Config: cfg,
-	}
-	s.SendMessage(msg)
-	time.Sleep(400 * time.Millisecond)
-	return nil
-}
+// func AddGadgets(w http.ResponseWriter, r *http.Request, u *models.User, vars map[string]string) error {
+// 	d := json.NewDecoder(r.Body)
+// 	defer r.Body.Close()
+// 	var cfg gogadgets.Config
+// 	err := d.Decode(&cfg)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	s := gogadgets.NewClientSockets(cfg)
+// 	err := s.Connect()
+// 	if err != nil {
+// 		return err
+// 	}
+// 	time.Sleep(200 * time.Millisecond)
+// 	defer s.Close()
+// 	cfg.Host = "localhost"
+// 	msg := gogadgets.Message{
+// 		Config: cfg,
+// 	}
+// 	s.SendMessage(msg)
+// 	time.Sleep(400 * time.Millisecond)
+// 	return nil
+// }

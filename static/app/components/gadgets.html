@@ -6,13 +6,11 @@
         <li class="devices" ng-repeat="(device, data) in devices">
           <a>{{device}}</a>
           <span ng-if="data.info.direction != 'output'">
-            <a class="device-value">{{data.value.value | ifnumber}}
+            <a class="device-value">{{data.value.value | ifnumber}}</a>
           </span>
           <span ng-if="data.info.direction == 'output'">
-            <toggle-switch device="data"><toggle-switch>
-                <!-- <button class="device-value" -->
-                <!--     ng-mousedown="getArguments(data)" -->
-                <!--     ng-mouseup="toggle(data)">{{data.value.value}}</button> -->
+            <toggle-switch device="data"></toggle-switch>
+            <a class="device-value">{{data.value.output}}</a>
           </span>
         </li>
       </ul>
