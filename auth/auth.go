@@ -3,7 +3,6 @@ package auth
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -31,6 +30,7 @@ func CheckAuth(w http.ResponseWriter, r *http.Request, ctrl controller, permissi
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	} else {
+		log.Println(err)
 		http.Error(w, "Not Authorized", http.StatusUnauthorized)
 	}
 }
@@ -60,20 +60,15 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 
 func Login(w http.ResponseWriter, r *http.Request) {
 	user := &models.User{}
-	body, err := ioutil.ReadAll(r.Body)
+	dec := json.NewDecoder(r.Body)
+	err := dec.Decode(user)
 	if err != nil {
 		http.Error(w, "bad request 1", http.StatusBadRequest)
 		return
 	}
-	err = json.Unmarshal(body, user)
-	if err != nil {
-
-		http.Error(w, "bad request 2", http.StatusBadRequest)
-		return
-	}
 	goodPassword, err := user.CheckPassword()
 	if !goodPassword {
-		http.Error(w, "bad request 3", http.StatusBadRequest)
+		http.Error(w, "bad request 2", http.StatusBadRequest)
 		return
 	}
 	value := map[string]string{
