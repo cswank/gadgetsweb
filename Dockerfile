@@ -6,11 +6,10 @@ RUN apt-get update &&\
 
 ADD . /opt/gadgets/src/github.com/cswank/gadgetsweb
 
-RUN GOPATH=/opt/gadgets go get github.com/vaughan0/go-zmq
+RUN GOPATH=/opt/gadgets go get github.com/tools/godep
 
 RUN cd /opt/gadgets/src/github.com/cswank/gadgetsweb &&\
     export GOPATH=/opt/gadgets &&\
-    go get &&\ 
-    go install
+    $GOPATH/bin/godep go install
 
 CMD /opt/gadgets/bin/gadgetsweb
